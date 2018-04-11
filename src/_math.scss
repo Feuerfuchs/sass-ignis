@@ -85,7 +85,7 @@ $ig-math-taylor-iters: 10 !default;
 ///
 @function rad($angle) {
     $unit:  unit($angle);
-    $angle: strip-unit($angle);
+    $angle: ig-strip-unit($angle);
     
     @if $unit == deg {
         $angle: $angle / 180 * pi();

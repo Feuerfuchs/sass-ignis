@@ -116,7 +116,7 @@ $ig-bem-context-id: 'bem' !default;
         $selector: selector-nest(&, $selector);
 
         // BUGFIX
-        $selector: selector-nest-fix($selector);
+        $selector: ig-selector-nest-fix($selector);
     }
 
     $ig-bem-blocks: append($ig-bem-blocks, $name + '_' + $type) !global;
@@ -334,7 +334,7 @@ $ig-bem-context-id: 'bem' !default;
         $selector: selector-nest(&, selector-append($parent-selector, $ig-bem-element-separator + $name));
 
         // BUGFIX
-        $selector: selector-nest-fix($selector);
+        $selector: ig-selector-nest-fix($selector);
     }
     @else {
         $parent-selector: map-get(nth($parent-context, 2), 'selector');
@@ -354,7 +354,7 @@ $ig-bem-context-id: 'bem' !default;
             }
 
             // BUGFIX
-            $selector: selector-nest-fix($selector);
+            $selector: ig-selector-nest-fix($selector);
         }
     }
 
@@ -597,7 +597,7 @@ $ig-bem-context-id: 'bem' !default;
     }
 
     // BUGFIX
-    $selector: selector-nest-fix($selector);
+    $selector: ig-selector-nest-fix($selector);
 
     @include ig-context-push($ig-bem-context-id, 'theme', ( 'selector': $selector ));
     @at-root #{$selector} {

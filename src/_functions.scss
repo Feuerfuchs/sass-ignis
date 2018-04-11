@@ -18,11 +18,11 @@
 ///
 /// @return {string} A string with all instances of $search replaced with $replace
 ///
-@function str-replace($string, $search, $replace) {
+@function ig-str-replace($string, $search, $replace) {
     $index: str-index($string, $search);
   
     @if $index {
-        @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+        @return str-slice($string, 1, $index - 1) + $replace + ig-str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
     }
   
     @return $string;
@@ -37,7 +37,7 @@
 ///
 /// @return {list} A list with new length $end - $start
 ///
-@function list-slice($list, $start: 1, $end: length($list)) {
+@function ig-list-slice($list, $start: 1, $end: length($list)) {
     $result: ();
 
     @for $i from $start through $end {
@@ -57,7 +57,7 @@
 ///
 /// @return {any} Either the value assigned to $key or $default
 ///
-@function map-get-default($map, $key, $default) {
+@function ig-map-get-default($map, $key, $default) {
     @return if(map-has-key($map, $key), map-get($map, $key), $default);
 }
 
@@ -69,7 +69,7 @@
 ///
 /// @return {map} The result of a recursive merge of $map1 and $map2
 ///
-@function map-merge-recursive($map1, $map2) {
+@function ig-map-merge-recursive($map1, $map2) {
     @if type-of($map1) != map or type-of($map2) != map {
         @error 'Two maps expected';
     }
@@ -78,7 +78,7 @@
 
     @each $key, $value in $map2 {
         @if type-of(map-get($result, $key)) == map and type-of($value) == map {
-            $result: map-merge($result, ($key: map-merge-recursive(map-get($result, $key), $value)));
+            $result: map-merge($result, ($key: ig-map-merge-recursive(map-get($result, $key), $value)));
         }
         @else {
             $result: map-merge($result, ($key: $value));
@@ -99,7 +99,7 @@
 ///
 /// @return {selector} Selector without duplicates
 ///
-@function selector-nest-fix($selector) {
+@function ig-selector-nest-fix($selector) {
     $new-selector: ();
 
     @for $a from 1 through length($selector) {
@@ -143,7 +143,7 @@
 ///
 /// @return {number} Unit-less variable
 ///
-@function strip-unit($n) {
+@function ig-strip-unit($n) {
     @return $n / ($n * 0 + 1);
 }
 
@@ -155,7 +155,7 @@
 ///
 /// @return {number} Pixel value converted to rem
 ///
-@function px-to-rem($size, $base: $ig-root-size) {
+@function ig-px-to-rem($size, $base: $ig-root-size) {
     @return $size / $base * 1rem;
 }
 
@@ -168,7 +168,7 @@
 ///
 /// @link http://alienryderflex.com/hsp.html Information about the HSP Color Model
 ///
-@function brightness($color) {
+@function ig-brightness($color) {
     @return ((red($color) * 0.299) + (green($color) * 0.587) + (blue($color) * 0.114));
 }
 

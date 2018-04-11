@@ -1,17 +1,149 @@
-@function easing-gradient($type, $easing, $dir, $start, $stop, $pos-value: null) {
+////
+/// Smoother background gradients.
+///
+/// The default background gradients produced by any browser have a quite harsh transition between
+/// colors. This is especially apparent if you, for example, use a strong fade-out gradient to make
+/// text in front of a background more readable.
+///
+/// The function in this file generates smoother gradients by using an easing function of the user's
+/// choice.
+/// It's essentially a more flexible alternative to the PostCSS plugin "PostCSS Easing Gradients":
+/// https://github.com/larsenwork/postcss-easing-gradients
+///
+/// @group Background gradients
+///
+/// @access public
+////
+
+///
+/// Number of easing steps. The lower the value, the more fine-grained are the steps and the better is
+/// the quality. However, a value of 0.1 is perfectly sufficient and I wouldn't recommend changing it.
+///
+/// @type number
+///
+$ig-easing-gradient-precision: 0.1 !default;
+
+/// 
+/// Generate a new easing background gradient.
+/// This function is intended to be as similar as possible to CSS' built-in linear-gradient and radial-gradient,
+/// without losing on flexibility. The only major drawback of this function is that only two colors can be used.
+///
+/// @param {string}       $type                - Either 'linear' or 'radial', which means the gradient will be either a linear-gradient or a radial-gradient.
+/// @param {string}       $easing              - Easing function to use. Can be one of these: 'in-quad', 'out-quad', 'in-out-quad', 'in-cubic', 'out-cubic', 'in-out-cubic', 'in-sine', 'out-sine', 'in-out-sine'
+/// @param {string}       $dir                 - The direction of the gradient. Depending on $type, this value must be a valid direction for linear-gradient or radial-gradient.
+/// @param {color | list} $start               - The start color. You may change the start position (default: 0) to another value by passing a list instead, with the first item being the color and the second item being the position.
+/// @param {color | list} $stop                - The stop color. You may change the stop position (default: 100%) to another value by passing a list instead, with the first item being the color and the second item being the position.
+/// @param {string}       $pos-template [null] - The template string for the position value of each step, where each instance of a certain substring (can't note it here because it breaks SassDoc, so see example below) is replaced with the percentage (between 0 and 1 inclusive) of the intermediate position. This is useful if you want to use complex positions with calc() that can't be automatically interpolated.
+///
+/// @return {string} A linear-gradient or radial-gradient with an alternative transitioning behavior.
+///
+/// @throw If $type is invalid
+///
+/// @example scss - A smoother linear gradient
+///   .background {
+///     background-image: ig-easing-gradient(
+///       linear,
+///       in-out-sine,
+///       to top,
+///       #000,
+///       transparent
+///     );
+///   }
+///   
+///   // Generates:
+///   
+///   .background {
+///     background-image: linear-gradient(
+///       to top,
+///       black                        0%,
+///       rgba(0, 0, 0, 0.975528)     10%,
+///       rgba(0, 0, 0, 0.904508)     20%,
+///       rgba(0, 0, 0, 0.793893)     30%,
+///       rgba(0, 0, 0, 0.654508)     40%,
+///       rgba(0, 0, 0, 0.5)          50%,
+///       rgba(0, 0, 0, 0.345492)     60%,
+///       rgba(0, 0, 0, 0.206107)     70%,
+///       rgba(0, 0, 0, 0.0954915)    80%,
+///       rgba(0, 0, 0, 0.0244717)    90%,
+///       rgba(0, 0, 0, 3.78257e-11) 100%
+///     );
+///   }
+///
+/// @example scss - A smoother radial gradient
+///   .background {
+///     background-image: ig-easing-gradient(
+///       radial,
+///       in-out-sine,
+///       50em 16em at 0 0,
+///       #000,
+///       transparent
+///     );
+///   }
+///   
+///   // Generates:
+///   
+///   .background {
+///     background-image: radial-gradient(
+///       50em 16em at 0 0,
+///       black                        0%,
+///       rgba(0, 0, 0, 0.975528)     10%,
+///       rgba(0, 0, 0, 0.904508)     20%,
+///       rgba(0, 0, 0, 0.793893)     30%,
+///       rgba(0, 0, 0, 0.654508)     40%,
+///       rgba(0, 0, 0, 0.5)          50%,
+///       rgba(0, 0, 0, 0.345492)     60%,
+///       rgba(0, 0, 0, 0.206107)     70%,
+///       rgba(0, 0, 0, 0.0954915)    80%,
+///       rgba(0, 0, 0, 0.0244717)    90%,
+///       rgba(0, 0, 0, 3.78257e-11) 100%
+///     );
+///   }
+///
+/// @example scss - A smoother linear gradient with complex color positions
+///   .background {
+///     background-image: ig-easing-gradient(
+///       linear,
+///       in-out-sine,
+///       to top,
+///       #000,
+///       transparent,
+///       'calc(20% + ${x} * 25em)'
+///     );
+///   }
+///   
+///   // Generates:
+///   
+///   .background {
+///     background-image: linear-gradient(
+///       to top,
+///       black                      calc(20% + 0   * 25em),
+///       rgba(0, 0, 0, 0.975528)    calc(20% + 0.1 * 25em),
+///       rgba(0, 0, 0, 0.904508)    calc(20% + 0.2 * 25em),
+///       rgba(0, 0, 0, 0.793893)    calc(20% + 0.3 * 25em),
+///       rgba(0, 0, 0, 0.654508)    calc(20% + 0.4 * 25em),
+///       rgba(0, 0, 0, 0.5)         calc(20% + 0.5 * 25em),
+///       rgba(0, 0, 0, 0.345492)    calc(20% + 0.6 * 25em),
+///       rgba(0, 0, 0, 0.206107)    calc(20% + 0.7 * 25em),
+///       rgba(0, 0, 0, 0.0954915)   calc(20% + 0.8 * 25em),
+///       rgba(0, 0, 0, 0.0244717)   calc(20% + 0.9 * 25em),
+///       rgba(0, 0, 0, 3.78257e-11) calc(20% + 1   * 25em)
+///     );
+///   }
+///
+@function ig-easing-gradient($type, $easing, $dir, $start, $stop, $pos-template: null) {
     $start-color: #000;
     $start-pos:   0%;
     $stop-color:  #000;
     $stop-pos:    100%;
 
-    @if type-of($start) == 'list' {
+    @if type-of($start) == list {
         $start-color: nth($start, 1);
         $start-pos:   nth($start, 2);
     } @else {
         $start-color: $start;
     }
 
-    @if type-of($stop) == 'list' {
+    @if type-of($stop) == list {
         $stop-color: nth($stop, 1);
         $stop-pos:   nth($stop, 2);
     } @else {
@@ -20,9 +152,9 @@
 
     $distance: $stop-pos - $start-pos;
 
-    @if $pos-value == null {
+    @if $pos-template == null {
         @if unit($start-pos) != unit($distance) {
-            $pos-value: 'calc(#{$start-pos} + ${x} * #{$distance})';
+            $pos-template: 'calc(#{$start-pos} + ${x} * #{$distance})';
         }
     }
 
@@ -36,37 +168,16 @@
         @error 'Invalid gradient type: #{inspect($type)}';
     }
 
+    $easing-func: get-function('ig-ease-' + $easing);
+
     $i: 0;
     @while $i <= 1 {
-        $mix: 0;
-
-        @if $easing == 'in-quad' {
-            $mix: ease-in-quad($i);
-        } @else if $easing == 'out-quad' {
-            $mix: ease-out-quad($i);
-        } @else if $easing == 'in-out-quad' {
-            $mix: ease-in-out-quad($i);
-        } @else if $easing == 'in-cubic' {
-            $mix: ease-in-cubic($i);
-        } @else if $easing == 'out-cubic' {
-            $mix: ease-out-cubic($i);
-        } @else if $easing == 'in-out-cubic' {
-            $mix: ease-in-out-cubic($i);
-        } @else if $easing == 'in-sine' {
-            $mix: ease-in-sine($i);
-        } @else if $easing == 'out-sine' {
-            $mix: ease-out-sine($i);
-        } @else if $easing == 'in-out-sine' {
-            $mix: ease-in-out-sine($i);
-        } @else {
-            @error 'Invalid easing function: #{inspect($easing)}';
-        }
-
+        $mix:   call($easing-func, $i);
         $color: mix($stop-color, $start-color, $mix * 100%);
 
         $pos: $start-pos + $i * $distance;
-        @if $pos-value != null {
-            $pos: str-replace($pos-value, '${x}', $i);
+        @if $pos-template != null {
+            $pos: ig-str-replace($pos-template, '${x}', $i);
         }
 
         $result: $result + ', ' + $color + ' ' + $pos;
@@ -78,46 +189,109 @@
     @return unquote($result);
 }
 
-@function ease-in-quad($t) {
+/// 
+/// A normalized quadratic easing function (in direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-in-quad($t) {
 	@return $t * $t;
 }
 
-@function ease-out-quad($t) {
-	@return 1 - ease-in-quad(1 - $t);
+/// 
+/// A normalized quadratic easing function (out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-out-quad($t) {
+	@return 1 - ig-ease-in-quad(1 - $t);
 }
 
-@function ease-in-out-quad($t) {
+/// 
+/// A normalized quadratic easing function (in-out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-in-out-quad($t) {
     @if t < 0.5 {
-        @return ease-in-quad($t * 2) / 2;
+        @return ig-ease-in-quad($t * 2) / 2;
     }
 
-	@return 1 - ease-in-quad((1 - $t) * 2) / 2;
+	@return 1 - ig-ease-in-quad((1 - $t) * 2) / 2;
 }
 
-@function ease-in-cubic($t) {
+/// 
+/// A normalized cubic easing function (in direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-in-cubic($t) {
 	@return $t * $t * $t;
 }
 
-@function ease-out-cubic($t) {
-	@return 1 - ease-in-cubic(1 - $t);
+/// 
+/// A normalized cubic easing function (out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-out-cubic($t) {
+	@return 1 - ig-ease-in-cubic(1 - $t);
 }
 
-@function ease-in-out-cubic($t) {
+/// 
+/// A normalized cubic easing function (in-out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-in-out-cubic($t) {
     @if t < 0.5 {
-        @return ease-in-cubic($t * 2) / 2;
+        @return ig-ease-in-cubic($t * 2) / 2;
     }
 
-	@return 1 - ease-in-cubic((1 - $t) * 2) / 2;
+	@return 1 - ig-ease-in-cubic((1 - $t) * 2) / 2;
 }
 
-@function ease-in-sine($t) {
+/// 
+/// A normalized sinusoidal easing function (in direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-in-sine($t) {
 	@return -1 * cos($t * (pi() / 2));
 }
 
-@function ease-out-sine($t) {
+/// 
+/// A normalized sinusoidal easing function (out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-out-sine($t) {
 	@return sin($t * (pi() / 2));
 }
 
-@function ease-in-out-sine($t) {
+/// 
+/// A normalized sinusoidal easing function (in-out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-in-out-sine($t) {
 	@return 0.5 * (1 - cos(pi() * $t));
 }

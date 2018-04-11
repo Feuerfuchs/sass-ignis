@@ -1,20 +1,39 @@
 ////
 /// Property trees.
 ///
-/// Property trees allow you to organize variables in a tree structure.
-/// The intended use is to store all your variables at the beginning and
-/// for the rest of the stylesheet you just get them. There is no way
-/// to remove variables.
+/// Property trees allow you to organize properties in a tree structure (internally nested maps).
+/// The intended use is to store all your properties at the beginning and for the rest of the
+/// stylesheet you just get them. There is no way to remove properties.
 ///
 /// @group Property trees
 ///
 /// @access public
 ////
 
-
+///
+/// Default tree name to use if no name is specified.
+///
+/// @type string
+///
 $ig-props-default-tree: 'default' !default;
-$ig-props-list:         ();
 
+///
+/// Character sequence for BEM elements.
+///
+/// @type list
+///
+/// @access private
+///
+$ig-props-list: ();
+
+/// 
+/// Save a new property tree.
+///
+/// @param {map}    $map                           - Map containing properties
+/// @param {string} $tree [$ig-props-default-tree] - ID the map is saved as
+///
+/// @throw If a property name doesn't start with '--'
+///
 @mixin ig-props-set($map, $tree: $ig-props-default-tree) {
     $prop-map: ();
 
@@ -24,7 +43,7 @@ $ig-props-list:         ();
 
     @each $key, $value in $map {
         @if str-slice($key, 1, 2) != '--' {
-            @error "Variable names must start with '--'.";
+            @error "Property names must start with '--'.";
         }
     }
 
@@ -33,6 +52,18 @@ $ig-props-list:         ();
     $ig-props-list: map-merge($ig-props-list, ($tree: $prop-map)) !global;
 }
 
+/// 
+/// Read a value from a property tree.
+///
+/// @param {string | list} $key                              - Key of the property to read. If this is a list of keys, the map will be traversed in that order.
+/// @param {string}        $tree    [$ig-props-default-tree] - ID of the property map to use
+/// @param {any}           $default [null]                   - Default value to return of no match was found. If null, this function will throw an error instead.
+///
+/// @return {any} Value assigned to property or $default
+///
+/// @throw If there is no tree with the given ID
+/// @throw If there was no match for $key and $default is null
+///
 @function ig-props-get($key, $tree: $ig-props-default-tree, $default: null) {
     @if not map-has-key($ig-props-list, $tree) {
         @error "Unknown tree '#{$tree}'.";
@@ -51,7 +82,8 @@ $ig-props-list:         ();
                 @error "'#{$key}' is null.";
             }
         }
-    } @else {
+    }
+    @else {
         $prop-value: map-get($prop-map, $key);
 
         @if $prop-value == null and $default == null {

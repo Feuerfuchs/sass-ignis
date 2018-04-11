@@ -1,11 +1,11 @@
 ////
 /// Context handling.
 ///
-/// Contexts allow you to pass data between mixins and let you enforce
-/// a certain nesting order. It's an essential part for the BEM-related mixins.
+/// Contexts allow you to pass data between mixins and let you enforce a certain nesting order.
+/// It's an essential part for the BEM-related mixins.
 ///
-/// If you want to create a new context, the easiest pattern is to create a new mixin
-/// and wrap the @content between a pair of ig-context-push and ig-context-pop.
+/// If you want to create a new context, the easiest pattern is to create a new mixin and wrap
+/// the @content between a pair of ig-context-push and ig-context-pop.
 /// From within the @content, you can access the context's data with ig-context-get.
 /// To make the compilation fail if a certain nesting order is violated, use
 /// ig-context-assert-stack-must-contain and ig-context-assert-stack-must-not-contain.
@@ -78,7 +78,7 @@ $ig-context-stacks: ();
         $context-stack: ();
     }
     @else {
-        $context-stack: list-slice($context-stack, 1, length($context-stack) - 1);
+        $context-stack: ig-list-slice($context-stack, 1, length($context-stack) - 1);
     }
 
     $ig-context-stacks: map-merge($ig-context-stacks, ($stack-id: $context-stack)) !global;

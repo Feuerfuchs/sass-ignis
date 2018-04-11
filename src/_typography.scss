@@ -1,15 +1,44 @@
-@function ig-typography-scale-font($times, $base, $mult) {
+////
+/// Typography.
+///
+/// @group Typography
+///
+/// @access public
+////
+
+/// 
+/// Adjust a font size to a modular scale, a method to make typography appear more visually appealing.
+///
+/// @link http://alistapart.com/article/more-meaningful-typography An article about modular scales by Tim Brown
+///
+/// @param {number} $times - Number of iterations. If positive, $base will be multiplied with $ratio. If negative, $base will be divided by $ratio.
+/// @param {number} $base  - Base font size
+/// @param {number} $ratio - Ratio
+///
+/// @return {number} Adjusted font size
+///
+@function ig-typography-scale-font($times, $base, $ratio) {
     @if $times > 0 {
         @for $i from 1 through $times {
-            $base: $base * $mult;
+            $base: $base * $ratio;
+        }
+    }
+    @else if $times < 0 {
+        @for $i from 1 through -$times {
+            $base: $base / $ratio;
         }
     }
 
     @return $base;
 }
 
-@mixin ig-typography-scale-font($times, $base, $mult) {
-    $size: ig-typography-scale-font($times, $base, $mult);
+/// 
+/// Adjust a font size to a modular scale and immediately assign it to the font-size property.
+///
+/// @see {mixin} ig-typography-scale-font
+///
+@mixin ig-typography-scale-font($times, $base, $ratio) {
+    $size: ig-typography-scale-font($times, $base, $ratio);
 
     font-size: $size;
 }
