@@ -4,7 +4,7 @@
 	"private": true,
 	"author": "Feuerfuchs <me@feuerfuchs.eu> (feuerfuchs.eu)",
 	"license": "MIT",
-	"description": "A mixin-based framework that makes it easier to work with BEMIT, organize variables and offers other useful features",
+	"description": "A mixin-based framework that makes it easier to work with BEMIT, organize variables and offers other useful features.",
 	"devDependencies": {
 		"sass-lint": "^1.12.1",
 		"sassdoc": "^2.5.0"
