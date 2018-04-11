@@ -1,0 +1,63 @@
+////
+/// Property trees.
+///
+/// Property trees allow you to organize variables in a tree structure.
+/// The intended use is to store all your variables at the beginning and
+/// for the rest of the stylesheet you just get them. There is no way
+/// to remove variables.
+///
+/// @group Property trees
+///
+/// @access public
+////
+
+
+$ig-props-default-tree: 'default' !default;
+$ig-props-list:         ();
+
+@mixin ig-props-set($map, $tree: $ig-props-default-tree) {
+    $prop-map: ();
+
+    @if map-has-key($ig-props-list, $tree) {
+        $prop-map: map-get($ig-props-list, $tree);
+    }
+
+    @each $key, $value in $map {
+        @if str-slice($key, 1, 2) != '--' {
+            @error "Variable names must start with '--'.";
+        }
+    }
+
+    $prop-map: map-merge($prop-map, $map);
+
+    $ig-props-list: map-merge($ig-props-list, ($tree: $prop-map)) !global;
+}
+
+@function ig-props-get($key, $tree: $ig-props-default-tree, $default: null) {
+    @if not map-has-key($ig-props-list, $tree) {
+        @error "Unknown tree '#{$tree}'.";
+    }
+
+    $prop-map:   map-get($ig-props-list, $tree);
+    $prop-value: null;
+
+    @if type-of($key) == list {
+        $prop-value: $prop-map;
+
+        @each $k in $key {
+            $prop-value: map-get($prop-value, $k);
+
+            @if $prop-value == null and $default == null {
+                @error "'#{$key}' is null.";
+            }
+        }
+    } @else {
+        $prop-value: map-get($prop-map, $key);
+
+        @if $prop-value == null and $default == null {
+            @error "'#{$key}' is null.";
+        }
+    }
+
+    @return if($prop-value == null, $default, $prop-value);
+}

@@ -1,0 +1,60 @@
+{
+    "version": "2.0.0",
+    "runner":  "terminal",
+    "command": "npm",
+    "tasks": [
+        {
+            "label": "watch",
+            "command": "npm",
+            "args": [
+                "run",
+                "watch"
+            ],
+            "type": "shell",
+            "isBackground": true,
+            "problemMatcher": []
+        },
+        {
+            "label": "make",
+            "command": "npm",
+            "args": [
+                "run",
+                "make"
+            ],
+            "type": "shell",
+            "isBackground": false,
+            "problemMatcher": []
+        },
+        {
+            "label": "lint",
+            "command": "npm",
+            "args": [
+                "run",
+                "livelint"
+            ],
+            "type": "shell",
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "owner": "stylelint",
+                    "fileLocation": "absolute",
+                    "pattern": [
+                        {
+                            "regexp": "^(info|warning|error): (.*) \\((\\d+), (\\d+)\\):\\s+(.*)$",
+                            "severity": 1,
+                            "file": 2,
+                            "line": 3,
+                            "column": 4,
+                            "message": 5
+                        }
+                    ],
+                    "background": {
+                        "activeOnStart": false,
+                        "beginsPattern": "^BEGIN LINT:SASS",
+                        "endsPattern": "^END LINT:SASS"
+                    }
+                }
+            ]
+        }
+    ]
+}

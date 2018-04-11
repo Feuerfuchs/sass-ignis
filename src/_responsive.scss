@@ -1,0 +1,159 @@
+////
+/// Responsive properties.
+///
+/// The mixins and functions in this file allow you to scale any px- or rem-based value depending on
+/// the available viewport width. One popular use case is the dynamic scaling of fonts.
+///
+/// The code in this file is based on an article by Niklas Postulart:
+/// http://niklaspostulart.de/2015/10/sass-responsive-type-mixin
+/// 
+/// The following changes were made:
+/// - Support any property passed by the user, not just font-size
+/// - Slightly different error handling
+/// - Make the media queries for viewport > max-width and viewport < min-width optional so the resize rate
+///   between different media queries can be altered without generating useless code
+/// - Provide a variant of the mixin which integrates include-media for media queries
+///
+/// @group Responsive
+///
+/// @access public
+////
+
+/// 
+/// Scale a property uniformly from $min-value to $max-value depending on the viewport width.
+/// If the viewport is wider than $max-width, the property will have the value $max-value.
+/// Conversely, if the viewport is narrower than $min-width, the property will have the value $min-value.
+///
+/// @param {string} $prop                           - Property to scale
+/// @param {number} $min-value                      - Minimum value
+/// @param {number} $max-value                      - Maximum value
+/// @param {number} $min-width                      - Minimum viewport width
+/// @param {number} $max-width                      - Maximum viewport width
+/// @param {number} $root-size      [$ig-root-size] - The reference root font size in px used for the px -> rem conversion
+/// @param {bool}   $include-gt-max [true]          - If false, the media query for viewport > $max-width will not be generated
+/// @param {bool}   $include-lt-min [true]          - If false, the media query for viewport < $min-width will not be generated
+///
+/// @example scss - Responsive font size
+///   .something {
+///     @include ig-responsive-property(font-size, 1rem, 2.5rem, 320px, 720px);
+///   }
+///   
+///   // Generates:
+///   
+///   @media (min-width: 320px) and (max-width: 720px) {
+///     .something {
+///       font-size: calc(1rem + 1.5 * ((100vw - 20rem) / 25));
+///     }
+///   }
+///   
+///   @media (max-width: 320px) {
+///     .something {
+///       font-size: 1rem;
+///     }
+///   }
+///   
+///   @media (min-width: 720px) {
+///     .something {
+///       font-size: 2.5rem;
+///     }
+///   }
+///
+@mixin ig-responsive-property($prop, $min-value, $max-value, $min-width, $max-width, $root-size: $ig-root-size, $include-gt-max: true, $include-lt-min: true) {
+    $calc: ig-responsive-generate-calc($min-value, $max-value, $min-width, $max-width, $root-size);
+
+    @media (min-width: $min-width) and (max-width: $max-width) {
+        #{$prop}: $calc;
+    }
+
+    @if $include-lt-min {
+        @media (max-width: $min-width) {
+            #{$prop}: $min-value;
+        }
+    }
+
+    @if $include-gt-max {
+        @media (min-width: $max-width) {
+            #{$prop}: $max-value;
+        }
+    }
+}
+
+/// 
+/// Version of ig-responsive-property that uses include-media for media queries.
+///
+/// @param {string} $prop                           - Property to scale
+/// @param {number} $min-value                      - Minimum value
+/// @param {number} $max-value                      - Maximum value
+/// @param {string} $min-bp                         - Minimum viewport breakpoint (-> include-media)
+/// @param {string} $max-bp                         - Maximum viewport breakpoint (-> include-media)
+/// @param {number} $root-size      [$ig-root-size] - The reference root font size in px used for the px -> rem conversion
+/// @param {bool}   $include-gt-max [true]          - If false, the media query for viewport > $max-width will not be generated
+/// @param {bool}   $include-lt-min [true]          - If false, the media query for viewport < $min-width will not be generated
+///
+/// @see {mixin} ig-responsive-property
+/// 
+@mixin ig-responsive-property-im($prop, $min-value, $max-value, $min-bp, $max-bp, $root-size: $ig-root-size, $include-gt-max: true, $include-lt-min: true) {
+    $min-width: if(map-has-key($breakpoints, $min-bp), map-get($breakpoints, $min-bp), $min-bp);
+    $max-width: if(map-has-key($breakpoints, $max-bp), map-get($breakpoints, $max-bp), $max-bp);
+
+    $calc: ig-responsive-generate-calc($min-value, $max-value, $min-width, $max-width, $root-size);
+
+    @include media('>#{$min-width}', '<=#{$max-width}') {
+        #{$prop}: $calc;
+    }
+
+    @if $include-lt-min {
+        @include media('<=#{$min-width}') {
+            #{$prop}: $min-value;
+        }
+    }
+
+    @if $include-gt-max {
+        @include media('>#{$max-width}') {
+            #{$prop}: $max-value;
+        }
+    }
+}
+
+/// 
+/// Generate the calc() function that uniformly scales a value from $min-value to $max-value depending
+/// on the viewport width.
+///
+/// @param {number} $min-value                 - Minimum value
+/// @param {number} $max-value                 - Maximum value
+/// @param {number} $min-width                 - Minimum viewport width
+/// @param {number} $max-width                 - Maximum viewport width
+/// @param {number} $root-size [$ig-root-size] - The reference root font size in px used for the px -> rem conversion
+///
+/// @access private
+///
+@function ig-responsive-generate-calc($min-value, $max-value, $min-width, $max-width, $root-size: $ig-root-size) {
+    $value-unit:     unit($min-value);
+    $max-value-unit: unit($max-value);
+    $width-unit:     unit($min-width);
+    $max-width-unit: unit($max-width);
+
+    @if ($value-unit != $max-value-unit) or ($width-unit != $max-width-unit) {
+        @error 'Units of $min-value and $max-value, $min-width and $max-width must match';
+    }
+
+    @if ($value-unit == rem) and ($width-unit == px) {
+        $min-width:  px-to-rem($min-width, $root-size);
+        $max-width:  px-to-rem($max-width, $root-size);
+        $width-unit: rem;
+    }
+    @else if ($value-unit == px) and ($width-unit == rem) {
+        $min-value:  px-to-rem($min-value, $root-size);
+        $max-value:  px-to-rem($max-value, $root-size);
+        $value-unit: rem;
+    }
+
+    @if $value-unit != $width-unit {
+        @error 'This combination of units is not supported';
+    }
+
+    $value-diff:  strip-unit($max-value)  - strip-unit($min-value);
+    $width-diff: strip-unit($max-width) - strip-unit($min-width);
+
+    @return calc(#{$min-value} + #{$value-diff} * ((100vw - #{$min-width}) / #{$width-diff}));
+}

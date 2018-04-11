@@ -1,0 +1,157 @@
+////
+/// Basic mathematical functions.
+///
+/// @group Math functions
+///
+/// @access public
+////
+
+///
+/// Number of iterations used to approximate sine and cosine functions.
+///
+/// @type string
+///
+$ig-math-taylor-iters: 10 !default;
+
+/// 
+/// Perform exponentiation. Only integer exponents are supported.
+///
+/// @param {number} $base
+/// @param {number} $exp
+///
+/// @return {number}
+///
+/// @example scss - Exponentiation with a positive exponent
+///   $result: pow(3, 2); // The value of $result is 3^2 = 9
+///
+/// @example scss - Exponentiation with a negative exponent
+///   $result: pow(2, -3); // The value of $result is 1/(2^3) = 1/8
+///
+@function pow($base, $exp) {
+    $value: 1;
+
+    @if $exp > 0 {
+        @for $i from 1 through $exp {
+            $value: $value * $base;
+        }
+    }
+    @else if $exp < 0 {
+        @for $i from 1 through -$exp {
+            $value: $value / $base;
+        }
+    }
+
+    @return $value;
+}
+
+/// 
+/// Calculates the factorial of a given number.
+///
+/// @param {number} $number
+///
+/// @return {number}
+///
+/// @example scss
+///   $result: fact(4); // The value of $result is 1 * 2 * 3 * 4 = 24
+///
+@function fact($number) {
+    $value: 1;
+
+    @if $number > 0 {
+        @for $i from 1 through $number {
+            $value: $value * $i;
+        }
+    }
+
+    @return $value;
+}
+
+///
+/// Return the mathematical constant π (pi).
+///
+@function pi() {
+    @return 3.14159265359;
+}
+
+///
+/// Convert an angle from degrees to radians.
+///
+/// @param {number} $angle
+///
+/// @return {number}
+///
+/// @example scss
+///   $result: rad(45deg); // The value of $result is π/4 = 0.785398163...
+///
+@function rad($angle) {
+    $unit:  unit($angle);
+    $angle: strip-unit($angle);
+    
+    @if $unit == deg {
+        $angle: $angle / 180 * pi();
+    }
+
+    @return $angle;
+}
+
+///
+/// Get the sine value for a specific angle.
+///
+/// The sine function is approximated using a Taylor series with $ig-math-taylor-iters iterations:
+///   sum{n from 0 to $ig-math-taylor-iters}[(-1)^n * (θ^(2n+1) / (2n+1)!)] | θ = input angle
+///
+/// @param {number} $angle - Angle in degrees or radians
+///
+/// @return {number}
+///
+/// @example scss
+///   $result: sin(90deg); // The value of $result is 1
+///
+@function sin($angle) {
+    $sin:   0;
+    $angle: rad($angle);
+    
+    @for $i from 0 through $ig-math-taylor-iters {
+        $sin: $sin + pow(-1, $i) * pow($angle, (2 * $i + 1)) / fact(2 * $i + 1);
+    }
+
+    @return $sin;
+}
+
+///
+/// Get the cosine value for a specific angle.
+///
+/// The cosine function is approximated using a Taylor series with $ig-math-taylor-iters iterations:
+///   sum{n from 0 to $ig-math-taylor-iters}[(-1)^n * (θ^(2n) / (2n)!)] | θ = input angle
+///
+/// @param {number} $angle - Angle in degrees or radians
+///
+/// @return {number}
+///
+/// @example scss
+///   $result: cos(180deg); // The value of $result is -1
+///
+@function cos($angle) {
+    $cos:   0;
+    $angle: rad($angle);
+    
+    @for $i from 0 through $ig-math-taylor-iters {
+        $cos: $cos + pow(-1, $i) * pow($angle, 2 * $i) / fact(2 * $i);
+    }
+
+    @return $cos;
+}
+
+///
+/// Get the tangents value for a specific angle.
+///
+/// @param {number} $angle - Angle in degrees or radians
+///
+/// @return {number}
+///
+/// @example scss
+///   $result: tan(45deg); // The value of $result is π/4 = 0.785398163...
+///
+@function tan($angle) {
+    @return sin($angle) / cos($angle);
+}

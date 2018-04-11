@@ -1,0 +1,206 @@
+////
+/// Context handling.
+///
+/// Contexts allow you to pass data between mixins and let you enforce
+/// a certain nesting order. It's an essential part for the BEM-related mixins.
+///
+/// If you want to create a new context, the easiest pattern is to create a new mixin
+/// and wrap the @content between a pair of ig-context-push and ig-context-pop.
+/// From within the @content, you can access the context's data with ig-context-get.
+/// To make the compilation fail if a certain nesting order is violated, use
+/// ig-context-assert-stack-must-contain and ig-context-assert-stack-must-not-contain.
+///
+/// @group Contexts
+///
+/// @access public
+////
+
+///
+/// Map of all context stacks.
+///
+/// @type map
+///
+/// @access private
+///
+$ig-context-stacks: ();
+
+/// 
+/// Create a new context stack.
+///
+/// @param {string} $stack-id - ID of context stack
+///
+/// @throw If context stack already exists
+///
+@mixin ig-context-create-stack($stack-id) {
+    @if map-has-key($ig-context-stacks, $stack-id) {
+        @error "Context stack '#{inspect($stack-id)}' already exists.";
+    }
+
+    $ig-context-stacks: map-merge($ig-context-stacks, ($stack-id: ())) !global;
+}
+
+/// 
+/// Push a new context to a context stack.
+///
+/// @param {string} $stack-id  - ID of context stack to use
+/// @param {string} $id        - ID of new context
+/// @param {any}    $data [()] - Data that belongs to the context
+///
+@mixin ig-context-push($stack-id, $id, $data: ()) {
+    @if not map-has-key($ig-context-stacks, $stack-id) {
+        @error "Context stack '#{inspect($stack-id)}' does not exist.";
+    }
+
+    $context-stack: map-get($ig-context-stacks, $stack-id);
+    $context-stack: append($context-stack, $id $data);
+    $ig-context-stacks: map-merge($ig-context-stacks, ($stack-id: $context-stack)) !global;
+}
+
+/// 
+/// Pop the latest context from a context stack.
+///
+/// @param {string} $stack-id - ID of context stack to use
+///
+/// @throw If context stack doesn't exist
+///
+@mixin ig-context-pop($stack-id) {
+    @if not map-has-key($ig-context-stacks, $stack-id) {
+        @error "Context stack '#{inspect($stack-id)}' does not exist.";
+    }
+
+    $context-stack: map-get($ig-context-stacks, $stack-id);
+
+    @if length($context-stack) == 0 {
+        @error "Context stack '#{inspect($stack-id)}' is already empty.";
+    }
+
+    @if length($context-stack) == 1 {
+        $context-stack: ();
+    }
+    @else {
+        $context-stack: list-slice($context-stack, 1, length($context-stack) - 1);
+    }
+
+    $ig-context-stacks: map-merge($ig-context-stacks, ($stack-id: $context-stack)) !global;
+}
+
+/// 
+/// Assert that a context stack must contain one of the given context IDs.
+///
+/// @param {string} $stack-id                - ID of context stack to use
+/// @param {list}   $context-ids             - Context IDs
+/// @param {bool}   $check-head-only [false] - If false, all items will be checked. If true, only the head will be checked.
+///
+/// @throw If assertion fails
+///
+@mixin ig-context-assert-stack-must-contain($stack-id, $context-ids, $check-head-only: false) {
+    @if not ig-context-stack-contains($stack-id, $context-ids, $check-head-only) {
+        @error "Must be called inside of contexts '#{inspect($context-ids)}'.";
+    }
+}
+
+/// 
+/// Assert that a context stack must not contain any of the given context IDs.
+///
+/// @param {string} $stack-id                - ID of context stack to use
+/// @param {list}   $context-ids             - Context IDs
+/// @param {bool}   $check-head-only [false] - If false, all items will be checked. If true, only the head will be checked.
+///
+/// @throw If assertion fails
+///
+@mixin ig-context-assert-stack-must-not-contain($stack-id, $context-ids, $check-head-only: false) {
+    @if ig-context-stack-contains($stack-id, $context-ids, $check-head-only) {
+        @error "Must not be called inside of contexts '#{inspect($context-ids)}'.";
+    }
+}
+
+/// 
+/// Check if a context stack contains one of the given context IDs.
+///
+/// @param {string} $stack-id                - ID of context stack to use
+/// @param {list}   $context-ids             - Context IDs
+/// @param {bool}   $check-head-only [false] - If false, all items will be checked. If true, only the head will be checked.
+///
+/// @return {bool} true if the context stack contains one of the context IDs, otherwise false
+///
+/// @throw If context stack doesn't exist
+///
+@function ig-context-stack-contains($stack-id, $context-ids, $check-head-only: false) {
+    @if not map-has-key($ig-context-stacks, $stack-id) {
+        @error "Context stack '#{inspect($stack-id)}' does not exist.";
+    }
+
+    $context-stack: map-get($ig-context-stacks, $stack-id);
+
+    @if length($context-stack) == 0 {
+        @return false;
+    }
+
+    $end-idx: if($check-head-only, length($context-stack), 1);
+
+    @for $i from length($context-stack) through $end-idx {
+        $context: nth($context-stack, $i);
+
+        @each $chk-context in $context-ids {
+            @if nth($context, 1) == $chk-context {
+                @return true;
+            }
+        }
+    }
+
+    @return false;
+}
+
+/// 
+/// Get a specific context from the stack.
+///
+/// @param {string}                 $stack-id      - ID of context stack to use
+/// @param {number | string | list} $type-or-level - If this is a number, the nth context from the head will be returned. If it is a string, the first context with a matching ID will be returned. If it is a list, the first context that matches one of the IDs in the list will be returned.
+///
+/// @return {list} An empty list if no matching context was found, otherwise a list with two items: 1. context ID, 2. context data.
+///
+/// @throw If context stack doesn't exist
+///
+@function ig-context-get($stack-id, $type-or-level: null) {
+    @if not map-has-key($ig-context-stacks, $stack-id) {
+        @error "Context stack '#{inspect($stack-id)}' does not exist.";
+    }
+
+    $context-stack: map-get($ig-context-stacks, $stack-id);
+
+    @if length($context-stack) == 0 {
+        @return ( );
+    }
+
+    @if type-of($type-or-level) == number {
+        @if $type-or-level == 0 {
+            $type-or-level: length($context-stack);
+        }
+
+        $context: nth($context-stack, -$type-or-level);
+
+        @return nth($context, 1);
+    }
+    @else {
+        @for $i from -1 through -(length($context-stack)) {
+            $context: nth($context-stack, $i);
+                    
+            @if type-of($type-or-level) == list {
+                @for $j from 1 through length($type-or-level) {
+                    $ctx: nth($type-or-level, $j);
+
+                    @if nth($context, 1) == $ctx {
+                        @return $context;
+                    }
+                }
+            }
+            @else {
+                @if nth($context, 1) == $type-or-level {
+                    @return $context;
+                }
+            }
+        }
+    }
+
+    @return ( );
+}

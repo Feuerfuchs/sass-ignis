@@ -1,0 +1,27 @@
+options:
+  merge-default-rules: true
+  formatter: visualstudio
+rules:
+  indentation: 0
+  property-sort-order:
+    - 1
+    - order: recess
+  leading-zero:
+    - 1
+    - include: true
+  space-around-operator: 0
+  no-trailing-whitespace: 0
+  mixins-before-declarations:
+    - 1
+    - exclude: 
+      - ig-bem-block
+      - ig-bem-object
+      - ig-bem-component
+      - ig-bem-utility
+      - ig-bem-element
+      - ig-bem-modifier
+      - ig-bem-theme
+  no-color-literals: 0
+files:
+  ignore:
+    - src/css/ignis/**/*.scss

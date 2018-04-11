@@ -1,0 +1,182 @@
+////
+/// Various functions.
+///
+/// This file contains various and mostly unrelated functions. Some of which
+/// are used in this framework, while others are just there and may be used.
+///
+/// @group Functions
+///
+/// @access public
+////
+
+/// 
+/// Replace a substring with a new string.
+///
+/// @param {string} $string  - String to search
+/// @param {string} $search  - Substring that gets replaced
+/// @param {string} $replace - String that replaces $search
+///
+/// @return {string} A string with all instances of $search replaced with $replace
+///
+@function str-replace($string, $search, $replace) {
+    $index: str-index($string, $search);
+  
+    @if $index {
+        @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+    }
+  
+    @return $string;
+}
+
+/// 
+/// Extract a subset from the given list.
+///
+/// @param {list}   $list
+/// @param {number} $start [1]             - Indices before this value will be discarded
+/// @param {number} $end   [length($list)] - Indices starting after this value will be discarded
+///
+/// @return {list} A list with new length $end - $start
+///
+@function list-slice($list, $start: 1, $end: length($list)) {
+    $result: ();
+
+    @for $i from $start through $end {
+        $result: append($result, nth($list, $i), list-separator($list));
+    }
+
+    @return $result;
+}
+
+/// 
+/// Try to get the value for the given key from the given map. If it doesn't contain that key,
+/// return the provided default value instead.
+///
+/// @param {map}    $map
+/// @param {string} $key
+/// @param {any}    $default
+///
+/// @return {any} Either the value assigned to $key or $default
+///
+@function map-get-default($map, $key, $default) {
+    @return if(map-has-key($map, $key), map-get($map, $key), $default);
+}
+
+/// 
+/// Merge two maps recursively.
+///
+/// @param {map} $map1
+/// @param {map} $map2
+///
+/// @return {map} The result of a recursive merge of $map1 and $map2
+///
+@function map-merge-recursive($map1, $map2) {
+    @if type-of($map1) != map or type-of($map2) != map {
+        @error 'Two maps expected';
+    }
+
+    $result: $map1;
+
+    @each $key, $value in $map2 {
+        @if type-of(map-get($result, $key)) == map and type-of($value) == map {
+            $result: map-merge($result, ($key: map-merge-recursive(map-get($result, $key), $value)));
+        }
+        @else {
+            $result: map-merge($result, ($key: $value));
+        }
+    }
+
+    @return $result;
+}
+
+/// 
+/// A bugfix for the built-in selector-nest function.
+///
+/// For some reason, SASS will duplicate parts of the selector which will result in
+/// excessively long selectors and bad compilation performance. This fix removes
+/// all duplicate selectors and should be called right after selector-nest.
+///
+/// @param {selector} $selector - Selector modified with selector-nest
+///
+/// @return {selector} Selector without duplicates
+///
+@function selector-nest-fix($selector) {
+    $new-selector: ();
+
+    @for $a from 1 through length($selector) {
+        $drop: false;
+        $sel1: nth($selector, $a);
+
+        @if length($new-selector) != 0 {
+            @for $b from 1 through length($new-selector) {
+                @if $drop == false {
+                    $sel2: nth($selector, $b);
+
+                    @if length($sel1) == length($sel2) {
+                        $same: true;
+
+                        @for $i from 1 through length($sel1) {
+                            @if nth($sel1, $i) != nth($sel2, $i) {
+                                $same: false;
+                            }
+                        }
+
+                        @if $same {
+                            $drop: true;
+                        }
+                    }
+                }
+            }
+        }
+
+        @if $drop == false {
+            $new-selector: append($new-selector, $sel1, comma);
+        }
+    }
+
+    @return $new-selector;
+}
+
+/// 
+/// Remove the unit from any variable.
+///
+/// @param {any} $n
+///
+/// @return {number} Unit-less variable
+///
+@function strip-unit($n) {
+    @return $n / ($n * 0 + 1);
+}
+
+/// 
+/// Convert a pixel value to a rem value.
+///
+/// @param {number} $size                 - Pixel value to convert
+/// @param {number} $base [$ig-root-size] - Reference base font size used for conversion
+///
+/// @return {number} Pixel value converted to rem
+///
+@function px-to-rem($size, $base: $ig-root-size) {
+    @return $size / $base * 1rem;
+}
+
+/// 
+/// Calculate the brightness of a color according to the HSP Color Model.
+///
+/// @param {color} $color
+///
+/// @return {number} Brightness between 0 and 1
+///
+/// @link http://alienryderflex.com/hsp.html Information about the HSP Color Model
+///
+@function brightness($color) {
+    @return ((red($color) * 0.299) + (green($color) * 0.587) + (blue($color) * 0.114));
+}
+
+/// 
+/// A mixin with the sole purpose of letting you use temporary variables without polluting the global namespace.
+///
+/// @content
+///
+@mixin execute {
+    @content;
+}

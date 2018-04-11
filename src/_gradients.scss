@@ -1,0 +1,123 @@
+@function easing-gradient($type, $easing, $dir, $start, $stop, $pos-value: null) {
+    $start-color: #000;
+    $start-pos:   0%;
+    $stop-color:  #000;
+    $stop-pos:    100%;
+
+    @if type-of($start) == 'list' {
+        $start-color: nth($start, 1);
+        $start-pos:   nth($start, 2);
+    } @else {
+        $start-color: $start;
+    }
+
+    @if type-of($stop) == 'list' {
+        $stop-color: nth($stop, 1);
+        $stop-pos:   nth($stop, 2);
+    } @else {
+        $stop-color: $stop;
+    }
+
+    $distance: $stop-pos - $start-pos;
+
+    @if $pos-value == null {
+        @if unit($start-pos) != unit($distance) {
+            $pos-value: 'calc(#{$start-pos} + ${x} * #{$distance})';
+        }
+    }
+
+    $result: '';
+
+    @if $type == 'linear' {    
+        $result: 'linear-gradient(#{$dir}';
+    } @else if $type == 'radial' {
+        $result: 'radial-gradient(#{$dir}';
+    } @else {
+        @error 'Invalid gradient type: #{inspect($type)}';
+    }
+
+    $i: 0;
+    @while $i <= 1 {
+        $mix: 0;
+
+        @if $easing == 'in-quad' {
+            $mix: ease-in-quad($i);
+        } @else if $easing == 'out-quad' {
+            $mix: ease-out-quad($i);
+        } @else if $easing == 'in-out-quad' {
+            $mix: ease-in-out-quad($i);
+        } @else if $easing == 'in-cubic' {
+            $mix: ease-in-cubic($i);
+        } @else if $easing == 'out-cubic' {
+            $mix: ease-out-cubic($i);
+        } @else if $easing == 'in-out-cubic' {
+            $mix: ease-in-out-cubic($i);
+        } @else if $easing == 'in-sine' {
+            $mix: ease-in-sine($i);
+        } @else if $easing == 'out-sine' {
+            $mix: ease-out-sine($i);
+        } @else if $easing == 'in-out-sine' {
+            $mix: ease-in-out-sine($i);
+        } @else {
+            @error 'Invalid easing function: #{inspect($easing)}';
+        }
+
+        $color: mix($stop-color, $start-color, $mix * 100%);
+
+        $pos: $start-pos + $i * $distance;
+        @if $pos-value != null {
+            $pos: str-replace($pos-value, '${x}', $i);
+        }
+
+        $result: $result + ', ' + $color + ' ' + $pos;
+        $i:      $i + $ig-easing-gradient-precision;
+    }
+
+    $result: $result + ')';
+
+    @return unquote($result);
+}
+
+@function ease-in-quad($t) {
+	@return $t * $t;
+}
+
+@function ease-out-quad($t) {
+	@return 1 - ease-in-quad(1 - $t);
+}
+
+@function ease-in-out-quad($t) {
+    @if t < 0.5 {
+        @return ease-in-quad($t * 2) / 2;
+    }
+
+	@return 1 - ease-in-quad((1 - $t) * 2) / 2;
+}
+
+@function ease-in-cubic($t) {
+	@return $t * $t * $t;
+}
+
+@function ease-out-cubic($t) {
+	@return 1 - ease-in-cubic(1 - $t);
+}
+
+@function ease-in-out-cubic($t) {
+    @if t < 0.5 {
+        @return ease-in-cubic($t * 2) / 2;
+    }
+
+	@return 1 - ease-in-cubic((1 - $t) * 2) / 2;
+}
+
+@function ease-in-sine($t) {
+	@return -1 * cos($t * (pi() / 2));
+}
+
+@function ease-out-sine($t) {
+	@return sin($t * (pi() / 2));
+}
+
+@function ease-in-out-sine($t) {
+	@return 0.5 * (1 - cos(pi() * $t));
+}

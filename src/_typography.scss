@@ -1,0 +1,15 @@
+@function ig-typography-scale-font($times, $base, $mult) {
+    @if $times > 0 {
+        @for $i from 1 through $times {
+            $base: $base * $mult;
+        }
+    }
+
+    @return $base;
+}
+
+@mixin ig-typography-scale-font($times, $base, $mult) {
+    $size: ig-typography-scale-font($times, $base, $mult);
+
+    font-size: $size;
+}
