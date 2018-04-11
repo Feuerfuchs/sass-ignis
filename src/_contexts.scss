@@ -33,7 +33,7 @@ $ig-context-stacks: ();
 ///
 @mixin ig-context-create-stack($stack-id) {
     @if map-has-key($ig-context-stacks, $stack-id) {
-        @error "Context stack '#{inspect($stack-id)}' already exists.";
+        @error 'Context stack "#{inspect($stack-id)}" already exists.';
     }
 
     $ig-context-stacks: map-merge($ig-context-stacks, ($stack-id: ())) !global;
@@ -48,7 +48,7 @@ $ig-context-stacks: ();
 ///
 @mixin ig-context-push($stack-id, $id, $data: ()) {
     @if not map-has-key($ig-context-stacks, $stack-id) {
-        @error "Context stack '#{inspect($stack-id)}' does not exist.";
+        @error 'Context stack "#{inspect($stack-id)}" does not exist.';
     }
 
     $context-stack: map-get($ig-context-stacks, $stack-id);
@@ -65,19 +65,18 @@ $ig-context-stacks: ();
 ///
 @mixin ig-context-pop($stack-id) {
     @if not map-has-key($ig-context-stacks, $stack-id) {
-        @error "Context stack '#{inspect($stack-id)}' does not exist.";
+        @error 'Context stack "#{inspect($stack-id)}" does not exist.';
     }
 
     $context-stack: map-get($ig-context-stacks, $stack-id);
 
     @if length($context-stack) == 0 {
-        @error "Context stack '#{inspect($stack-id)}' is already empty.";
+        @error 'Context stack "#{inspect($stack-id)}" is already empty.';
     }
 
     @if length($context-stack) == 1 {
         $context-stack: ();
-    }
-    @else {
+    } @else {
         $context-stack: ig-list-slice($context-stack, 1, length($context-stack) - 1);
     }
 
@@ -95,7 +94,7 @@ $ig-context-stacks: ();
 ///
 @mixin ig-context-assert-stack-must-contain($stack-id, $context-ids, $check-head-only: false) {
     @if not ig-context-stack-contains($stack-id, $context-ids, $check-head-only) {
-        @error "Must be called inside of contexts '#{inspect($context-ids)}'.";
+        @error 'Must be called inside of contexts "#{inspect($context-ids)}".';
     }
 }
 
@@ -110,7 +109,7 @@ $ig-context-stacks: ();
 ///
 @mixin ig-context-assert-stack-must-not-contain($stack-id, $context-ids, $check-head-only: false) {
     @if ig-context-stack-contains($stack-id, $context-ids, $check-head-only) {
-        @error "Must not be called inside of contexts '#{inspect($context-ids)}'.";
+        @error 'Must not be called inside of contexts "#{inspect($context-ids)}".';
     }
 }
 
@@ -127,7 +126,7 @@ $ig-context-stacks: ();
 ///
 @function ig-context-stack-contains($stack-id, $context-ids, $check-head-only: false) {
     @if not map-has-key($ig-context-stacks, $stack-id) {
-        @error "Context stack '#{inspect($stack-id)}' does not exist.";
+        @error 'Context stack "#{inspect($stack-id)}" does not exist.';
     }
 
     $context-stack: map-get($ig-context-stacks, $stack-id);
@@ -163,7 +162,7 @@ $ig-context-stacks: ();
 ///
 @function ig-context-get($stack-id, $type-or-level: null) {
     @if not map-has-key($ig-context-stacks, $stack-id) {
-        @error "Context stack '#{inspect($stack-id)}' does not exist.";
+        @error 'Context stack "#{inspect($stack-id)}" does not exist.';
     }
 
     $context-stack: map-get($ig-context-stacks, $stack-id);
@@ -180,11 +179,10 @@ $ig-context-stacks: ();
         $context: nth($context-stack, -$type-or-level);
 
         @return nth($context, 1);
-    }
-    @else {
+    } @else {
         @for $i from -1 through -(length($context-stack)) {
             $context: nth($context-stack, $i);
-                    
+
             @if type-of($type-or-level) == list {
                 @for $j from 1 through length($type-or-level) {
                     $ctx: nth($type-or-level, $j);
@@ -193,11 +191,8 @@ $ig-context-stacks: ();
                         @return $context;
                     }
                 }
-            }
-            @else {
-                @if nth($context, 1) == $type-or-level {
-                    @return $context;
-                }
+            } @else if nth($context, 1) == $type-or-level {
+                @return $context;
             }
         }
     }

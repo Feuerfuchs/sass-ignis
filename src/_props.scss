@@ -43,7 +43,7 @@ $ig-props-list: ();
 
     @each $key, $value in $map {
         @if str-slice($key, 1, 2) != '--' {
-            @error "Property names must start with '--'.";
+            @error 'Property names must start with "--".';
         }
     }
 
@@ -66,7 +66,7 @@ $ig-props-list: ();
 ///
 @function ig-props-get($key, $tree: $ig-props-default-tree, $default: null) {
     @if not map-has-key($ig-props-list, $tree) {
-        @error "Unknown tree '#{$tree}'.";
+        @error 'Unknown tree "#{$tree}".';
     }
 
     $prop-map:   map-get($ig-props-list, $tree);
@@ -79,15 +79,14 @@ $ig-props-list: ();
             $prop-value: map-get($prop-value, $k);
 
             @if $prop-value == null and $default == null {
-                @error "'#{$key}' is null.";
+                @error '"#{$key}" is null.';
             }
         }
-    }
-    @else {
+    } @else {
         $prop-value: map-get($prop-map, $key);
 
         @if $prop-value == null and $default == null {
-            @error "'#{$key}' is null.";
+            @error '"#{$key}" is null.';
         }
     }
 

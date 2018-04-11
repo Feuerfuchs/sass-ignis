@@ -20,11 +20,11 @@
 ///
 @function ig-str-replace($string, $search, $replace) {
     $index: str-index($string, $search);
-  
+
     @if $index {
         @return str-slice($string, 1, $index - 1) + $replace + ig-str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
     }
-  
+
     @return $string;
 }
 
@@ -71,7 +71,7 @@
 ///
 @function ig-map-merge-recursive($map1, $map2) {
     @if type-of($map1) != map or type-of($map2) != map {
-        @error 'Two maps expected';
+        @error 'Two maps expected.';
     }
 
     $result: $map1;
@@ -79,8 +79,7 @@
     @each $key, $value in $map2 {
         @if type-of(map-get($result, $key)) == map and type-of($value) == map {
             $result: map-merge($result, ($key: ig-map-merge-recursive(map-get($result, $key), $value)));
-        }
-        @else {
+        } @else {
             $result: map-merge($result, ($key: $value));
         }
     }
@@ -177,6 +176,6 @@
 ///
 /// @content
 ///
-@mixin execute {
+@mixin ig-execute {
     @content;
 }

@@ -106,7 +106,7 @@ $ig-bem-context-id: 'bem' !default;
     $namespace: map-get($ig-bem-namespaces, $type);
 
     @if not $namespace {
-        @error "'#{$type}' is not a valid '$type'.";
+        @error '"#{$type}" is not a valid "$type".';
     }
 
     $namespace: $namespace + '-';
@@ -251,11 +251,11 @@ $ig-bem-context-id: 'bem' !default;
 ///
 @mixin ig-bem-composed-of($name, $type) {
     @if not map-get($ig-bem-namespaces, $type) {
-        @error "'#{$type}' is not a valid type.";
+        @error '"#{$type}" is not a valid type.';
     }
 
     @if not index($ig-bem-blocks, $name + '_' + $type) {
-        @error "Block '#{$name}' does not exist.";
+        @error 'Block "#{$name}" does not exist.';
     }
 }
 
@@ -335,21 +335,18 @@ $ig-bem-context-id: 'bem' !default;
 
         // BUGFIX
         $selector: ig-selector-nest-fix($selector);
-    }
-    @else {
+    } @else {
         $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
         @if is-superselector(&, $parent-selector) {
             $selector: selector-append(&, $ig-bem-element-separator + $name);
-        }
-        @else {
+        } @else {
             @if nth($parent-context, 1) == 'theme' {
                 $next-parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix');
                 $next-parent-selector: map-get(nth($next-parent-context, 2), 'selector');
-        
+
                 $selector: selector-nest(&, selector-append($next-parent-selector, $ig-bem-element-separator + $name));
-            }
-            @else {
+            } @else {
                 $selector: selector-nest(&, selector-append($parent-selector, $ig-bem-element-separator + $name));
             }
 
@@ -476,12 +473,10 @@ $ig-bem-context-id: 'bem' !default;
 
         @if is-superselector(&, $parent-selector) {
             $selector: selector-append(&, $ig-bem-modifier-separator + $name);
-        }
-        @else {
+        } @else {
             $selector: selector-replace(&, $parent-selector, selector-append($parent-selector, $ig-bem-modifier-separator + $name));
         }
-    }
-    @else {
+    } @else {
         $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element');
         $parent-selector: map-get(nth($parent-context, 2), 'selector');
 

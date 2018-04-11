@@ -22,8 +22,7 @@
         @for $i from 1 through $times {
             $base: $base * $ratio;
         }
-    }
-    @else if $times < 0 {
+    } @else if $times < 0 {
         @for $i from 1 through -$times {
             $base: $base / $ratio;
         }
