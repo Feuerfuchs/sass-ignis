@@ -119,6 +119,11 @@ $ig-bem-context-id: 'bem' !default;
     $selector:       selector-parse('.' + $namespace + '-' + $name);
 
     @if length($parent-context) != 0 {
+        //
+        // Block is used within a theme.
+        // Make sure there are no selectors between theme and this mixin call.
+        //
+
         $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
         @if not is-superselector(&, $parent-selector) {
@@ -500,7 +505,8 @@ $ig-bem-context-id: 'bem' !default;
 
     @if index('block' 'element' 'theme', nth($parent-context, 1)) or $extend == true {
         //
-        // Parent context is block, element or theme.
+        // Either the parent context is block, element or theme, or a modifier or suffix
+        // is to be extended.
         //
 
         $parent-selector: map-get(nth($parent-context, 2), 'selector');
@@ -510,8 +516,8 @@ $ig-bem-context-id: 'bem' !default;
             // The current selector doesn't match the parent selector.
             // The user manually added a selector between parent context and this modifier call.
             // This case is forbidden because any outcome semantically wouldn't make sense:
-            //   - ({t}) {b} [manual selector] {b}--modifier
-            //   - ({t}) {b}--modifier [manual selector]
+            //   - ({t}) {b,e,m,s} [manual selector] {b,e,m,s}--modifier
+            //   - ({t}) {b,e,m,s}--modifier [manual selector]
             // The first case would make the modifier behave like an element.
             // The second case is unintuitive, the code would be more clear by nesting the manual
             // selector in the modifier instead.
@@ -523,7 +529,7 @@ $ig-bem-context-id: 'bem' !default;
         //
         // The modifier part can simply be appended.
         // Possible outcomes:
-        //   - ({t}) {b,e}--modifier
+        //   - ({t}) {b,e,m,s}--modifier
         //
 
         $selector: selector-append(&, $ig-bem-modifier-separator + $name);
@@ -592,9 +598,6 @@ $ig-bem-context-id: 'bem' !default;
 @mixin ig-bem-suffix($name) {
     //
     // Suffixes can be used on block, element, modifier and theme.
-    // The suffix part can simply be appended.
-    // Possible outcomes:
-    //   - ({t}) {b,e,m}@suffix
     //
 
     @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
@@ -617,6 +620,12 @@ $ig-bem-context-id: 'bem' !default;
 
         @error 'A suffix must be an immediate child of the parent context';
     }
+
+    //
+    // The suffix part can simply be appended.
+    // Possible outcomes:
+    //   - ({t}) {b,e,m}@suffix
+    //
 
     $selector: selector-append(&, $ig-bem-suffix-separator + $name);
 
@@ -676,6 +685,11 @@ $ig-bem-context-id: 'bem' !default;
     $selector:       ig-bem-theme-selector($theme, $sub-theme);
 
     @if length($parent-context) != 0 {
+        //
+        // Theme is used within a block.
+        // Make sure there are no selectors between block and this mixin call.
+        //
+
         $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
         @if not is-superselector(&, $parent-selector) {
