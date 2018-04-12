@@ -101,7 +101,13 @@ $ig-bem-context-id: 'bem' !default;
 ///   }
 ///
 @mixin ig-bem-block($name, $type) {
-    @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'theme');
+    //
+    // Blocks can only be used by itself or within a theme.
+    // Possible outcomes:
+    //   - ({t}) block
+    //
+
+    @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix');
 
     $namespace: map-get($ig-bem-namespaces, $type);
 
@@ -114,8 +120,6 @@ $ig-bem-context-id: 'bem' !default;
 
     @if & {
         $selector: selector-nest(&, $selector);
-
-        // BUGFIX
         $selector: ig-selector-nest-fix($selector);
     }
 
@@ -322,35 +326,53 @@ $ig-bem-context-id: 'bem' !default;
 ///   }
 ///
 @mixin ig-bem-element($name) {
-    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix');
+    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
     $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'theme');
     $selector:       null;
 
     @if index('element' 'modifier' 'suffix', nth($parent-context, 1)) {
+        //
+        // Parent context is element, modifier or suffix.
+        // Possible outcomes:
+        //   - {e,m,s} ([manual selector]) {b}__element
+        //
+
         $parent-context:  ig-context-get($ig-bem-context-id, 'block');
         $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
         $selector: selector-nest(&, selector-append($parent-selector, $ig-bem-element-separator + $name));
-
-        // BUGFIX
         $selector: ig-selector-nest-fix($selector);
     } @else {
+        //
+        // Parent context is block or theme.
+        //
+
         $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
         @if is-superselector(&, $parent-selector) {
+            //
+            // The current selector matches the parent selector.
+            // The element part can simply be appended
+            // Possible outcomes:
+            //   - ({t}) {b}__element
+            //
+
             $selector: selector-append(&, $ig-bem-element-separator + $name);
         } @else {
-            @if nth($parent-context, 1) == 'theme' {
-                $next-parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix');
-                $next-parent-selector: map-get(nth($next-parent-context, 2), 'selector');
+            //
+            // The current selector doesn't match the parent selector.
+            // The user manually added a selector between parent context and this mixin call.
+            // Possible outcomes:
+            //   - ({t}) {b} [manual selector] {b}__element
+            //
 
-                $selector: selector-nest(&, selector-append($next-parent-selector, $ig-bem-element-separator + $name));
-            } @else {
-                $selector: selector-nest(&, selector-append($parent-selector, $ig-bem-element-separator + $name));
+            @if nth($parent-context, 1) == 'theme' {
+                $parent-context:  ig-context-get($ig-bem-context-id, 'block');
+                $parent-selector: map-get(nth($next-parent-context, 2), 'selector');
             }
 
-            // BUGFIX
+            $selector: selector-nest(&, selector-append($parent-selector, $ig-bem-element-separator + $name));
             $selector: ig-selector-nest-fix($selector);
         }
     }
@@ -463,20 +485,45 @@ $ig-bem-context-id: 'bem' !default;
 ///   }
 ///
 @mixin ig-bem-modifier($name, $extend: false) {
-    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'theme');
+    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
-    $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix');
+    $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'theme');
     $selector:       null;
 
-    @if index('block' 'element', nth($parent-context, 1)) or $extend == true {
+    @if index('block' 'element' 'theme', nth($parent-context, 1)) or $extend == true {
+        //
+        // Parent context is block, element or theme.
+        //
+
         $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
-        @if is-superselector(&, $parent-selector) {
-            $selector: selector-append(&, $ig-bem-modifier-separator + $name);
-        } @else {
-            $selector: selector-replace(&, $parent-selector, selector-append($parent-selector, $ig-bem-modifier-separator + $name));
+        @if not is-superselector(&, $parent-selector) {
+            //
+            // The current selector doesn't match the parent selector.
+            // The user manually added a selector between parent context and this modifier call.
+            // This case is forbidden because any outcome semantically wouldn't make sense:
+            //   - ({t}) {b} [manual selector] {b}--modifier
+            //   - ({t}) {b}--modifier [manual selector]
+            // The first case would make the modifier behave like an element.
+            // The second case is unintuitive, the code would be more clear by adding the manual
+            // selector to the modifier instead.
+            //
+
+            @error 'A modifier must be an immediate child of the parent context';
         }
+
+        //
+        // The modifier part can simply be appended.
+        // Possible outcomes:
+        //   - ({t}) {b,e}--modifier
+        //
+
+        $selector: selector-append(&, $ig-bem-modifier-separator + $name);
     } @else {
+        //
+        // Parent context is modifier or suffix and $extend is false.
+        //
+
         $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element');
         $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
@@ -535,7 +582,33 @@ $ig-bem-context-id: 'bem' !default;
 ///   }
 ///
 @mixin ig-bem-suffix($name) {
-    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block' 'element' 'modifier');
+    //
+    // Suffixes can be used on block, element, modifier and theme.
+    // The suffix part can simply be appended.
+    // Possible outcomes:
+    //   - ({t}) {b,e,m}@suffix
+    //
+
+    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
+    @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'suffix');
+
+    $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'theme');
+    $parent-selector: map-get(nth($parent-context, 2), 'selector');
+
+    @if not is-superselector(&, $parent-selector) {
+        //
+        // The current selector doesn't match the parent selector.
+        // The user manually added a selector between parent context and this suffix call.
+        // This case is forbidden because any outcome semantically wouldn't make sense:
+        //   - ({t}) {b,e,m} [manual selector] {b,e,m}@suffix
+        //   - ({t}) {b,e,m}@suffix [manual selector]
+        // The first case would make the modifier behave like an element.
+        // The second case is unintuitive, the code would be more clear by adding the manual
+        // selector to the suffix instead.
+        //
+
+        @error 'A suffix must be an immediate child of the parent context';
+    }
 
     $selector: selector-append(&, $ig-bem-suffix-separator + $name);
 
@@ -583,16 +656,20 @@ $ig-bem-context-id: 'bem' !default;
 ///   }
 ///
 @mixin ig-bem-theme($theme, $sub-theme: null) {
-    @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'theme');
+    //
+    // Themes can only be used by itself or as immediate child of a block.
+    // Possible outcomes:
+    //   - theme ({b})
+    //
+
+    @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'element' 'modifier' 'suffix' 'theme');
 
     $selector: ig-bem-theme-selector($theme, $sub-theme);
 
     @if & {
         $selector: selector-nest($selector, &);
+        $selector: ig-selector-nest-fix($selector);
     }
-
-    // BUGFIX
-    $selector: ig-selector-nest-fix($selector);
 
     @include ig-context-push($ig-bem-context-id, 'theme', ( 'selector': $selector ));
     @at-root #{$selector} {
