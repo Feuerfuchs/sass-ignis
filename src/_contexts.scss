@@ -168,7 +168,7 @@ $ig-context-stacks: ();
     $context-stack: map-get($ig-context-stacks, $stack-id);
 
     @if length($context-stack) == 0 {
-        @return ( );
+        @return ();
     }
 
     @if type-of($type-or-level) == number {
@@ -197,5 +197,5 @@ $ig-context-stacks: ();
         }
     }
 
-    @return ( );
+    @return ();
 }

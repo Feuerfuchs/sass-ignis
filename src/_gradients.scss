@@ -219,7 +219,7 @@ $ig-easing-gradient-precision: 0.1 !default;
 /// @return {number} Distorted time between 0 and 1 inclusive
 ///
 @function ig-ease-in-out-quad($t) {
-    @if t < 0.5 {
+    @if $t < 0.5 {
         @return ig-ease-in-quad($t * 2) / 2;
     }
 
@@ -256,7 +256,7 @@ $ig-easing-gradient-precision: 0.1 !default;
 /// @return {number} Distorted time between 0 and 1 inclusive
 ///
 @function ig-ease-in-out-cubic($t) {
-    @if t < 0.5 {
+    @if $t < 0.5 {
         @return ig-ease-in-cubic($t * 2) / 2;
     }
 
