@@ -112,15 +112,23 @@ $ig-bem-context-id: 'bem' !default;
     $namespace: map-get($ig-bem-namespaces, $type);
 
     @if not $namespace {
-        @error '"#{$type}" is not a valid "$type".';
+        @error '"#{$type}" is not a valid type.';
     }
 
-    $namespace: $namespace + '-';
-    $selector:  selector-parse('.' + $namespace + $name);
+    $parent-context: ig-context-get($ig-bem-context-id, 'theme');
+    $selector:       selector-parse('.' + $namespace + '-' + $name);
 
-    @if & {
+    @if length($parent-context) != 0 {
+        $parent-selector: map-get(nth($parent-context, 2), 'selector');
+
+        @if not is-superselector(&, $parent-selector) {
+            @error 'Block must be an immediate child of the theme.';
+        }
+
         $selector: selector-nest(&, $selector);
         $selector: ig-selector-nest-fix($selector);
+    } @else if & {
+        @error 'Block must be declared at the root level.';
     }
 
     $ig-bem-blocks: append($ig-bem-blocks, $name + '_' + $type) !global;
@@ -505,8 +513,8 @@ $ig-bem-context-id: 'bem' !default;
             //   - ({t}) {b} [manual selector] {b}--modifier
             //   - ({t}) {b}--modifier [manual selector]
             // The first case would make the modifier behave like an element.
-            // The second case is unintuitive, the code would be more clear by adding the manual
-            // selector to the modifier instead.
+            // The second case is unintuitive, the code would be more clear by nesting the manual
+            // selector in the modifier instead.
             //
 
             @error 'A modifier must be an immediate child of the parent context';
@@ -603,8 +611,8 @@ $ig-bem-context-id: 'bem' !default;
         //   - ({t}) {b,e,m} [manual selector] {b,e,m}@suffix
         //   - ({t}) {b,e,m}@suffix [manual selector]
         // The first case would make the modifier behave like an element.
-        // The second case is unintuitive, the code would be more clear by adding the manual
-        // selector to the suffix instead.
+        // The second case is unintuitive, the code would be more clear by nesting the manual
+        // selector in the suffix instead.
         //
 
         @error 'A suffix must be an immediate child of the parent context';
@@ -664,11 +672,20 @@ $ig-bem-context-id: 'bem' !default;
 
     @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'element' 'modifier' 'suffix' 'theme');
 
-    $selector: ig-bem-theme-selector($theme, $sub-theme);
+    $parent-context: ig-context-get($ig-bem-context-id, 'block');
+    $selector:       ig-bem-theme-selector($theme, $sub-theme);
 
-    @if & {
+    @if length($parent-context) != 0 {
+        $parent-selector: map-get(nth($parent-context, 2), 'selector');
+
+        @if not is-superselector(&, $parent-selector) {
+            @error 'Theme must be an immediate child of the block.';
+        }
+
         $selector: selector-nest($selector, &);
         $selector: ig-selector-nest-fix($selector);
+    } @else if & {
+        @error 'Theme must be declared at the root level.';
     }
 
     @include ig-context-push($ig-bem-context-id, 'theme', ( 'selector': $selector ));
