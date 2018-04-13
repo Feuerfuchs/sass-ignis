@@ -6,11 +6,13 @@
 	"license": "MIT",
 	"description": "A mixin-based framework that makes it easier to work with BEMIT, organize variables and offers other useful features.",
 	"devDependencies": {
+		"nodemon": "^1.17.3",
 		"sass-lint": "^1.12.1",
 		"sassdoc": "^2.5.0"
 	},
 	"scripts": {
 		"lint": "sass-lint 'src/**/*.scss' -q -v || true",
+		"livelint": "nodemon --watch src/css -e scss -x 'echo \"BEGIN LINT\" && npm run lint && echo \"END LINT\"'",
 		"doc": "sassdoc src"
 	}
 }

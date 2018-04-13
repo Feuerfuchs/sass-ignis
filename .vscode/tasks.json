@@ -4,28 +4,6 @@
     "command": "npm",
     "tasks": [
         {
-            "label": "watch",
-            "command": "npm",
-            "args": [
-                "run",
-                "watch"
-            ],
-            "type": "shell",
-            "isBackground": true,
-            "problemMatcher": []
-        },
-        {
-            "label": "make",
-            "command": "npm",
-            "args": [
-                "run",
-                "make"
-            ],
-            "type": "shell",
-            "isBackground": false,
-            "problemMatcher": []
-        },
-        {
             "label": "lint",
             "command": "npm",
             "args": [
@@ -36,22 +14,22 @@
             "isBackground": true,
             "problemMatcher": [
                 {
-                    "owner": "stylelint",
-                    "fileLocation": "absolute",
+                    "owner": "sass-lint",
+                    "fileLocation": "relative",
                     "pattern": [
                         {
-                            "regexp": "^(info|warning|error): (.*) \\((\\d+), (\\d+)\\):\\s+(.*)$",
-                            "severity": 1,
-                            "file": 2,
-                            "line": 3,
-                            "column": 4,
+                            "regexp": "^(.*)\\((\\d+),(\\d+)\\): (info|warning|error) (.*)$",
+                            "file": 1,
+                            "line": 2,
+                            "column": 3,
+                            "severity": 4,
                             "message": 5
                         }
                     ],
                     "background": {
                         "activeOnStart": false,
-                        "beginsPattern": "^BEGIN LINT:SASS",
-                        "endsPattern": "^END LINT:SASS"
+                        "beginsPattern": "^BEGIN LINT",
+                        "endsPattern": "^END LINT"
                     }
                 }
             ]
