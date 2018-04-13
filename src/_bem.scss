@@ -536,6 +536,8 @@ $ig-bem-context-id: 'bem' !default;
     } @else {
         //
         // Parent context is modifier or suffix and $extend is false.
+        // Possible outcomes:
+        //   - ({t}) {m,s} {b,e}--modifier
         //
 
         $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element');
