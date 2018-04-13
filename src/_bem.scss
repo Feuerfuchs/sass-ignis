@@ -8,6 +8,32 @@
 /// The mixins in this class make working with BEMIT (and by extension BEM) easier by automatically
 /// generating the right selectors and enforcing a certain nesting order.
 ///
+/// There are comments in the mixins explaining what selector is generated. The EBNF grammar is as follows:
+///
+///   (* Shorthands for block, element, modifier, suffix, theme *)
+///   entity_shorthand = "b" "e" "m" "s" "t" ;
+///   
+///   (* One or multiple BEMIT entities that were generated with an earlier mixin invocation *)
+///   existing_entities = "{" entity_shorthand { "," entity_shorthand } "}" ;
+///   
+///   (* A BEM entity that doesn't depend on a parent entity *)
+///   generated_independent_entity = "block" | "theme" ;
+///   
+///   (* A BEM entity that is attached to a parent entity *)
+///   generated_attached_entity = existing_entities ( "__element" | "--modifier" | "@suffix" ) ;
+///   
+///   (* A selector created by the user, such as "&:hover", "> a", and so on *)
+///   manual_selector_part = "[manual selector]" ;
+///   
+///   (* A part of the selector that may or may not be in the generated result *)
+///   optional_selector_part = "(" ( existing_entities | manual_selector_part ) ")" ;
+///   
+///   (* One part of the selector *)
+///   selector_part = existing_entities | manual_selector_part | optional_selector_part | generated_independent_entity | generated_attached_entity ;
+///   
+///   (* The whole selector *)
+///   selector = selector_part { " " selector_part } ;
+///
 /// @link https://en.bem.info/                                                                   Information about BEM
 /// @link https://csswizardry.com/2015/08/bemit-taking-the-bem-naming-convention-a-step-further/ Information about BEMIT 
 ///
@@ -68,6 +94,20 @@ $ig-bem-namespaces: (
 $ig-bem-blocks: ();
 
 ///
+/// Maximum nesting depth of BEM mixins. The large default value means there is no effective limit.
+/// 
+/// @type number
+///
+$ig-bem-max-depth: 99 !default;
+
+///
+/// Indicates if nesting elements is allowed.
+/// 
+/// @type bool
+///
+$ig-bem-allow-nested-elements: true !default;
+
+///
 /// Context ID used for all BEM-related mixins.
 ///
 /// @type string
@@ -107,6 +147,7 @@ $ig-bem-context-id: 'bem' !default;
     //   - ({t}) block
     //
 
+    @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix');
 
     $namespace: map-get($ig-bem-namespaces, $type);
@@ -221,10 +262,12 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Assert that a block or element extends an existing block (a so called "composition").
-/// Compilation will fail if the extended block doesn't exist.
-/// This way, you can ensure that blocks are created in the right order so that extending blocks/elements
-/// will actually override the original declarations without having to resort to deeper nesting.
+/// Assert that a block or element is composed of another block. In BEM, such a relationship is referred to
+/// as a "mix": https://en.bem.info/methodology/key-concepts/#mix
+///
+/// Compilation will fail if the foreign block doesn't exist. This way, you can ensure that blocks are
+/// defined in the right order so that composed blocks/elements will actually override the foreign
+/// declarations without having to artificially increase the specificity.
 ///
 /// @param {string} $name - Block name
 /// @param {string} $type - BEMIT namespace of the block
@@ -339,7 +382,16 @@ $ig-bem-context-id: 'bem' !default;
 ///   }
 ///
 @mixin ig-bem-element($name) {
+    @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
+
+    @if not $ig-bem-allow-nested-elements {
+        //
+        // Element nesting was forbidden by the user
+        //
+
+        @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'element');
+    }
 
     $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'theme');
     $selector:       null;
@@ -368,7 +420,7 @@ $ig-bem-context-id: 'bem' !default;
             // The current selector matches the parent selector.
             // The element part can simply be appended
             // Possible outcomes:
-            //   - ({t}) {b}__element
+            //   - {b}__element
             //
 
             $selector: selector-append(&, $ig-bem-element-separator + $name);
@@ -377,7 +429,7 @@ $ig-bem-context-id: 'bem' !default;
             // The current selector doesn't match the parent selector.
             // The user manually added a selector between parent context and this mixin call.
             // Possible outcomes:
-            //   - ({t}) {b} [manual selector] {b}__element
+            //   - {b} [manual selector] {b}__element
             //
 
             @if nth($parent-context, 1) == 'theme' {
@@ -498,6 +550,7 @@ $ig-bem-context-id: 'bem' !default;
 ///   }
 ///
 @mixin ig-bem-modifier($name, $extend: false) {
+    @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
     $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'theme');
@@ -516,8 +569,8 @@ $ig-bem-context-id: 'bem' !default;
             // The current selector doesn't match the parent selector.
             // The user manually added a selector between parent context and this modifier call.
             // This case is forbidden because any outcome semantically wouldn't make sense:
-            //   - ({t}) {b,e,m,s} [manual selector] {b,e,m,s}--modifier
-            //   - ({t}) {b,e,m,s}--modifier [manual selector]
+            //   - {b,e,m,s} [manual selector] {b,e,m,s}--modifier
+            //   - {b,e,m,s}--modifier [manual selector]
             // The first case would make the modifier behave like an element.
             // The second case is unintuitive, the code would be more clear by nesting the manual
             // selector in the modifier instead.
@@ -529,7 +582,7 @@ $ig-bem-context-id: 'bem' !default;
         //
         // The modifier part can simply be appended.
         // Possible outcomes:
-        //   - ({t}) {b,e,m,s}--modifier
+        //   - {b,e,m,s}--modifier
         //
 
         $selector: selector-append(&, $ig-bem-modifier-separator + $name);
@@ -537,7 +590,7 @@ $ig-bem-context-id: 'bem' !default;
         //
         // Parent context is modifier or suffix and $extend is false.
         // Possible outcomes:
-        //   - ({t}) {m,s} {b,e}--modifier
+        //   - {m,s} {b,e}--modifier
         //
 
         $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element');
@@ -602,6 +655,7 @@ $ig-bem-context-id: 'bem' !default;
     // Suffixes can be used on block, element, modifier and theme.
     //
 
+    @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
     @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'suffix');
 
@@ -613,8 +667,8 @@ $ig-bem-context-id: 'bem' !default;
         // The current selector doesn't match the parent selector.
         // The user manually added a selector between parent context and this suffix call.
         // This case is forbidden because any outcome semantically wouldn't make sense:
-        //   - ({t}) {b,e,m} [manual selector] {b,e,m}@suffix
-        //   - ({t}) {b,e,m}@suffix [manual selector]
+        //   - {b,e,m} [manual selector] {b,e,m}@suffix
+        //   - {b,e,m}@suffix [manual selector]
         // The first case would make the modifier behave like an element.
         // The second case is unintuitive, the code would be more clear by nesting the manual
         // selector in the suffix instead.
@@ -626,7 +680,7 @@ $ig-bem-context-id: 'bem' !default;
     //
     // The suffix part can simply be appended.
     // Possible outcomes:
-    //   - ({t}) {b,e,m}@suffix
+    //   - {b,e,m}@suffix
     //
 
     $selector: selector-append(&, $ig-bem-suffix-separator + $name);
@@ -681,6 +735,7 @@ $ig-bem-context-id: 'bem' !default;
     //   - theme ({b})
     //
 
+    @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'element' 'modifier' 'suffix' 'theme');
 
     $parent-context: ig-context-get($ig-bem-context-id, 'block');

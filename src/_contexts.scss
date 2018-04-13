@@ -114,6 +114,26 @@ $ig-context-stacks: ();
 }
 
 /// 
+/// Assert that a context stack must contain a number of contexts smaller than $max-count.
+///
+/// @param {string} $stack-id  - ID of context stack to use
+/// @param {number} $max-count - Maximum number ofg contexts in context stack
+///
+/// @throw If assertion fails
+///
+@mixin ig-context-assert-stack-count($stack-id, $max-count) {
+    @if not map-has-key($ig-context-stacks, $stack-id) {
+        @error 'Context stack "#{inspect($stack-id)}" does not exist.';
+    }
+
+    $context-stack: map-get($ig-context-stacks, $stack-id);
+
+    @if length($context-stack) > $max-count {
+        @error 'Maximum context count "#{inspect($max-count)}" exceeded.';
+    }
+}
+
+/// 
 /// Check if a context stack contains one of the given context IDs.
 ///
 /// @param {string} $stack-id                - ID of context stack to use
