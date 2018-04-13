@@ -32,7 +32,7 @@
 ///   selector_part = existing_entities | manual_selector_part | optional_selector_part | generated_independent_entity | generated_attached_entity ;
 ///   
 ///   (* The whole selector *)
-///   selector = selector_part { " " selector_part } ;
+///   selector = selector_part { ( " " | "." ) selector_part } ;
 ///
 /// @link https://en.bem.info/                                                                   Information about BEM
 /// @link https://csswizardry.com/2015/08/bemit-taking-the-bem-naming-convention-a-step-further/ Information about BEMIT 
@@ -81,7 +81,10 @@ $ig-bem-namespaces: (
     component: 'c',
     layout:    'l',
     scope:     's',
-    theme:     't'
+    theme:     't',
+    js:        'js',
+    qa:        'qa',
+    hack:      '_'
 ) !default;
 
 ///
@@ -179,7 +182,7 @@ $ig-bem-context-id: 'bem' !default;
 
     $ig-bem-blocks: append($ig-bem-blocks, $name + '_' + $type) !global;
 
-    @include ig-context-push($ig-bem-context-id, 'block', ( 'selector': $selector ));
+    @include ig-context-push($ig-bem-context-id, 'block', ( 'name': $name, 'selector': $selector ));
     @at-root #{$selector} {
         @content;
     }
@@ -188,8 +191,6 @@ $ig-bem-context-id: 'bem' !default;
 
 /// 
 /// Generate a new BEMIT object block. It's a shorthand for ig-bem-block($name, 'object').
-///
-/// @require {mixin} ig-bem-block
 ///
 /// @param {string} $name - Object block name
 ///
@@ -204,8 +205,6 @@ $ig-bem-context-id: 'bem' !default;
 /// 
 /// Generate a new BEMIT component block. It's a shorthand for ig-bem-block($name, 'component').
 ///
-/// @require {mixin} ig-bem-block
-///
 /// @param {string} $name - Component block name
 ///
 /// @content [All declarations belonging to that component block]
@@ -218,8 +217,6 @@ $ig-bem-context-id: 'bem' !default;
 
 /// 
 /// Generate a new BEMIT layout block. It's a shorthand for ig-bem-block($name, 'layout').
-///
-/// @require {mixin} ig-bem-block
 ///
 /// @param {string} $name - Layout block name
 ///
@@ -234,8 +231,6 @@ $ig-bem-context-id: 'bem' !default;
 /// 
 /// Generate a new BEMIT utility block. It's a shorthand for ig-bem-block($name, 'utility').
 ///
-/// @require {mixin} ig-bem-block
-///
 /// @param {string} $name - Utility block name
 ///
 /// @content [All declarations belonging to that utility block]
@@ -249,14 +244,51 @@ $ig-bem-context-id: 'bem' !default;
 /// 
 /// Generate a new BEMIT scope block. It's a shorthand for ig-bem-block($name, 'scope').
 ///
-/// @require {mixin} ig-bem-block
-///
 /// @param {string} $name - Scope block name
 ///
 /// @content [All declarations belonging to that scope block]
 ///
 @mixin ig-bem-scope($name) {
     @include ig-bem-block($name, 'scope') {
+        @content;
+    }
+}
+
+/// 
+/// Generate a new BEMIT JS block. It's a shorthand for ig-bem-block($name, 'js').
+///
+/// @param {string} $name - JS block name
+///
+/// @content [All declarations belonging to that JS block]
+///
+@mixin ig-bem-js($name) {
+    @include ig-bem-block($name, 'js') {
+        @content;
+    }
+}
+
+/// 
+/// Generate a new BEMIT QA block. It's a shorthand for ig-bem-block($name, 'qa').
+///
+/// @param {string} $name - QA block name
+///
+/// @content [All declarations belonging to that QA block]
+///
+@mixin ig-bem-qa($name) {
+    @include ig-bem-block($name, 'qa') {
+        @content;
+    }
+}
+
+/// 
+/// Generate a new BEMIT hack block. It's a shorthand for ig-bem-block($name, 'hack').
+///
+/// @param {string} $name - Hack block name
+///
+/// @content [All declarations belonging to that hack block]
+///
+@mixin ig-bem-hack($name) {
+    @include ig-bem-block($name, 'hack') {
         @content;
     }
 }
@@ -442,11 +474,95 @@ $ig-bem-context-id: 'bem' !default;
         }
     }
 
-    @include ig-context-push($ig-bem-context-id, 'element', ( 'selector': $selector ));
+    @include ig-context-push($ig-bem-context-id, 'element', ( 'name': $name, 'selector': $selector ));
     @at-root #{$selector} {
         @content;
     }
     @include ig-context-pop($ig-bem-context-id);
+}
+
+/// 
+/// Generate a BEM element that is related to the parent element.
+///
+/// The generated element selector is appended to the parent element selector. The $sign
+/// determines the relationship.
+///
+/// @param {string} $name - Element name
+/// @param {string} $sign - Relationshop sign, either '+' or '~'
+///
+/// @content [All declarations belonging to that element]
+///
+/// @throw If the element is not preceded by an element.
+///
+@mixin ig-bem-related-element($name, $sign) {
+    @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
+    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'element');
+
+    $parent-context:  ig-context-get($ig-bem-context-id, 'element');
+    $parent-selector: map-get(nth($parent-context, 2), 'selector');
+
+    @if not is-superselector(&, $parent-selector) {
+        @error 'Related element must be an immediate child of element.';
+    }
+
+    $parent-context:  ig-context-get($ig-bem-context-id, 'block');
+    $parent-selector: map-get(nth($parent-context, 2), 'selector');
+
+    $selector: selector-nest(&, selector-append($sign + $parent-selector, $ig-bem-element-separator + $name));
+    $selector: ig-selector-nest-fix($selector);
+
+    @include ig-context-push($ig-bem-context-id, 'element', ( 'name': $name, 'selector': $selector ));
+    @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+/// 
+/// Generate a BEM element that is a sibling of the parent element.
+///
+/// It's a shorthand for ig-bem-related-element($name, '~').
+///
+/// @param {string} $name - Element name
+///
+/// @content [All declarations belonging to that element]
+///
+@mixin ig-bem-sibling-element($name) {
+    @include ig-bem-related-element($name, '~') {
+        @content;
+    }
+}
+
+/// 
+/// Generate a BEM element that comes after the parent element.
+///
+/// It's a shorthand for ig-bem-related-element($name, '+').
+///
+/// @param {string} $name - Element name
+///
+/// @content [All declarations belonging to that element]
+///
+@mixin ig-bem-next-element($name) {
+    @include ig-bem-related-element($name, '+') {
+        @content;
+    }
+}
+
+/// 
+/// Generate the current BEM element as a next-child to itself.
+///
+/// @content [All declarations belonging to that element]
+///
+@mixin ig-bem-twin-element {
+    @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
+    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'element');
+
+    $parent-context: ig-context-get($ig-bem-context-id, 'element');
+    $parent-name:    map-get(nth($parent-context, 2), 'name');
+
+    @include ig-bem-related-element($parent-name, '+') {
+        @content;
+    }
 }
 
 /// 
@@ -590,7 +706,7 @@ $ig-bem-context-id: 'bem' !default;
         //
         // Parent context is modifier or suffix and $extend is false.
         // Possible outcomes:
-        //   - {m,s} {b,e}--modifier
+        //   - {m,s}.{b,e}--modifier
         //
 
         $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element');
@@ -599,7 +715,7 @@ $ig-bem-context-id: 'bem' !default;
         $selector: selector-append(&, $parent-selector, $ig-bem-modifier-separator + $name);
     }
 
-    @include ig-context-push($ig-bem-context-id, 'modifier', ( 'selector': $selector ));
+    @include ig-context-push($ig-bem-context-id, 'modifier', ( 'name': $name, 'selector': $selector ));
     @at-root #{$selector} {
         @content;
     }
@@ -685,7 +801,7 @@ $ig-bem-context-id: 'bem' !default;
 
     $selector: selector-append(&, $ig-bem-suffix-separator + $name);
 
-    @include ig-context-push($ig-bem-context-id, 'suffix', ( 'selector': $selector ));
+    @include ig-context-push($ig-bem-context-id, 'suffix', ( 'name': $name, 'selector': $selector ));
     @at-root #{$selector} {
         @content;
     }
