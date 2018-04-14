@@ -1,0 +1,59 @@
+// sass-lint:disable class-name-format force-element-nesting force-pseudo-nesting mixins-before-declarations
+
+//
+// Included test cases:
+//  - /// 1 /// - without namespace
+//  - /// 2 /// - with namespace
+//
+
+@include it('ig-bem-composed-of') {
+    @include assert('without namespace') { /// 1 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                font-size: 1em;
+            }
+
+            @include ig-bem-block('another') {
+                @include ig-bem-composed-of('something');
+
+                font-size: 2em;
+            }
+        }
+
+        @include expect(false) {
+            .something {
+                font-size: 1em;
+            }
+
+            .another {
+                font-size: 2em;
+            }
+        }
+    }
+
+    @each $ns in map-keys($ig-bem-namespaces) {
+        @include assert('with namespace "#{$ns}"') { /// 2 ///
+            @include output(false) {
+                @include ig-bem-block('something', $ns) {
+                    font-size: 1em;
+                }
+
+                @include ig-bem-block('another') {
+                    @include ig-bem-composed-of('something', $ns);
+
+                    font-size: 2em;
+                }
+            }
+
+            @include expect(false) {
+                .#{map-get($ig-bem-namespaces, $ns)}-something {
+                    font-size: 1em;
+                }
+
+                .another {
+                    font-size: 2em;
+                }
+            }
+        }
+    }
+}

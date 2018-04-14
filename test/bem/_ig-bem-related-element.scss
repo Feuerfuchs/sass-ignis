@@ -1,0 +1,133 @@
+// sass-lint:disable class-name-format force-element-nesting force-pseudo-nesting mixins-before-declarations
+
+//
+// Included test cases:
+//  - /// 1 ///  - single element, single related element
+//  - /// 2 ///  - single element, single related element, manual selector in-between
+//  - /// 3 ///  - single element, single related element, modifier in-between
+//  - /// 4 ///  - single element, multiple related elements
+//  - /// 5 ///  - single element, multiple related elements, manual selector in-between
+//  - /// 6 ///  - single element, multiple related elements, modifier in-between
+//  - /// 7 ///  - multiple elements, single related element
+//  - /// 8 ///  - multiple elements, single related element, manual selector in-between
+//  - /// 9 ///  - multiple elements, single related element, modifier in-between
+//  - /// 10 /// - multiple elements, multiple related elements
+//  - /// 11 /// - multiple elements, multiple related elements, manual selector in-between
+//  - /// 12 /// - multiple elements, multiple related elements, modifier in-between
+//
+
+@include it('ig-bem-related-element') {
+    @include assert('single element, single related element') { /// 1 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child') {
+                    @include ig-bem-related-element('+', 'subchild') {
+                        font-size: 2.5em;
+                    }
+
+                    @include ig-bem-related-element('~', 'subchild') {
+                        font-size: 2.5em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child + .something__subchild {
+                font-size: 2.5em;
+            }
+
+            .something__child ~ .something__subchild {
+                font-size: 2.5em;
+            }
+        }
+    }
+
+    @include assert('single element, multiple related elements') { /// 2 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child') {
+                    @include ig-bem-related-element('+', 'subchild1', 'subchild2') {
+                        font-size: 2.5em;
+                    }
+
+                    @include ig-bem-related-element('~', 'subchild1', 'subchild2') {
+                        font-size: 2.5em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child + .something__subchild1,
+            .something__child + .something__subchild2 {
+                font-size: 2.5em;
+            }
+
+            .something__child ~ .something__subchild1,
+            .something__child ~ .something__subchild2 {
+                font-size: 2.5em;
+            }
+        }
+    }
+
+    @include assert('multiple elements, single related element') { /// 3 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1', 'child2') {
+                    @include ig-bem-related-element('+', 'subchild') {
+                        font-size: 2.5em;
+                    }
+
+                    @include ig-bem-related-element('~', 'subchild') {
+                        font-size: 2.5em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1 + .something__subchild,
+            .something__child2 + .something__subchild {
+                font-size: 2.5em;
+            }
+
+            .something__child1 ~ .something__subchild,
+            .something__child2 ~ .something__subchild {
+                font-size: 2.5em;
+            }
+        }
+    }
+
+    @include assert('multiple elements, multiple related elements') { /// 4 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1', 'child2') {
+                    @include ig-bem-related-element('+', 'subchild1', 'subchild2') {
+                        font-size: 2.5em;
+                    }
+
+                    @include ig-bem-related-element('~', 'subchild1', 'subchild2') {
+                        font-size: 2.5em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1 + .something__subchild1,
+            .something__child2 + .something__subchild1,
+            .something__child1 + .something__subchild2,
+            .something__child2 + .something__subchild2 {
+                font-size: 2.5em;
+            }
+
+            .something__child1 ~ .something__subchild1,
+            .something__child2 ~ .something__subchild1,
+            .something__child1 ~ .something__subchild2,
+            .something__child2 ~ .something__subchild2 {
+                font-size: 2.5em;
+            }
+        }
+    }
+}

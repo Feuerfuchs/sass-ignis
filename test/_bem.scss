@@ -1,0 +1,9 @@
+@include describe('BEM') {
+    @import 'bem/ig-bem-block';
+    @import 'bem/ig-bem-composed-of';
+    @import 'bem/ig-bem-element';
+    @import 'bem/ig-bem-related-element';
+    @import 'bem/ig-bem-next-twin-element';
+    @import 'bem/ig-bem-modifier';
+    @import 'bem/ig-bem-suffix';
+}

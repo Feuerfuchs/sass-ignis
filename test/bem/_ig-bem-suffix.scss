@@ -1,0 +1,86 @@
+// sass-lint:disable class-name-format force-element-nesting force-pseudo-nesting mixins-before-declarations
+
+@include it('ig-bem-suffix') {
+    @include assert('block suffix') {
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-suffix('sm') {
+                    font-size: 1.5em;
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something\@sm {
+                font-size: 1.5em;
+            }
+        }
+    }
+
+    @include assert('element suffix') {
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child') {
+                    @include ig-bem-suffix('sm') {
+                        font-size: 2.5em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child\@sm {
+                font-size: 2.5em;
+            }
+        }
+    }
+
+    @include assert('modifier suffix') {
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-modifier('mod1') {
+                    @include ig-bem-suffix('sm') {
+                        font-size: 1.75em;
+                    }
+                }
+
+                @include ig-bem-element('child') {
+                    @include ig-bem-modifier('mod2') {
+                        @include ig-bem-suffix('sm') {
+                            font-size: 2.75em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something--mod1\@sm {
+                font-size: 1.75em;
+            }
+
+            .something__child--mod2\@sm {
+                font-size: 2.75em;
+            }
+        }
+    }
+
+    @include assert('multiple element suffix') {
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1', 'child2') {
+                    @include ig-bem-suffix('sm') {
+                        font-size: 2.5em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1\@sm,
+            .something__child2\@sm {
+                font-size: 2.5em;
+            }
+        }
+    }
+}

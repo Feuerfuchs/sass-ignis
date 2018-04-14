@@ -1,0 +1,132 @@
+// sass-lint:disable class-name-format force-element-nesting force-pseudo-nesting mixins-before-declarations
+
+//
+// Included test cases:
+//  - /// 1 /// - single element
+//  - /// 2 /// - single element, manual selector in-between
+//  - /// 3 /// - single element, modifier in-between
+//  - /// 4 /// - multiple elements
+//  - /// 5 /// - multiple elements, manual selector in-between
+//  - /// 6 /// - multiple elements, modifier in-between
+//
+
+@include it('ig-bem-next-twin-element') {
+    @include assert('single element') { /// 1 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child') {
+                    @include ig-bem-next-twin-element {
+                        font-size: 2.5em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child + .something__child {
+                font-size: 2.5em;
+            }
+        }
+    }
+
+    @include assert('single element, manual selector in-between') { /// 2 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child') {
+                    &:hover {
+                        @include ig-bem-next-twin-element {
+                            font-size: 2.5em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child:hover + .something__child {
+                font-size: 2.5em;
+            }
+        }
+    }
+
+    @include assert('single element, modifier in-between') { /// 3 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child') {
+                    @include ig-bem-modifier('mod') {
+                        @include ig-bem-next-twin-element {
+                            font-size: 2.75em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child--mod + .something__child {
+                font-size: 2.75em;
+            }
+        }
+    }
+
+    @include assert('multiple elements') { /// 4 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1', 'child2') {
+                    @include ig-bem-next-twin-element {
+                        font-size: 2.5em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1 + .something__child1,
+            .something__child2 + .something__child2 {
+                font-size: 2.5em;
+            }
+        }
+    }
+
+    @include assert('multiple elements') { /// 5 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1', 'child2') {
+                    &:hover {
+                        @include ig-bem-next-twin-element {
+                            font-size: 2.5em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1:hover + .something__child1,
+            .something__child2:hover + .something__child2 {
+                font-size: 2.5em;
+            }
+        }
+    }
+
+    @include assert('multiple elements') { /// 6 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1', 'child2') {
+                    @include ig-bem-modifier('mod') {
+                        @include ig-bem-next-twin-element {
+                            font-size: 2.5em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1--mod + .something__child1,
+            .something__child2--mod + .something__child2 {
+                font-size: 2.5em;
+            }
+        }
+    }
+}

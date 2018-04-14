@@ -47,8 +47,8 @@
 ///
 /// @alias ig-bem-related-element
 ///
-@mixin related-element($name, $sign) {
-    @include ig-bem-related-element($name, $sign) {
+@mixin related-element($sign, $name, $names...) {
+    @include ig-bem-related-element($sign, $name, $names...) {
         @content;
     }
 }
@@ -56,8 +56,8 @@
 ///
 /// @alias related-element
 ///
-@mixin re($name, $sign) {
-    @include related-element($name, $sign) {
+@mixin re($sign, $name, $names...) {
+    @include related-element($sign, $name, $names...) {
         @content;
     }
 }

@@ -1,0 +1,10 @@
+@import '../src/prep';
+@import '../src/main';
+
+@import 'true';
+
+$ig-bem-testing: true;
+
+@import 'bem';
+
+@include report;

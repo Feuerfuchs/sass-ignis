@@ -539,7 +539,7 @@ $ig-bem-context-id: 'bem' !default;
 ///     @include ig-bem-element('elem') {
 ///       /* some element definitions */
 ///       
-///       @include ig-bem-related-element('sibling', '~') {
+///       @include ig-bem-related-element('~', 'sibling') {
 ///         /* some sibling element definitions */
 ///       }
 ///     }
@@ -560,7 +560,7 @@ $ig-bem-context-id: 'bem' !default;
 ///     @include ig-bem-element('elem') {
 ///       /* some element definitions */
 ///       
-///       @include ig-bem-related-element('successor', '+') {
+///       @include ig-bem-related-element('+', 'successor') {
 ///         /* some successor element definitions */
 ///       }
 ///     }
@@ -581,7 +581,7 @@ $ig-bem-context-id: 'bem' !default;
 ///     @include ig-bem-element('elem1', 'elem2') {
 ///       /* some element definitions */
 ///       
-///       @include ig-bem-related-element('successor', '+') {
+///       @include ig-bem-related-element('+', 'successor') {
 ///         /* some successor element definitions */
 ///       }
 ///     }
@@ -597,7 +597,7 @@ $ig-bem-context-id: 'bem' !default;
 ///     /* some successor element definitions */
 ///   }
 ///
-@mixin ig-bem-related-element($name, $sign) {
+@mixin ig-bem-related-element($sign, $name, $names...) {
     //
     // Generating this selector is simple: Take the latest block context, use it
     // to generate the element part, and insert it at the end of the current selector.
@@ -616,11 +616,19 @@ $ig-bem-context-id: 'bem' !default;
     $block-context:  ig-context-get($ig-bem-context-id, 'block');
     $block-selector: map-get(nth($block-context, 2), 'selector');
 
-    $selector: selector-nest(&, $sign, selector-append($block-selector, $ig-bem-element-separator + $name));
-    $selector: ig-selector-nest-fix($selector);
+    $selector:   ();
+    $parts-data: ();
+
+    @each $name in join($name, $names) {
+        $sel: selector-nest(&, $sign, selector-append($block-selector, $ig-bem-element-separator + $name));
+        $sel: ig-selector-nest-fix($sel);
+
+        $selector:   join($selector, $sel, 'comma');
+        $parts-data: append($parts-data, ('name': $name, 'selector': $sel));
+    }
 
     @include ig-context-push($ig-bem-context-id, 'element', (
-            'parts':    (('name': $name, 'selector': $selector)),
+            'parts':    $parts-data,
             'selector': $selector
     ));
     @at-root #{$selector} {
@@ -632,14 +640,14 @@ $ig-bem-context-id: 'bem' !default;
 /// 
 /// Generate a BEM element that is a sibling of the current element.
 ///
-/// It's a shorthand for ig-bem-related-element($name, '~').
+/// It's a shorthand for ig-bem-related-element('~', $name).
 ///
 /// @param {string} $name - Element name
 ///
 /// @content [All declarations belonging to that element]
 ///
-@mixin ig-bem-sibling-element($name) {
-    @include ig-bem-related-element($name, '~') {
+@mixin ig-bem-sibling-element($name, $names...) {
+    @include ig-bem-related-element('~', $name, $names...) {
         @content;
     }
 }
@@ -647,14 +655,14 @@ $ig-bem-context-id: 'bem' !default;
 /// 
 /// Generate a BEM element that is the successor of the current element.
 ///
-/// It's a shorthand for ig-bem-related-element($name, '+').
+/// It's a shorthand for ig-bem-related-element('+', $name).
 ///
 /// @param {string} $name - Element name
 ///
 /// @content [All declarations belonging to that element]
 ///
-@mixin ig-bem-next-element($name) {
-    @include ig-bem-related-element($name, '+') {
+@mixin ig-bem-next-element($name, $names...) {
+    @include ig-bem-related-element('+', $name, $names...) {
         @content;
     }
 }
@@ -663,7 +671,7 @@ $ig-bem-context-id: 'bem' !default;
 /// Generate the current BEM element as a successor of itself.
 ///
 /// If this is applied to a single element, it behaves exactly the same as
-/// ig-bem-related-element(name, '+');
+/// ig-bem-related-element('+', name);
 /// However, if it is applied to multiple elements, each twin element only will influence
 /// their other twin, which is not replicable with ig-bem-related-element.
 ///
