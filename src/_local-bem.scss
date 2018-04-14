@@ -1,0 +1,171 @@
+////
+/// Shorter version of the bem-related mixins. Useful to reduce clutter.
+///
+/// @group BEM Aliases
+///
+/// @access public
+////
+
+@import 'bem';
+
+///
+/// @alias ig-bem-block
+///
+@mixin block($name, $type) {
+    @include ig-bem-block($name, $type) {
+        @content;
+    }
+}
+
+///
+/// @alias block
+///
+@mixin b($name, $type) {
+    @include block($name, $type) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-element
+///
+@mixin element($name, $names...) {
+    @include ig-bem-element($name, $names...) {
+        @content;
+    }
+}
+
+///
+/// @alias element
+///
+@mixin e($name, $names...) {
+    @include element($name, $names...) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-related-element
+///
+@mixin related-element($name, $sign) {
+    @include ig-bem-related-element($name, $sign) {
+        @content;
+    }
+}
+
+///
+/// @alias related-element
+///
+@mixin re($name, $sign) {
+    @include related-element($name, $sign) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-sibling-element
+///
+@mixin sibling-element($name) {
+    @include ig-bem-sibling-element($name) {
+        @content;
+    }
+}
+
+///
+/// @alias sibling-element
+///
+@mixin se($name) {
+    @include sibling-element($name) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-next-element
+///
+@mixin next-element($name) {
+    @include ig-bem-next-element($name) {
+        @content;
+    }
+}
+
+///
+/// @alias next-element
+///
+@mixin ne($name) {
+    @include next-element($name) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-next-twin-element
+///
+@mixin next-twin-element {
+    @include ig-bem-next-twin-element {
+        @content;
+    }
+}
+
+///
+/// @alias next-twin-element
+///
+@mixin te {
+    @include next-twin-element {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-modifier
+///
+@mixin modifier($name, $extend: false) {
+    @include ig-bem-modifier($name, $extend) {
+        @content;
+    }
+}
+
+///
+/// @alias modifier
+///
+@mixin m($name, $extend: false) {
+    @include modifier($name, $extend) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-suffix
+///
+@mixin suffix($name) {
+    @include ig-bem-suffix($name) {
+        @content;
+    }
+}
+
+///
+/// @alias suffix
+///
+@mixin s($name) {
+    @include suffix($name) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-theme
+///
+@mixin theme($theme, $sub-theme: null) {
+    @include ig-bem-theme($theme, $sub-theme) {
+        @content;
+    }
+}
+
+///
+/// @alias theme
+///
+@mixin t($theme, $sub-theme: null) {
+    @include theme($theme, $sub-theme) {
+        @content;
+    }
+}

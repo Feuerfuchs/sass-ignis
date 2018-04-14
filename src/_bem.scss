@@ -4,9 +4,11 @@
 /// BEM is a methodology for structuring websites and is mostly known for it's CSS naming convention.
 /// BEMIT is in extension of this methodology and allows you to give blocks a more fine-grained  purpose
 /// than BEM alone would let you do.
-/// 
-/// The mixins in this class make working with BEMIT (and by extension BEM) easier by automatically
-/// generating the right selectors and enforcing a certain nesting order.
+///
+/// SASS does support BEM quite well thanks to the ampersand (&) and the @at-root directive. However,
+/// there is no way to make sure users adhere to the BEM or BEMIT methodology.
+/// That's where the mixins in this file come into play: They automatically generate the right selectors
+/// and perform checks regarding the nesting order, nesting depth, and so on.
 ///
 /// There are comments in the mixins explaining what selector is generated. The EBNF grammar is as follows:
 ///
@@ -105,6 +107,7 @@ $ig-bem-max-depth: 99 !default;
 
 ///
 /// Indicates if nesting elements is allowed.
+/// Related elements are excluded from this option.
 /// 
 /// @type bool
 ///
@@ -124,8 +127,8 @@ $ig-bem-context-id: 'bem' !default;
 /// where {namespace} is the prefix assigned to $type and {name} is the
 /// block's name.
 ///
-/// @param {string} $name - Block name
-/// @param {string} $type - BEMIT namespace of the block
+/// @param {string} $name        - Block name
+/// @param {string} $type [null] - BEMIT namespace of the block
 ///
 /// @content [All declarations belonging to that block]
 ///
@@ -143,7 +146,7 @@ $ig-bem-context-id: 'bem' !default;
 ///     /* some definitions */
 ///   }
 ///
-@mixin ig-bem-block($name, $type) {
+@mixin ig-bem-block($name, $type: null) {
     //
     // Blocks can only be used by itself or within a theme.
     // Possible outcomes:
@@ -153,14 +156,21 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix');
 
-    $namespace: map-get($ig-bem-namespaces, $type);
+    $selector: null;
 
-    @if not $namespace {
-        @error '"#{$type}" is not a valid type.';
+    @if $type != null {
+        $namespace: map-get($ig-bem-namespaces, $type);
+
+        @if not $namespace {
+            @error '"#{$type}" is not a valid type.';
+        }
+
+        $selector: selector-parse('.' + $namespace + '-' + $name);
+    } @else {
+        $selector: selector-parse('.' + $name);
     }
 
     $parent-context: ig-context-get($ig-bem-context-id, 'theme');
-    $selector:       selector-parse('.' + $namespace + '-' + $name);
 
     @if length($parent-context) != 0 {
         //
@@ -180,7 +190,7 @@ $ig-bem-context-id: 'bem' !default;
         @error 'Block must be declared at the root level.';
     }
 
-    $ig-bem-blocks: append($ig-bem-blocks, $name + '_' + $type) !global;
+    $ig-bem-blocks: append($ig-bem-blocks, $name + if($type != null, '_' + $type, '')) !global;
 
     @include ig-context-push($ig-bem-context-id, 'block', ('name': $name, 'selector': $selector));
     @at-root #{$selector} {
@@ -341,12 +351,12 @@ $ig-bem-context-id: 'bem' !default;
 ///   
 ///   // Compilation will fail because c-someBlock is defined after c-anotherBlock__elem
 ///
-@mixin ig-bem-composed-of($name, $type) {
-    @if not map-get($ig-bem-namespaces, $type) {
+@mixin ig-bem-composed-of($name, $type: null) {
+    @if $type != null and not map-get($ig-bem-namespaces, $type) {
         @error '"#{$type}" is not a valid type.';
     }
 
-    @if not index($ig-bem-blocks, $name + '_' + $type) {
+    @if not index($ig-bem-blocks, $name + if($type != null, '_' + $type, '')) {
         @error 'Block "#{$name}" does not exist.';
     }
 }
