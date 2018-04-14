@@ -1,0 +1,45 @@
+@mixin _env {
+    @include ig-context-stack-create('test');
+
+    @include ig-context-push('test', 'ctx', 1234);
+    @include ig-context-push('test', 'another', 'text');
+    @include ig-context-push('test', 'ctx', 56);
+
+    @content;
+
+    @include ig-context-stack-delete('test');
+}
+
+@include describe('Contexts') {
+    @include it('Static data retrieval') {
+        @include _env {
+            @include assert-equal(nth(ig-context-get('test', 1), 2), 56);
+            @include assert-equal(nth(ig-context-get('test', 'ctx'), 2), 56);
+            @include assert-equal(nth(ig-context-get('test', 'another'), 2), 'text');
+            @include assert-equal(nth(ig-context-get('test', 2), 2), 'text');
+            @include assert-equal(nth(ig-context-get('test', -1), 2), 1234);
+        }
+    }
+
+    @include it('Dynamic data retrieval') {
+        @include _env {
+            @include assert-equal(nth(ig-context-get('test', 1), 2), 56);
+            @include assert-equal(nth(ig-context-get('test', 'ctx'), 2), 56);
+
+            @include ig-context-pop('test');
+
+            @include assert-equal(nth(ig-context-get('test', 1), 2), 'text');
+            @include assert-equal(nth(ig-context-get('test', -1), 2), 1234);
+
+            @include ig-context-push('test', 'more', 'string');
+
+            @include assert-equal(nth(ig-context-get('test', 1), 2), 'string');
+            @include assert-equal(nth(ig-context-get('test', 'more'), 2), 'string');
+
+            @include ig-context-pop('test');
+            @include ig-context-pop('test');
+
+            @include assert-equal(ig-context-get('test', 1), ig-context-get('test', -1));
+        }
+    }
+}

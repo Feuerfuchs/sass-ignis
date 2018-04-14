@@ -21,29 +21,85 @@
         @include output(false) {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
-                    @include ig-bem-related-element('+', 'subchild') {
-                        font-size: 2.5em;
+                    @include ig-bem-related-element('+', 'subchild1') {
+                        font-size: 2em;
                     }
 
-                    @include ig-bem-related-element('~', 'subchild') {
-                        font-size: 2.5em;
+                    @include ig-bem-related-element('~', 'subchild2') {
+                        font-size: 2em;
                     }
                 }
             }
         }
 
         @include expect(false) {
-            .something__child + .something__subchild {
+            .something__child + .something__subchild1 {
+                font-size: 2em;
+            }
+
+            .something__child ~ .something__subchild2 {
+                font-size: 2em;
+            }
+        }
+    }
+
+    @include assert('single element, single related element, manual selector in-between') { /// 2 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child') {
+                    &:hover {
+                        @include ig-bem-related-element('+', 'subchild1') {
+                            font-size: 2em;
+                        }
+
+                        @include ig-bem-related-element('~', 'subchild2') {
+                            font-size: 2em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child:hover + .something__subchild1 {
+                font-size: 2em;
+            }
+
+            .something__child:hover ~ .something__subchild2 {
+                font-size: 2em;
+            }
+        }
+    }
+
+    @include assert('single element, single related element, modifier in-between') { /// 3 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child') {
+                    @include ig-bem-modifier('mod') {
+                        @include ig-bem-related-element('+', 'subchild1') {
+                            font-size: 2.5em;
+                        }
+
+                        @include ig-bem-related-element('~', 'subchild2') {
+                            font-size: 2.5em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child--mod + .something__subchild1 {
                 font-size: 2.5em;
             }
 
-            .something__child ~ .something__subchild {
+            .something__child--mod ~ .something__subchild2 {
                 font-size: 2.5em;
             }
         }
     }
 
-    @include assert('single element, multiple related elements') { /// 2 ///
+    @include assert('single element, multiple related elements') { /// 4 ///
         @include output(false) {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
@@ -51,7 +107,7 @@
                         font-size: 2.5em;
                     }
 
-                    @include ig-bem-related-element('~', 'subchild1', 'subchild2') {
+                    @include ig-bem-related-element('~', 'subchild3', 'subchild4') {
                         font-size: 2.5em;
                     }
                 }
@@ -64,51 +120,171 @@
                 font-size: 2.5em;
             }
 
-            .something__child ~ .something__subchild1,
-            .something__child ~ .something__subchild2 {
+            .something__child ~ .something__subchild3,
+            .something__child ~ .something__subchild4 {
                 font-size: 2.5em;
             }
         }
     }
 
-    @include assert('multiple elements, single related element') { /// 3 ///
+    @include assert('single element, multiple related elements, manual selector in-between') { /// 5 ///
         @include output(false) {
             @include ig-bem-block('something') {
-                @include ig-bem-element('child1', 'child2') {
-                    @include ig-bem-related-element('+', 'subchild') {
-                        font-size: 2.5em;
-                    }
+                @include ig-bem-element('child') {
+                    &:hover {
+                        @include ig-bem-related-element('+', 'subchild1', 'subchild2') {
+                            font-size: 2.5em;
+                        }
 
-                    @include ig-bem-related-element('~', 'subchild') {
-                        font-size: 2.5em;
+                        @include ig-bem-related-element('~', 'subchild3', 'subchild4') {
+                            font-size: 2.5em;
+                        }
                     }
                 }
             }
         }
 
         @include expect(false) {
-            .something__child1 + .something__subchild,
-            .something__child2 + .something__subchild {
+            .something__child:hover + .something__subchild1,
+            .something__child:hover + .something__subchild2 {
                 font-size: 2.5em;
             }
 
-            .something__child1 ~ .something__subchild,
-            .something__child2 ~ .something__subchild {
+            .something__child:hover ~ .something__subchild3,
+            .something__child:hover ~ .something__subchild4 {
                 font-size: 2.5em;
             }
         }
     }
 
-    @include assert('multiple elements, multiple related elements') { /// 4 ///
+    @include assert('single element, multiple related elements, modifier in-between') { /// 6 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child') {
+                    @include ig-bem-modifier('mod') {
+                        @include ig-bem-related-element('+', 'subchild1', 'subchild2') {
+                            font-size: 2.5em;
+                        }
+
+                        @include ig-bem-related-element('~', 'subchild3', 'subchild4') {
+                            font-size: 2.5em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child--mod + .something__subchild1,
+            .something__child--mod + .something__subchild2 {
+                font-size: 2.5em;
+            }
+
+            .something__child--mod ~ .something__subchild3,
+            .something__child--mod ~ .something__subchild4 {
+                font-size: 2.5em;
+            }
+        }
+    }
+
+    @include assert('multiple elements, single related element') { /// 7 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1', 'child2') {
+                    @include ig-bem-related-element('+', 'subchild1') {
+                        font-size: 2em;
+                    }
+
+                    @include ig-bem-related-element('~', 'subchild2') {
+                        font-size: 2em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1 + .something__subchild1,
+            .something__child2 + .something__subchild1 {
+                font-size: 2em;
+            }
+
+            .something__child1 ~ .something__subchild2,
+            .something__child2 ~ .something__subchild2 {
+                font-size: 2em;
+            }
+        }
+    }
+
+    @include assert('multiple elements, single related element, manual selector in-between') { /// 8 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1', 'child2') {
+                    &:hover {
+                        @include ig-bem-related-element('+', 'subchild1') {
+                            font-size: 2em;
+                        }
+
+                        @include ig-bem-related-element('~', 'subchild2') {
+                            font-size: 2em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1:hover + .something__subchild1,
+            .something__child2:hover + .something__subchild1 {
+                font-size: 2em;
+            }
+
+            .something__child1:hover ~ .something__subchild2,
+            .something__child2:hover ~ .something__subchild2 {
+                font-size: 2em;
+            }
+        }
+    }
+
+    @include assert('multiple elements, single related element, modifier in-between') { /// 9 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1', 'child2') {
+                    @include ig-bem-modifier('mod') {
+                        @include ig-bem-related-element('+', 'subchild1') {
+                            font-size: 2.5em;
+                        }
+
+                        @include ig-bem-related-element('~', 'subchild2') {
+                            font-size: 2.5em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1--mod + .something__subchild1,
+            .something__child2--mod + .something__subchild1 {
+                font-size: 2.5em;
+            }
+
+            .something__child1--mod ~ .something__subchild2,
+            .something__child2--mod ~ .something__subchild2 {
+                font-size: 2.5em;
+            }
+        }
+    }
+
+    @include assert('multiple elements, multiple related elements') { /// 10 ///
         @include output(false) {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
                     @include ig-bem-related-element('+', 'subchild1', 'subchild2') {
-                        font-size: 2.5em;
+                        font-size: 2em;
                     }
 
-                    @include ig-bem-related-element('~', 'subchild1', 'subchild2') {
-                        font-size: 2.5em;
+                    @include ig-bem-related-element('~', 'subchild3', 'subchild4') {
+                        font-size: 2em;
                     }
                 }
             }
@@ -119,14 +295,82 @@
             .something__child2 + .something__subchild1,
             .something__child1 + .something__subchild2,
             .something__child2 + .something__subchild2 {
-                font-size: 2.5em;
+                font-size: 2em;
             }
 
-            .something__child1 ~ .something__subchild1,
-            .something__child2 ~ .something__subchild1,
-            .something__child1 ~ .something__subchild2,
-            .something__child2 ~ .something__subchild2 {
-                font-size: 2.5em;
+            .something__child1 ~ .something__subchild3,
+            .something__child2 ~ .something__subchild3,
+            .something__child1 ~ .something__subchild4,
+            .something__child2 ~ .something__subchild4 {
+                font-size: 2em;
+            }
+        }
+    }
+
+    @include assert('multiple elements, multiple related elements, manual selector in-between') { /// 11 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1', 'child2') {
+                    &:hover {
+                        @include ig-bem-related-element('+', 'subchild1', 'subchild2') {
+                            font-size: 2em;
+                        }
+
+                        @include ig-bem-related-element('~', 'subchild3', 'subchild4') {
+                            font-size: 2em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1:hover + .something__subchild1,
+            .something__child2:hover + .something__subchild1,
+            .something__child1:hover + .something__subchild2,
+            .something__child2:hover + .something__subchild2 {
+                font-size: 2em;
+            }
+
+            .something__child1:hover ~ .something__subchild3,
+            .something__child2:hover ~ .something__subchild3,
+            .something__child1:hover ~ .something__subchild4,
+            .something__child2:hover ~ .something__subchild4 {
+                font-size: 2em;
+            }
+        }
+    }
+
+    @include assert('multiple elements, multiple related elements, modifier in-between') { /// 12 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1', 'child2') {
+                    @include ig-bem-modifier('mod') {
+                        @include ig-bem-related-element('+', 'subchild1', 'subchild2') {
+                            font-size: 2em;
+                        }
+
+                        @include ig-bem-related-element('~', 'subchild3', 'subchild4') {
+                            font-size: 2em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1--mod + .something__subchild1,
+            .something__child2--mod + .something__subchild1,
+            .something__child1--mod + .something__subchild2,
+            .something__child2--mod + .something__subchild2 {
+                font-size: 2em;
+            }
+
+            .something__child1--mod ~ .something__subchild3,
+            .something__child2--mod ~ .something__subchild3,
+            .something__child1--mod ~ .something__subchild4,
+            .something__child2--mod ~ .something__subchild4 {
+                font-size: 2em;
             }
         }
     }

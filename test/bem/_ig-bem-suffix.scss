@@ -1,7 +1,15 @@
 // sass-lint:disable class-name-format force-element-nesting force-pseudo-nesting mixins-before-declarations
 
+//
+// Included test cases:
+//  - /// 1 /// - block suffix
+//  - /// 2 /// - element suffix
+//  - /// 3 /// - modifier suffix
+//  - /// 4 /// - multiple element suffix
+//
+
 @include it('ig-bem-suffix') {
-    @include assert('block suffix') {
+    @include assert('block suffix') { /// 1 ///
         @include output(false) {
             @include ig-bem-block('something') {
                 @include ig-bem-suffix('sm') {
@@ -17,7 +25,7 @@
         }
     }
 
-    @include assert('element suffix') {
+    @include assert('element suffix') { /// 2 ///
         @include output(false) {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
@@ -35,7 +43,7 @@
         }
     }
 
-    @include assert('modifier suffix') {
+    @include assert('modifier suffix') { /// 3 ///
         @include output(false) {
             @include ig-bem-block('something') {
                 @include ig-bem-modifier('mod1') {
@@ -65,7 +73,7 @@
         }
     }
 
-    @include assert('multiple element suffix') {
+    @include assert('multiple element suffix') { /// 4 ///
         @include output(false) {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {

@@ -6,5 +6,6 @@
 $ig-bem-testing: true;
 
 @import 'bem';
+@import 'contexts';
 
 @include report;

@@ -31,7 +31,7 @@ $ig-context-stacks: ();
 ///
 /// @throw If context stack already exists
 ///
-@mixin ig-context-create-stack($stack-id) {
+@mixin ig-context-stack-create($stack-id) {
     @if map-has-key($ig-context-stacks, $stack-id) {
         @error 'Context stack "#{inspect($stack-id)}" already exists.';
     }
@@ -174,7 +174,7 @@ $ig-context-stacks: ();
 /// Get a specific context from the stack.
 ///
 /// @param {string}                 $stack-id      - ID of context stack to use
-/// @param {number | string | list} $type-or-level - If this is a number, the nth context from the head will be returned. If it is a string, the first context with a matching ID will be returned. If it is a list, the first context that matches one of the IDs in the list will be returned.
+/// @param {number | string | list} $type-or-level - If this is a number (!= 0), the nth context from the head will be returned. If it is a string, the first context with a matching ID will be returned. If it is a list, the first context that matches one of the IDs in the list will be returned.
 ///
 /// @return {list} An empty list if no matching context was found, otherwise a list with two items: 1. context ID, 2. context data.
 ///
@@ -193,12 +193,12 @@ $ig-context-stacks: ();
 
     @if type-of($type-or-level) == number {
         @if $type-or-level == 0 {
-            $type-or-level: length($context-stack);
+            @error 'Level must be larger or smaller than 0.';
         }
 
         $context: nth($context-stack, -$type-or-level);
 
-        @return nth($context, 1);
+        @return $context;
     } @else {
         @for $i from -1 through -(length($context-stack)) {
             $context: nth($context-stack, $i);
@@ -218,4 +218,31 @@ $ig-context-stacks: ();
     }
 
     @return ();
+}
+
+/// 
+/// Clear a context stack.
+///
+/// @param {string} $stack-id - ID of context stack to use
+///
+@mixin ig-context-stack-clear($stack-id) {
+    @if not map-has-key($ig-context-stacks, $stack-id) {
+        @error 'Context stack "#{inspect($stack-id)}" does not exist.';
+    }
+
+    $context-stack: ();
+    $ig-context-stacks: map-merge($ig-context-stacks, ($stack-id: $context-stack)) !global;
+}
+
+/// 
+/// Clear a context stack.
+///
+/// @param {string} $stack-id - ID of context stack to use
+///
+@mixin ig-context-stack-delete($stack-id) {
+    @if not map-has-key($ig-context-stacks, $stack-id) {
+        @error 'Context stack "#{inspect($stack-id)}" does not exist.';
+    }
+
+    $ig-context-stacks: map-remove($ig-context-stacks, $stack-id) !global;
 }

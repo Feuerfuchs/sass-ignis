@@ -1113,4 +1113,4 @@ $ig-bem-context-id: 'bem' !default;
 
 //
 
-@include ig-context-create-stack($ig-bem-context-id);
+@include ig-context-stack-create($ig-bem-context-id);

@@ -1,0 +1,43 @@
+// sass-lint:disable class-name-format force-element-nesting force-pseudo-nesting mixins-before-declarations
+
+//
+// Included test cases:
+//  - /// 1 /// - theme
+//  - /// 2 /// - theme in block
+//
+
+@include it('ig-bem-theme') {
+    @include assert('theme') { /// 1 ///
+        @include output(false) {
+            @include ig-bem-theme('dark') {
+                @include ig-bem-block('something') {
+                    font-size: 1em;
+                }
+            }
+        }
+
+        @include expect(false) {
+            .t-dark .something,
+            [class*=" t-"] .t-dark .something {
+                font-size: 1em;
+            }
+        }
+    }
+
+    @include assert('theme in block') { /// 2 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-theme('dark') {
+                    font-size: 1em;
+                }
+            }
+        }
+
+        @include expect(false) {
+            .t-dark .something,
+            [class*=" t-"] .t-dark .something {
+                font-size: 1em;
+            }
+        }
+    }
+}
