@@ -182,7 +182,7 @@ $ig-bem-context-id: 'bem' !default;
 
     $ig-bem-blocks: append($ig-bem-blocks, $name + '_' + $type) !global;
 
-    @include ig-context-push($ig-bem-context-id, 'block', ( 'name': $name, 'selector': $selector ));
+    @include ig-context-push($ig-bem-context-id, 'block', ('name': $name, 'selector': $selector));
     @at-root #{$selector} {
         @content;
     }
@@ -413,7 +413,26 @@ $ig-bem-context-id: 'bem' !default;
 ///     background-color: #000;
 ///   }
 ///
-@mixin ig-bem-element($name) {
+/// @example scss - Multiple elements
+///   @include ig-bem-component('block') {
+///     /* some block definitions */
+///     
+///     @include ig-bem-element('elem1', 'elem2') {
+///       /* some element definitions */
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block {
+///     /* some block definitions */
+///   }
+///   
+///   .c-block__elem1, .c-block__elem2 {
+///     /* some element definitions */
+///   }
+///
+@mixin ig-bem-element($name, $names...) {
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
@@ -425,56 +444,67 @@ $ig-bem-context-id: 'bem' !default;
         @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'element');
     }
 
-    $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'theme');
-    $selector:       null;
+    $selector:   ();
+    $parts-data: ();
 
-    @if index('element' 'modifier' 'suffix', nth($parent-context, 1)) {
-        //
-        // Parent context is element, modifier or suffix.
-        // Possible outcomes:
-        //   - {e,m,s} ([manual selector]) {b}__element
-        //
+    @each $name in join($name, $names) {
+        $sel:            null;
+        $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'theme');
 
-        $parent-context:  ig-context-get($ig-bem-context-id, 'block');
-        $parent-selector: map-get(nth($parent-context, 2), 'selector');
-
-        $selector: selector-nest(&, selector-append($parent-selector, $ig-bem-element-separator + $name));
-        $selector: ig-selector-nest-fix($selector);
-    } @else {
-        //
-        // Parent context is block or theme.
-        //
-
-        $parent-selector: map-get(nth($parent-context, 2), 'selector');
-
-        @if is-superselector(&, $parent-selector) {
+        @if index('element' 'modifier' 'suffix', nth($parent-context, 1)) {
             //
-            // The current selector matches the parent selector.
-            // The element part can simply be appended
+            // Parent context is element, modifier or suffix.
             // Possible outcomes:
-            //   - {b}__element
+            //   - {e,m,s} ([manual selector]) {b}__element
             //
 
-            $selector: selector-append(&, $ig-bem-element-separator + $name);
+            $parent-context:  ig-context-get($ig-bem-context-id, 'block');
+            $parent-selector: map-get(nth($parent-context, 2), 'selector');
+
+            $sel: selector-nest(&, selector-append($parent-selector, $ig-bem-element-separator + $name));
+            $sel: ig-selector-nest-fix($sel);
         } @else {
             //
-            // The current selector doesn't match the parent selector.
-            // The user manually added a selector between parent context and this mixin call.
-            // Possible outcomes:
-            //   - {b} [manual selector] {b}__element
+            // Parent context is block or theme.
             //
 
-            @if nth($parent-context, 1) == 'theme' {
-                $parent-context:  ig-context-get($ig-bem-context-id, 'block');
-                $parent-selector: map-get(nth($next-parent-context, 2), 'selector');
-            }
+            $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
-            $selector: selector-nest(&, selector-append($parent-selector, $ig-bem-element-separator + $name));
-            $selector: ig-selector-nest-fix($selector);
+            @if is-superselector(&, $parent-selector) {
+                //
+                // The current selector matches the parent selector.
+                // The element part can simply be appended.
+                // Possible outcomes:
+                //   - {b}__element
+                //
+
+                $sel: selector-append(&, $ig-bem-element-separator + $name);
+            } @else {
+                //
+                // The current selector doesn't match the parent selector.
+                // The user manually added a selector between parent context and this mixin call.
+                // Possible outcomes:
+                //   - {b} [manual selector] {b}__element
+                //
+
+                @if nth($parent-context, 1) == 'theme' {
+                    $parent-context:  ig-context-get($ig-bem-context-id, 'block');
+                    $parent-selector: map-get(nth($next-parent-context, 2), 'selector');
+                }
+
+                $sel: selector-nest(&, selector-append($parent-selector, $ig-bem-element-separator + $name));
+                $sel: ig-selector-nest-fix($sel);
+            }
         }
+
+        $selector:   join($selector, $sel, 'comma');
+        $parts-data: append($parts-data, ('name': $name, 'selector': $sel));
     }
 
-    @include ig-context-push($ig-bem-context-id, 'element', ( 'name': $name, 'selector': $selector ));
+    @include ig-context-push($ig-bem-context-id, 'element', (
+            'parts':    $parts-data,
+            'selector': $selector
+    ));
     @at-root #{$selector} {
         @content;
     }
@@ -482,9 +512,9 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a BEM element that is related to the parent element.
+/// Generate a BEM element that is related to the current element.
 ///
-/// The generated element selector is appended to the parent element selector. The $sign
+/// The generated element selector is appended to the current element selector. The $sign
 /// determines the relationship.
 ///
 /// @param {string} $name - Element name
@@ -494,24 +524,94 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @throw If the element is not preceded by an element.
 ///
+/// @example scss - A sibling element to a single element
+///   @include ig-bem-component('block') {
+///     @include ig-bem-element('elem') {
+///       /* some element definitions */
+///       
+///       @include ig-bem-related-element('sibling', '~') {
+///         /* some sibling element definitions */
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block__elem {
+///     /* some element definitions */
+///   }
+///   
+///   .c-block__elem ~ .c-block__sibling {
+///     /* some sibling element definitions */
+///   }
+///
+/// @example scss - A successor element to a single element
+///   @include ig-bem-component('block') {
+///     @include ig-bem-element('elem') {
+///       /* some element definitions */
+///       
+///       @include ig-bem-related-element('successor', '+') {
+///         /* some successor element definitions */
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block__elem {
+///     /* some element definitions */
+///   }
+///   
+///   .c-block__elem + .c-block__successor {
+///     /* some successor element definitions */
+///   }
+///
+/// @example scss - A successor element to multiple elements
+///   @include ig-bem-component('block') {
+///     @include ig-bem-element('elem1', 'elem2') {
+///       /* some element definitions */
+///       
+///       @include ig-bem-related-element('successor', '+') {
+///         /* some successor element definitions */
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block__elem1, .c-block__elem2 {
+///     /* some element definitions */
+///   }
+///   
+///   .c-block__elem1 + .c-block__successor, .c-block__elem2 + .c-block__successor {
+///     /* some successor element definitions */
+///   }
+///
 @mixin ig-bem-related-element($name, $sign) {
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'element');
 
-    $parent-context:  ig-context-get($ig-bem-context-id, 'element');
-    $parent-selector: map-get(nth($parent-context, 2), 'selector');
+    @if $sign != '+' and $sign != '~' {
+        @error 'Invalid relationship sign #{inspect($sign)}.';
+    }
 
-    @if not is-superselector(&, $parent-selector) {
+    $element-context:  ig-context-get($ig-bem-context-id, 'element');
+    $element-selector: map-get(nth($element-context, 2), 'selector');
+
+    @if not is-superselector(&, $element-selector) {
         @error 'Related element must be an immediate child of element.';
     }
 
-    $parent-context:  ig-context-get($ig-bem-context-id, 'block');
-    $parent-selector: map-get(nth($parent-context, 2), 'selector');
+    $block-context:  ig-context-get($ig-bem-context-id, 'block');
+    $block-selector: map-get(nth($block-context, 2), 'selector');
 
-    $selector: selector-nest(&, selector-append($sign + $parent-selector, $ig-bem-element-separator + $name));
+    $selector: selector-nest(&, $sign, selector-append($block-selector, $ig-bem-element-separator + $name));
     $selector: ig-selector-nest-fix($selector);
 
-    @include ig-context-push($ig-bem-context-id, 'element', ( 'name': $name, 'selector': $selector ));
+    @include ig-context-push($ig-bem-context-id, 'element', (
+            'parts':    (('name': $name, 'selector': $selector)),
+            'selector': $selector
+    ));
     @at-root #{$selector} {
         @content;
     }
@@ -519,7 +619,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a BEM element that is a sibling of the parent element.
+/// Generate a BEM element that is a sibling of the current element.
 ///
 /// It's a shorthand for ig-bem-related-element($name, '~').
 ///
@@ -534,7 +634,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a BEM element that comes after the parent element.
+/// Generate a BEM element that is the successor of the current element.
 ///
 /// It's a shorthand for ig-bem-related-element($name, '+').
 ///
@@ -549,20 +649,90 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate the current BEM element as a next-child to itself.
+/// Generate the current BEM element as a successor of itself.
+///
+/// If this is applied to a single element, it behaves exactly the same as
+/// ig-bem-related-element(name, '+');
+/// However, if it is applied to multiple elements, each twin element only will influence
+/// their other twin, which is not replicable with ig-bem-related-element.
 ///
 /// @content [All declarations belonging to that element]
+///
+/// @example scss - Two twin elements
+///   @include ig-bem-component('block') {
+///     @include ig-bem-element('elem') {
+///       /* some element definitions */
+///       
+///       @include ig-bem-twin-element {
+///         /* some twin element definitions */
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block__elem {
+///     /* some element definitions */
+///   }
+///   
+///   .c-block__elem + .c-block__elem {
+///     /* some twin element definitions */
+///   }
+///
+/// @example scss - Multiple twin elements
+///   @include ig-bem-component('block') {
+///     @include ig-bem-element('elem1', 'elem2') {
+///       /* some element definitions */
+///       
+///       @include ig-bem-twin-element {
+///         /* some twin element definitions */
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block__elem1, .c-block__elem2 {
+///     /* some element definitions */
+///   }
+///   
+///   .c-block__elem1 + .c-block__elem1, .c-block__elem2 + .c-block__elem2 {
+///     /* some twin element definitions */
+///   }
 ///
 @mixin ig-bem-twin-element {
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'element');
 
-    $parent-context: ig-context-get($ig-bem-context-id, 'element');
-    $parent-name:    map-get(nth($parent-context, 2), 'name');
+    $element-context: ig-context-get($ig-bem-context-id, 'element');
+    $selector:        ();
+    $parts-data:      ();
 
-    @include ig-bem-related-element($parent-name, '+') {
+    @each $part-data in map-get(nth($element-context, 2), 'parts') {
+        $part-selector: map-get($part-data, 'selector');
+        $part-name:     map-get($part-data, 'name');
+
+        @if not is-superselector(&, $part-selector) {
+            @error 'Related element must be an immediate child of element.';
+        }
+
+        $block-context:  ig-context-get($ig-bem-context-id, 'block');
+        $block-selector: map-get(nth($block-context, 2), 'selector');
+
+        $sel: selector-nest($part-selector, '+', selector-append($block-selector, $ig-bem-element-separator + $part-name));
+        
+        $selector:   join($selector, $sel, 'comma');
+        $parts-data: append($parts-data, ('name': $part-name, 'selector': $sel));
+    }
+
+    @include ig-context-push($ig-bem-context-id, 'element', (
+            'parts':    $parts-data,
+            'selector': $selector
+    ));
+    @at-root #{$selector} {
         @content;
     }
+    @include ig-context-pop($ig-bem-context-id);
 }
 
 /// 
@@ -715,7 +885,7 @@ $ig-bem-context-id: 'bem' !default;
         $selector: selector-append(&, $parent-selector, $ig-bem-modifier-separator + $name);
     }
 
-    @include ig-context-push($ig-bem-context-id, 'modifier', ( 'name': $name, 'selector': $selector ));
+    @include ig-context-push($ig-bem-context-id, 'modifier', ('name': $name, 'selector': $selector));
     @at-root #{$selector} {
         @content;
     }
@@ -801,7 +971,7 @@ $ig-bem-context-id: 'bem' !default;
 
     $selector: selector-append(&, $ig-bem-suffix-separator + $name);
 
-    @include ig-context-push($ig-bem-context-id, 'suffix', ( 'name': $name, 'selector': $selector ));
+    @include ig-context-push($ig-bem-context-id, 'suffix', ('name': $name, 'selector': $selector));
     @at-root #{$selector} {
         @content;
     }
@@ -875,7 +1045,7 @@ $ig-bem-context-id: 'bem' !default;
         @error 'Theme must be declared at the root level.';
     }
 
-    @include ig-context-push($ig-bem-context-id, 'theme', ( 'selector': $selector ));
+    @include ig-context-push($ig-bem-context-id, 'theme', ('selector': $selector));
     @at-root #{$selector} {
         @content;
     }
