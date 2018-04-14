@@ -458,10 +458,10 @@ $ig-bem-context-id: 'bem' !default;
             //   - {e,m,s} ([manual selector]) {b}__element
             //
 
-            $parent-context:  ig-context-get($ig-bem-context-id, 'block');
-            $parent-selector: map-get(nth($parent-context, 2), 'selector');
+            $block-context:  ig-context-get($ig-bem-context-id, 'block');
+            $block-selector: map-get(nth($block-context, 2), 'selector');
 
-            $sel: selector-nest(&, selector-append($parent-selector, $ig-bem-element-separator + $name));
+            $sel: selector-nest(&, selector-append($block-selector, $ig-bem-element-separator + $name));
             $sel: ig-selector-nest-fix($sel);
         } @else {
             //
@@ -488,8 +488,8 @@ $ig-bem-context-id: 'bem' !default;
                 //
 
                 @if nth($parent-context, 1) == 'theme' {
-                    $parent-context:  ig-context-get($ig-bem-context-id, 'block');
-                    $parent-selector: map-get(nth($next-parent-context, 2), 'selector');
+                    $block-context:  ig-context-get($ig-bem-context-id, 'block');
+                    $parent-selector: map-get(nth($block-context, 2), 'selector');
                 }
 
                 $sel: selector-nest(&, selector-append($parent-selector, $ig-bem-element-separator + $name));
@@ -588,18 +588,19 @@ $ig-bem-context-id: 'bem' !default;
 ///   }
 ///
 @mixin ig-bem-related-element($name, $sign) {
+    //
+    // Generating this selector is simple: Take the latest block context, use it
+    // to generate the element part, and insert it at the end of the current selector.
+    // Possible outcomes:
+    //   - {e} ({m,s}) ([manual selector]) + {e}
+    //   - {e} ({m,s}) ([manual selector]) ~ {e}
+    //
+
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'element');
 
     @if $sign != '+' and $sign != '~' {
         @error 'Invalid relationship sign #{inspect($sign)}.';
-    }
-
-    $element-context:  ig-context-get($ig-bem-context-id, 'element');
-    $element-selector: map-get(nth($element-context, 2), 'selector');
-
-    @if not is-superselector(&, $element-selector) {
-        @error 'Related element must be an immediate child of element.';
     }
 
     $block-context:  ig-context-get($ig-bem-context-id, 'block');
@@ -663,7 +664,7 @@ $ig-bem-context-id: 'bem' !default;
 ///     @include ig-bem-element('elem') {
 ///       /* some element definitions */
 ///       
-///       @include ig-bem-twin-element {
+///       @include ig-bem-next-twin-element {
 ///         /* some twin element definitions */
 ///       }
 ///     }
@@ -684,7 +685,7 @@ $ig-bem-context-id: 'bem' !default;
 ///     @include ig-bem-element('elem1', 'elem2') {
 ///       /* some element definitions */
 ///       
-///       @include ig-bem-twin-element {
+///       @include ig-bem-next-twin-element {
 ///         /* some twin element definitions */
 ///       }
 ///     }
@@ -700,27 +701,45 @@ $ig-bem-context-id: 'bem' !default;
 ///     /* some twin element definitions */
 ///   }
 ///
-@mixin ig-bem-twin-element {
+@mixin ig-bem-next-twin-element {
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'element');
 
     $element-context: ig-context-get($ig-bem-context-id, 'element');
-    $selector:        ();
-    $parts-data:      ();
 
+    $block-context:  ig-context-get($ig-bem-context-id, 'block');
+    $block-selector: map-get(nth($block-context, 2), 'selector');
+
+    $selector:   ();
+    $parts-data: ();
+
+    //
+    // To determine the twin for each element, iterate the parts from the latest element
+    // context.
+    // Then, iterate all sub-selectors from the current selector and check if it contains
+    // the element part selector. This has to be done with string comparison since none of
+    // SASS selector functions would be useful here. 
+    // Finally, the current twin will be appended to the extracted selector part as a successor
+    // element.
+    // Possible outcomes:
+    //   - {e} ({m,s}) ([manual selector]) + {e}
+    //
     @each $part-data in map-get(nth($element-context, 2), 'parts') {
         $part-selector: map-get($part-data, 'selector');
         $part-name:     map-get($part-data, 'name');
 
-        @if not is-superselector(&, $part-selector) {
-            @error 'Related element must be an immediate child of element.';
+        $current-selector-part: null;
+        @each $s in & {
+            @if str-index(inspect($s), inspect($part-selector)) {
+                $current-selector-part: $s;
+            }
+        }
+        @if $current-selector-part == null {
+            @error 'Could not generate twin element selector.';
         }
 
-        $block-context:  ig-context-get($ig-bem-context-id, 'block');
-        $block-selector: map-get(nth($block-context, 2), 'selector');
+        $sel: selector-nest($current-selector-part, '+', selector-append($block-selector, $ig-bem-element-separator + $part-name));
 
-        $sel: selector-nest($part-selector, '+', selector-append($block-selector, $ig-bem-element-separator + $part-name));
-        
         $selector:   join($selector, $sel, 'comma');
         $parts-data: append($parts-data, ('name': $part-name, 'selector': $sel));
     }
@@ -748,7 +767,8 @@ $ig-bem-context-id: 'bem' !default;
 /// If it's true, you signalize that the modifier extends the parent modifier or suffix and can only be
 /// used in conjunction with it.
 ///
-/// @param {string} $name - Modifier name
+/// @param {string} $name           - Modifier name
+/// @param {bool}   $extend [false] - Indicate if the parent modifier or suffix will be extended
 ///
 /// @content [All declarations belonging to that modifier]
 ///
