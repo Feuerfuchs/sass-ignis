@@ -7,9 +7,9 @@
 /// The code in this file is based on an article by Niklas Postulart:
 /// http://niklaspostulart.de/2015/10/sass-responsive-type-mixin
 /// 
-/// The following changes were made:
+/// The following adjustments were made:
 /// - Support any property passed by the user, not just font-size
-/// - Slightly different error handling
+/// - Omit the unnecessary requirement that units must match or be convertible into each other
 /// - Make the media queries for viewport > max-width and viewport < min-width optional so the resize rate
 ///   between different media queries can be altered without generating useless code
 /// - Provide a variant of the mixin which integrates include-media for media queries
@@ -128,31 +128,12 @@
 /// @access private
 ///
 @function ig-responsive-generate-calc($min-value, $max-value, $min-width, $max-width, $root-size: $ig-root-size) {
-    $value-unit:     unit($min-value);
-    $max-value-unit: unit($max-value);
-    $width-unit:     unit($min-width);
-    $max-width-unit: unit($max-width);
-
-    @if ($value-unit != $max-value-unit) or ($width-unit != $max-width-unit) {
+    @if (unit($min-value) != unit($max-value)) or (unit($min-width) != unit($max-width)) {
         @error 'Units of $min-value and $max-value, $min-width and $max-width must match.';
     }
 
-    @if ($value-unit == rem) and ($width-unit == px) {
-        $min-width:  ig-px-to-rem($min-width, $root-size);
-        $max-width:  ig-px-to-rem($max-width, $root-size);
-        $width-unit: rem;
-    } @else if ($value-unit == px) and ($width-unit == rem) {
-        $min-value:  ig-px-to-rem($min-value, $root-size);
-        $max-value:  ig-px-to-rem($max-value, $root-size);
-        $value-unit: rem;
-    }
-
-    @if $value-unit != $width-unit {
-        @error 'This combination of units is not supported.';
-    }
-
-    $value-diff: ig-strip-unit($max-value) - ig-strip-unit($min-value);
-    $width-diff: ig-strip-unit($max-width) - ig-strip-unit($min-width);
+    $value-diff: ig-strip-unit($max-value - $min-value);
+    $width-diff: ig-strip-unit($max-width - $min-width);
 
     @return calc(#{$min-value} + #{$value-diff} * ((100vw - #{$min-width}) / #{$width-diff}));
 }

@@ -50,6 +50,64 @@
 }
 
 /// 
+/// Sort numeric items in a list.
+///
+/// The implementation is based on the algorithm on the German article
+/// on Wikipedia about quicksort: https://de.wikipedia.org/wiki/Quicksort
+///
+/// @param {list} $l
+///
+/// @return {list} Sorted list
+///
+@function ig-quicksort($l, $left: 1, $right: length($l)) {
+    @if $left < $right {
+        $pvr:   ig-quicksort-partition($l, $left, $right);
+        $pivot: nth($pvr, 1);
+        $l:     nth($pvr, 2);
+        $l:     ig-quicksort($l, $left, $pivot);
+        $l:     ig-quicksort($l, $pivot + 1, $right);
+    }
+
+    @return $l;
+}
+
+/// 
+/// @access private
+///
+@function ig-quicksort-partition($l, $left, $right) {
+    $start: true;
+    $i:     $left;
+    $j:     $right - 1;
+    $pivot: nth($l, $right);
+
+    @while ($i < $j) or $start {
+        @while (nth($l, $i) < $pivot) and ($i < $right - 1) {
+            $i: $i + 1;
+        }
+
+        @while (nth($l, $j)>= $pivot) and ($j > $left) {
+            $j: $j - 1;
+        }
+
+        @if $i < $j {
+            $i-val: nth($l, $i);
+            $l:     set-nth($l, $i, nth($l, $j));
+            $l:     set-nth($l, $j, $i-val);
+        }
+
+        $start: false;
+    }
+
+    @if nth($l, $i) > $pivot {
+        $i-val: nth($l, $i);
+        $l:     set-nth($l, $i, nth($l, $right));
+        $l:     set-nth($l, $right, $i-val);
+    }
+
+    @return $i $l;
+}
+
+/// 
 /// Try to get the value for the given key from the given map. If it doesn't contain that key,
 /// return the provided default value instead.
 ///

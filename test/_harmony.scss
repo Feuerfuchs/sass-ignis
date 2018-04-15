@@ -1,0 +1,19 @@
+@function _limit-decimals($n) {
+    @return floor($n * 1000) / 1000;
+}
+
+@include describe('Harmony') {
+    @include it('ig-harmony-modular-scale') {
+        @include assert-equal(_limit-decimals(ig-harmony-modular-scale(0, 1em, 1.1)), 1em,    'Zero iterations, 1em base, 1.1 scale');
+        @include assert-equal(_limit-decimals(ig-harmony-modular-scale(1, 1em, 1.1)), 1.1em,  '1 iteration, 1em base, 1.1 scale');
+        @include assert-equal(_limit-decimals(ig-harmony-modular-scale(2, 2px, 1.2)), 2.88px, '2 iterations, 2px base, 1.2 scale');
+        @include assert-equal(_limit-decimals(ig-harmony-modular-scale(-1, 2rem, 2)), 1rem,   '-1 iteration, 2rem base, 2 scale');
+        @include assert-equal(_limit-decimals(ig-harmony-modular-scale(-2, 2rem, 2)), 0.5rem, '-2 iterations, 2rem base, 2 scale');
+
+        @include assert-equal(_limit-decimals(ig-harmony-modular-scale(0, 1em 2em, 1.1)), 1em,        'Zero iterations, 1em 2em base, 1.1 scale');
+        @include assert-equal(_limit-decimals(ig-harmony-modular-scale(1, 1em 2em, 1.1)), 1.026em,    '1 iteration, 1em 2em base, 1.1 scale');
+        @include assert-equal(_limit-decimals(ig-harmony-modular-scale(2, 1em 2em, 1.1)), 1.1em,      '2 iterations, 1em 2em base, 1.1 scale');
+        @include assert-equal(_limit-decimals(ig-harmony-modular-scale(-1, 1em 1.5em, 1.2)), 0.868em, '-1 iteration, 1em 2em base, 1.1 scale');
+        @include assert-equal(_limit-decimals(ig-harmony-modular-scale(-2, 1em 1.5em, 1.2)), 0.833em, '-2 iterations, 1em 2em base, 1.1 scale');
+    }
+}

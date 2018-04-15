@@ -3,10 +3,10 @@
 
 @import 'true';
 
-$ig-bem-testing: true;
-
 @import 'functions';
 @import 'contexts';
 @import 'bem';
+@import 'responsive';
+@import 'harmony';
 
 @include report;

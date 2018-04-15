@@ -1,0 +1,54 @@
+////
+/// Harmony.
+///
+/// Contains functions to make a design appear more harmonic.
+///
+/// @group Harmony
+///
+/// @access public
+////
+
+/// 
+/// Adjust a value to a modular scale.
+///
+/// For a more sophisticated solution, check out modularscale-sass: https://github.com/modularscale/modularscale-sass
+///
+/// @link http://alistapart.com/article/more-meaningful-typography An article about modular scales by Tim Brown
+///
+/// @param {number}        $times - Number of iterations. If positive, $base will be multiplied with $ratio. If negative, $base will be divided by $ratio.
+/// @param {number | list} $base  - Single base value or, for a multi-stranded modular scale, a list of base values
+/// @param {number}        $ratio - Ratio
+///
+/// @return {number}
+///
+@function ig-harmony-modular-scale($times, $base, $ratio) {
+    @if type-of($base) == number {
+        @return $base * pow($ratio, $times);
+    }
+
+    $main-base:  nth($base, 1);
+    $norm-bases: ();
+
+    @each $b in ig-list-slice($base, 2) {
+        @if $b > $main-base {
+            @while $b > $main-base {
+                $b: $b / $ratio;
+            }
+            $b: $b * $ratio;
+        } @else if $b < $main-base {
+            @while $b < $main-base {
+                $b: $b * $ratio;
+            }
+        }
+
+        $norm-bases: append($norm-bases, $b);
+    }
+
+    $all-bases: append($norm-bases, $main-base);
+    $all-bases: ig-quicksort($all-bases);
+
+    $base-index: $times % length($all-bases) + 1;
+    $exp:        floor($times / length($all-bases));
+
+    @return nth($all-bases, $base-index) * pow($ratio, $exp);
+}
