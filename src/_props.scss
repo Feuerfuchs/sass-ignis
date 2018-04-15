@@ -18,13 +18,13 @@
 $ig-props-default-tree: 'default' !default;
 
 ///
-/// Character sequence for BEM elements.
+/// List of all created property trees.
 ///
 /// @type list
 ///
 /// @access private
 ///
-$ig-props-list: ();
+$ig-props-trees: ();
 
 /// 
 /// Save a new property tree.
@@ -35,21 +35,59 @@ $ig-props-list: ();
 /// @throw If a property name doesn't start with '--'
 ///
 @mixin ig-props-set($map, $tree: $ig-props-default-tree) {
-    $prop-map: ();
+    $noop: ig-props-set($map, $tree);
+}
 
-    @if map-has-key($ig-props-list, $tree) {
-        $prop-map: map-get($ig-props-list, $tree);
-    }
-
+/// 
+/// Save a new property tree.
+///
+/// @param {map}    $map                           - Map containing properties
+/// @param {string} $tree [$ig-props-default-tree] - ID the map is saved as
+///
+/// @throw If a property name doesn't start with '--'
+///
+@function ig-props-set($map, $tree: $ig-props-default-tree) {
     @each $key, $value in $map {
         @if str-slice($key, 1, 2) != '--' {
             @error 'Property names must start with "--".';
         }
     }
 
-    $prop-map: map-merge($prop-map, $map);
+    $prop-map: null;
 
-    $ig-props-list: map-merge($ig-props-list, ($tree: $prop-map)) !global;
+    @if map-has-key($ig-props-trees, $tree) {
+        $map: ig-map-merge-recursive(map-get($ig-props-trees, $tree), $map);
+    }
+
+    $ig-props-trees: map-merge($ig-props-trees, ($tree: $map)) !global;
+
+    @return null;
+}
+
+/// 
+/// Unset a property tree.
+///
+/// @param {string} $tree [$ig-props-default-tree] - ID of the tree to be deleted
+///
+@mixin ig-props-unset($tree: $ig-props-default-tree) {
+    $noop: ig-props-set($tree);
+}
+
+/// 
+/// Unset a property tree.
+///
+/// @param {string} $tree [$ig-props-default-tree] - ID of the tree to be deleted
+///
+/// @throw If the property tree does not exist
+///
+@function ig-props-unset($tree: $ig-props-default-tree) {
+    @if not map-has-key($ig-props-trees, $tree) {
+        @error 'Property tree "#{inspect($tree)}" does not exist.';
+    }
+
+    $ig-props-trees: map-remove($ig-props-trees, $tree) !global;
+
+    @return null;
 }
 
 /// 
@@ -65,11 +103,11 @@ $ig-props-list: ();
 /// @throw If there was no match for $key and $default is null
 ///
 @function ig-props-get($key, $tree: $ig-props-default-tree, $default: null) {
-    @if not map-has-key($ig-props-list, $tree) {
+    @if not map-has-key($ig-props-trees, $tree) {
         @error 'Unknown tree "#{$tree}".';
     }
 
-    $prop-map:   map-get($ig-props-list, $tree);
+    $prop-map:   map-get($ig-props-trees, $tree);
     $prop-value: null;
 
     @if type-of($key) == list {
@@ -78,17 +116,25 @@ $ig-props-list: ();
         @each $k in $key {
             $prop-value: map-get($prop-value, $k);
 
-            @if $prop-value == null and $default == null {
-                @error '"#{$key}" is null.';
+            @if $prop-value == null {
+                @if $default == null {
+                    @error '"#{$key}" is null.';
+                } @else {
+                    @return $default;
+                }
             }
         }
     } @else {
         $prop-value: map-get($prop-map, $key);
 
-        @if $prop-value == null and $default == null {
-            @error '"#{$key}" is null.';
+        @if $prop-value == null {
+            @if $default == null {
+                @error '"#{$key}" is null.';
+            } @else {
+                @return $default;
+            }
         }
     }
 
-    @return if($prop-value == null, $default, $prop-value);
+    @return $prop-value;
 }
