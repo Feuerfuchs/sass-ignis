@@ -1,0 +1,77 @@
+@function _limit-decimals($n) {
+    @return floor($n * 1000) / 1000;
+}
+
+@include describe('Easing') {
+    @include it('ig-ease-in-quad') {
+        @include assert-equal(_limit-decimals(ig-ease-in-quad(0)),    0,     '0');
+        @include assert-equal(_limit-decimals(ig-ease-in-quad(0.25)), 0.062, '0.25');
+        @include assert-equal(_limit-decimals(ig-ease-in-quad(0.5)),  0.25,  '0.5');
+        @include assert-equal(_limit-decimals(ig-ease-in-quad(0.75)), 0.562, '0.75');
+        @include assert-equal(_limit-decimals(ig-ease-in-quad(1)),    1,     '1');
+    }
+
+    @include it('ig-ease-out-quad') {
+        @include assert-equal(_limit-decimals(ig-ease-out-quad(0)),    0,     '0');
+        @include assert-equal(_limit-decimals(ig-ease-out-quad(0.25)), 0.437, '0.25');
+        @include assert-equal(_limit-decimals(ig-ease-out-quad(0.5)),  0.75,  '0.5');
+        @include assert-equal(_limit-decimals(ig-ease-out-quad(0.75)), 0.937, '0.75');
+        @include assert-equal(_limit-decimals(ig-ease-out-quad(1)),    1,     '1');
+    }
+
+    @include it('ig-ease-in-out-quad') {
+        @include assert-equal(_limit-decimals(ig-ease-in-out-quad(0)),    0,     '0');
+        @include assert-equal(_limit-decimals(ig-ease-in-out-quad(0.25)), 0.125, '0.25');
+        @include assert-equal(_limit-decimals(ig-ease-in-out-quad(0.5)),  0.5,   '0.5');
+        @include assert-equal(_limit-decimals(ig-ease-in-out-quad(0.75)), 0.875, '0.75');
+        @include assert-equal(_limit-decimals(ig-ease-in-out-quad(1)),    1,     '1');
+    }
+
+    @include it('ig-ease-in-cubic') {
+        @include assert-equal(_limit-decimals(ig-ease-in-cubic(0)),    0,     '0');
+        @include assert-equal(_limit-decimals(ig-ease-in-cubic(0.25)), 0.015, '0.25');
+        @include assert-equal(_limit-decimals(ig-ease-in-cubic(0.5)),  0.125, '0.5');
+        @include assert-equal(_limit-decimals(ig-ease-in-cubic(0.75)), 0.421, '0.75');
+        @include assert-equal(_limit-decimals(ig-ease-in-cubic(1)),    1,     '1');
+    }
+
+    @include it('ig-ease-out-cubic') {
+        @include assert-equal(_limit-decimals(ig-ease-out-cubic(0)),    0,     '0');
+        @include assert-equal(_limit-decimals(ig-ease-out-cubic(0.25)), 0.578, '0.25');
+        @include assert-equal(_limit-decimals(ig-ease-out-cubic(0.5)),  0.875, '0.5');
+        @include assert-equal(_limit-decimals(ig-ease-out-cubic(0.75)), 0.984, '0.75');
+        @include assert-equal(_limit-decimals(ig-ease-out-cubic(1)),    1,     '1');
+    }
+
+    @include it('ig-ease-in-out-cubic') {
+        @include assert-equal(_limit-decimals(ig-ease-in-out-cubic(0)),    0,     '0');
+        @include assert-equal(_limit-decimals(ig-ease-in-out-cubic(0.25)), 0.062, '0.25');
+        @include assert-equal(_limit-decimals(ig-ease-in-out-cubic(0.5)),  0.5,   '0.5');
+        @include assert-equal(_limit-decimals(ig-ease-in-out-cubic(0.75)), 0.937, '0.75');
+        @include assert-equal(_limit-decimals(ig-ease-in-out-cubic(1)),    1,     '1');
+    }
+
+    @include it('ig-ease-in-sine') {
+        @include assert-equal(_limit-decimals(ig-ease-in-sine(0)),    0,     '0');
+        @include assert-equal(_limit-decimals(ig-ease-in-sine(0.25)), 0.076, '0.25');
+        @include assert-equal(_limit-decimals(ig-ease-in-sine(0.5)),  0.292, '0.5');
+        @include assert-equal(_limit-decimals(ig-ease-in-sine(0.75)), 0.617, '0.75');
+        @include assert-equal(_limit-decimals(ig-ease-in-sine(1)),    1,     '1');
+    }
+
+    @include it('ig-ease-out-sine') {
+        @include assert-equal(_limit-decimals(ig-ease-out-sine(0)),    0,     '0');
+        @include assert-equal(_limit-decimals(ig-ease-out-sine(0.25)), 0.382, '0.25');
+        @include assert-equal(_limit-decimals(ig-ease-out-sine(0.5)),  0.707, '0.5');
+        @include assert-equal(_limit-decimals(ig-ease-out-sine(0.75)), 0.923, '0.75');
+        @include assert-equal(_limit-decimals(ig-ease-out-sine(1)),    1,     '1');
+    }
+
+    @include it('ig-ease-in-out-sine') {
+        @include assert-equal(_limit-decimals(ig-ease-in-out-sine(0)),    0,     '0');
+        @include assert-equal(_limit-decimals(ig-ease-in-out-sine(0.25)), 0.146, '0.25');
+        @include assert-equal(_limit-decimals(ig-ease-in-out-sine(0.5)),  0.5,   '0.5');
+        @include assert-equal(_limit-decimals(ig-ease-in-out-sine(0.75)), 0.853, '0.75');
+        @include assert-equal(_limit-decimals(ig-ease-in-out-sine(1)),    1,     '1');
+    }
+}

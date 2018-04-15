@@ -1,0 +1,116 @@
+////
+/// Easing.
+///
+/// A collection of easing functions which are commonly used for animations.
+///
+/// @group Easing
+///
+/// @access public
+////
+
+/// 
+/// A normalized quadratic easing function (in direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-in-quad($t) {
+    @return $t * $t;
+}
+
+/// 
+/// A normalized quadratic easing function (out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-out-quad($t) {
+    @return 1 - ig-ease-in-quad(1 - $t);
+}
+
+/// 
+/// A normalized quadratic easing function (in-out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-in-out-quad($t) {
+    @if $t < 0.5 {
+        @return ig-ease-in-quad($t * 2) / 2;
+    }
+
+    @return 1 - ig-ease-in-quad((1 - $t) * 2) / 2;
+}
+
+/// 
+/// A normalized cubic easing function (in direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-in-cubic($t) {
+    @return $t * $t * $t;
+}
+
+/// 
+/// A normalized cubic easing function (out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-out-cubic($t) {
+    @return 1 - ig-ease-in-cubic(1 - $t);
+}
+
+/// 
+/// A normalized cubic easing function (in-out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-in-out-cubic($t) {
+    @if $t < 0.5 {
+        @return ig-ease-in-cubic($t * 2) / 2;
+    }
+
+    @return 1 - ig-ease-in-cubic((1 - $t) * 2) / 2;
+}
+
+/// 
+/// A normalized sinusoidal easing function (in direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-in-sine($t) {
+    @return 1 - ig-math-cos($t * (ig-math-pi() / 2));
+}
+
+/// 
+/// A normalized sinusoidal easing function (out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-out-sine($t) {
+    @return ig-math-sin($t * (ig-math-pi() / 2));
+}
+
+/// 
+/// A normalized sinusoidal easing function (in-out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} Distorted time between 0 and 1 inclusive
+///
+@function ig-ease-in-out-sine($t) {
+    @return 0.5 * (1 - ig-math-cos(ig-math-pi() * $t));
+}
