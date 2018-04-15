@@ -87,7 +87,7 @@ $ig-math-taylor-iters: 20 !default;
     $angle: ig-strip-unit($angle);
 
     @if $unit == deg {
-        $angle: $angle / 180 * pi();
+        $angle: $angle / 180 * ig-math-pi();
     }
 
     @return $angle;
@@ -156,7 +156,7 @@ $ig-math-taylor-iters: 20 !default;
 }
 
 ///
-/// Clamps a number between a minimum and maximum value.
+/// Clamp a number between a minimum and maximum value.
 ///
 /// @param {number} $value - Value to clamp
 /// @param {number} $min   - Minimum value
@@ -166,6 +166,9 @@ $ig-math-taylor-iters: 20 !default;
 ///
 /// @example scss
 ///   $result: ig-math-clamp(20, 0, 10); // The value of $result is 10
+///
+/// @example scss
+///   $result: ig-math-clamp(50, 20, 100); // The value of $result is 50
 ///
 @function ig-math-clamp($value, $min, $max) {
     @if $value < $min {
