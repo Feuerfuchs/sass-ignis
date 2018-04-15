@@ -29,7 +29,7 @@ $ig-easing-gradient-precision: 0.1 !default;
 /// without losing on flexibility. The only major drawback of this function is that only two colors can be used.
 ///
 /// @param {string}       $type                - Either 'linear' or 'radial', which means the gradient will be either a linear-gradient or a radial-gradient.
-/// @param {string}       $easing              - Easing function to use. Can be one of these: 'in-quad', 'out-quad', 'in-out-quad', 'in-cubic', 'out-cubic', 'in-out-cubic', 'in-sine', 'out-sine', 'in-out-sine'
+/// @param {string}       $easing              - Easing function to use. For the integrated easing functions, you may leave out the "ig-ease-" prefix.
 /// @param {string}       $dir                 - The direction of the gradient. Depending on $type, this value must be a valid direction for linear-gradient or radial-gradient.
 /// @param {color | list} $start               - The start color. You may change the start position (default: 0) to another value by passing a list instead, with the first item being the color and the second item being the position.
 /// @param {color | list} $stop                - The stop color. You may change the stop position (default: 100%) to another value by passing a list instead, with the first item being the color and the second item being the position.
@@ -150,13 +150,11 @@ $ig-easing-gradient-precision: 0.1 !default;
         $stop-color: $stop;
     }
 
-    $distance: $stop-pos - $start-pos;
-
-    @if $pos-template == null {
-        @if unit($start-pos) != unit($distance) {
-            $pos-template: 'calc(#{$start-pos} + ${x} * #{$distance})';
-        }
+    @if unit($start-pos) != unit($stop-pos) {
+        @error 'Position units must match.';
     }
+
+    $distance: $stop-pos - $start-pos;
 
     $result: '';
 
@@ -168,7 +166,12 @@ $ig-easing-gradient-precision: 0.1 !default;
         @error 'Invalid gradient type: #{inspect($type)}.';
     }
 
-    $easing-func: get-function('ig-ease-' + $easing);
+    $easing-func: null;
+    @if function-exists($easing) {
+        $easing-func: get-function($easing);
+    } @else {
+        $easing-func: get-function('ig-ease-' + $easing);
+    }
 
     $i: 0;
     @while $i <= 1 {

@@ -3,11 +3,14 @@
 
 @import 'true';
 
+$ig-easing-gradient-precision: 0.25;
+
 @import 'functions';
 @import 'contexts';
 @import 'bem';
 @import 'responsive';
 @import 'harmony';
 @import 'easing';
+@import 'gradients';
 
 @include report;

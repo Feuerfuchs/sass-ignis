@@ -1,0 +1,82 @@
+// sass-lint:disable no-color-literals
+
+@include describe('Gradients') {
+    @include it('ig-easing-gradient') {
+        $gradient1: ig-easing-gradient(
+            linear,
+            in-quad,
+            to right,
+            #000,
+            transparent
+        );
+
+        $expected1: linear-gradient(
+            to right,
+            mix(transparent, #000, ig-ease-in-quad(0) * 100%) 0%,
+            mix(transparent, #000, ig-ease-in-quad(0.25) * 100%) 25%,
+            mix(transparent, #000, ig-ease-in-quad(0.5) * 100%) 50%,
+            mix(transparent, #000, ig-ease-in-quad(0.75) * 100%) 75%,
+            mix(transparent, #000, ig-ease-in-quad(1) * 100%) 100%
+        );
+
+        @include assert-equal($gradient1, $expected1, 'Simple linear gradient');
+
+        $gradient2: ig-easing-gradient(
+            radial,
+            out-cubic,
+            1em 2em at 50% 60%,
+            #000,
+            transparent
+        );
+
+        $expected2: radial-gradient(
+            1em 2em at 50% 60%,
+            mix(transparent, #000, ig-ease-out-cubic(0) * 100%) 0%,
+            mix(transparent, #000, ig-ease-out-cubic(0.25) * 100%) 25%,
+            mix(transparent, #000, ig-ease-out-cubic(0.5) * 100%) 50%,
+            mix(transparent, #000, ig-ease-out-cubic(0.75) * 100%) 75%,
+            mix(transparent, #000, ig-ease-out-cubic(1) * 100%) 100%
+        );
+
+        @include assert-equal($gradient2, $expected2, 'Simple radial gradient');
+
+        $gradient3: ig-easing-gradient(
+            linear,
+            in-quad,
+            to right,
+            #000 2em,
+            transparent 10em
+        );
+
+        $expected3: linear-gradient(
+            to right,
+            mix(transparent, #000, ig-ease-in-quad(0) * 100%) 2em,
+            mix(transparent, #000, ig-ease-in-quad(0.25) * 100%) 4em,
+            mix(transparent, #000, ig-ease-in-quad(0.5) * 100%) 6em,
+            mix(transparent, #000, ig-ease-in-quad(0.75) * 100%) 8em,
+            mix(transparent, #000, ig-ease-in-quad(1) * 100%) 10em
+        );
+
+        @include assert-equal($gradient3, $expected3, 'Advanced linear gradient');
+
+        $gradient4: ig-easing-gradient(
+            linear,
+            in-quad,
+            to right,
+            #000,
+            transparent,
+            'calc(20% + ${x} * 10em)'
+        );
+
+        $expected4: linear-gradient(
+            to right,
+            mix(transparent, #000, ig-ease-in-quad(0) * 100%) calc(20% + 0 * 10em),
+            mix(transparent, #000, ig-ease-in-quad(0.25) * 100%) calc(20% + 0.25 * 10em),
+            mix(transparent, #000, ig-ease-in-quad(0.5) * 100%) calc(20% + 0.5 * 10em),
+            mix(transparent, #000, ig-ease-in-quad(0.75) * 100%) calc(20% + 0.75 * 10em),
+            mix(transparent, #000, ig-ease-in-quad(1) * 100%) calc(20% + 1 * 10em)
+        );
+
+        @include assert-equal($gradient4, $expected4, 'More advanced linear gradient');
+    }
+}
