@@ -23,7 +23,7 @@
 ///
 @function ig-harmony-modular-scale($times, $base, $ratio) {
     @if type-of($base) == number {
-        @return $base * pow($ratio, $times);
+        @return $base * ig-math-pow($ratio, $times);
     }
 
     $main-base:  nth($base, 1);
@@ -50,5 +50,5 @@
     $base-index: $times % length($all-bases) + 1;
     $exp:        floor($times / length($all-bases));
 
-    @return nth($all-bases, $base-index) * pow($ratio, $exp);
+    @return nth($all-bases, $base-index) * ig-math-pow($ratio, $exp);
 }

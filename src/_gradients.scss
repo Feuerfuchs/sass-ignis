@@ -271,7 +271,7 @@ $ig-easing-gradient-precision: 0.1 !default;
 /// @return {number} Distorted time between 0 and 1 inclusive
 ///
 @function ig-ease-in-sine($t) {
-    @return -1 * cos($t * (pi() / 2));
+    @return -1 * ig-math-cos($t * (ig-math-pi() / 2));
 }
 
 /// 
@@ -282,7 +282,7 @@ $ig-easing-gradient-precision: 0.1 !default;
 /// @return {number} Distorted time between 0 and 1 inclusive
 ///
 @function ig-ease-out-sine($t) {
-    @return sin($t * (pi() / 2));
+    @return ig-math-sin($t * (ig-math-pi() / 2));
 }
 
 /// 
@@ -293,5 +293,5 @@ $ig-easing-gradient-precision: 0.1 !default;
 /// @return {number} Distorted time between 0 and 1 inclusive
 ///
 @function ig-ease-in-out-sine($t) {
-    @return 0.5 * (1 - cos(pi() * $t));
+    @return 0.5 * (1 - ig-math-cos(ig-math-pi() * $t));
 }
