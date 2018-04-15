@@ -1,0 +1,69 @@
+@include describe('Functions') {
+    @include it('ig-str-replace') {
+        $str: 'Hello world!';
+
+        @include assert-equal(ig-str-replace($str, 'world', 'neighbor'), 'Hello neighbor!', 'Replace "world" with "neighbor"');
+        @include assert-equal(ig-str-replace($str, 'neighbor', 'moon'),  'Hello world!',    'Replace "neighbor" with "moon"');
+        @include assert-equal(ig-str-replace($str, 'Hello', 'Bye'),      'Bye world!',      'Replace "Hello" with "Bye"');
+    }
+
+    @include it('ig-list-slice') {
+        $list: 'this' 'is' 'a' 'list';
+
+        @include assert-equal(ig-list-slice($list, 2),      'is' 'a' 'list',  'Discard first item');
+        @include assert-equal(ig-list-slice($list, 1, 3),   'this' 'is' 'a',  'Keep first 3 items');
+        @include assert-equal(ig-list-slice($list, 2, 3),   'is' 'a',         'Extract list from index 2 to 3');
+        @include assert-equal(ig-list-slice($list, -1, -1), join((), 'list'), 'Keep last item');
+        @include assert-equal(ig-list-slice($list, -1, 1),  'list' 'this',    'Extract first and last item');
+    }
+
+    @include it('ig-map-get-default') {
+        $map: ('key': 'value', 'another': 'item');
+
+        @include assert-equal(ig-map-get-default($map, 'another', 0),         map-get($map, 'another'), 'Get existing value');
+        @include assert-equal(ig-map-get-default($map, 'index',   'nothing'), 'nothing',                'Get missing value');
+    }
+
+    @include it('ig-map-merge-recursive') {
+        $map1: (
+            'key':     'value',
+            'sub': (
+                'item1': 1,
+                'item3': 2
+            )
+        );
+        $map2: (
+            'another': 'item',
+            'sub': (
+                'item1': 0,
+                'item2': 1
+            )
+        );
+
+        $expected: (
+            'key':     'value',
+            'another': 'item',
+            'sub': (
+                'item1': 0,
+                'item2': 1,
+                'item3': 2
+            )
+        );
+
+        @include assert-equal(ig-map-merge-recursive($map1, $map2), $expected);
+    }
+
+    @include it('ig-strip-unit') {
+        @include assert-true(unitless(ig-strip-unit(1em)),  'Remove unit from 1em');
+        @include assert-true(unitless(ig-strip-unit(2rem)), 'Remove unit from 2rem');
+        @include assert-true(unitless(ig-strip-unit(3px)),  'Remove unit from 3px');
+        @include assert-true(unitless(ig-strip-unit(4)),    'Remove unit from 4');
+        @include assert-true(unitless(ig-strip-unit(5pt)),  'Remove unit from 5pt');
+    }
+
+    @include it('ig-px-to-rem') {
+        @include assert-equal(ig-px-to-rem(16px, 16px), 1rem,   'Convert 16px');
+        @include assert-equal(ig-px-to-rem(32px, 16px), 2rem,   'Convert 16px');
+        @include assert-equal(ig-px-to-rem(8px, 16px),  0.5rem, 'Convert 16px');
+    }
+}

@@ -172,7 +172,7 @@ $ig-bem-context-id: 'bem' !default;
 
     $parent-context: ig-context-get($ig-bem-context-id, 'theme');
 
-    @if length($parent-context) != 0 {
+    @if $parent-context != null {
         //
         // Block is used within a theme.
         // Make sure there are no selectors between theme and this mixin call.
@@ -1065,7 +1065,7 @@ $ig-bem-context-id: 'bem' !default;
     $parent-context: ig-context-get($ig-bem-context-id, 'block');
     $selector:       ig-bem-theme-selector($theme, $sub-theme);
 
-    @if length($parent-context) != 0 {
+    @if $parent-context != null {
         //
         // Theme is used within a block.
         // Make sure there are no selectors between block and this mixin call.

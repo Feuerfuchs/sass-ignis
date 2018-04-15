@@ -41,7 +41,9 @@
     $result: ();
 
     @for $i from $start through $end {
-        $result: append($result, nth($list, $i), list-separator($list));
+        @if $i != 0 {
+            $result: append($result, nth($list, $i), list-separator($list));
+        }
     }
 
     @return $result;
@@ -156,19 +158,6 @@
 ///
 @function ig-px-to-rem($size, $base: $ig-root-size) {
     @return $size / $base * 1rem;
-}
-
-/// 
-/// Calculate the brightness of a color according to the HSP Color Model.
-///
-/// @param {color} $color
-///
-/// @return {number} Brightness between 0 and 1
-///
-/// @link http://alienryderflex.com/hsp.html Information about the HSP Color Model
-///
-@function ig-brightness($color) {
-    @return ((red($color) * 0.299) + (green($color) * 0.587) + (blue($color) * 0.114));
 }
 
 /// 
