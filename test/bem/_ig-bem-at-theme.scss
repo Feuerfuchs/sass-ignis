@@ -1,0 +1,52 @@
+// sass-lint:disable class-name-format force-element-nesting force-pseudo-nesting mixins-before-declarations
+
+//
+// Included test cases:
+//  - /// 1 /// - single theme
+//  - /// 2 /// - with sub-theme
+//
+
+@include it('ig-bem-at-theme') {
+    @include assert('single theme') { /// 1 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-at-theme('theme') {
+                    font-size: 2em;
+                }
+            }
+        }
+
+        @include expect(false) {
+            .t-theme .something,
+            [class*=' t-'] .t-theme .something {
+                font-size: 2em;
+            }
+        }
+    }
+
+    @include assert('with sub-theme') { /// 2 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-at-theme('theme') {
+                    font-size: 2em;
+                }
+
+                @include ig-bem-at-theme('theme', 'subtheme') {
+                    font-size: 3em;
+                }
+            }
+        }
+
+        @include expect(false) {
+            .t-theme .something,
+            [class*=' t-'] .t-theme .something {
+                font-size: 2em;
+            }
+
+            .t-theme .t-subtheme .something,
+            [class*=' t-'] .t-theme .t-subtheme .something {
+                font-size: 3em;
+            }
+        }
+    }
+}

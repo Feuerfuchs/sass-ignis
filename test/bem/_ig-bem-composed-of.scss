@@ -46,8 +46,15 @@
             }
 
             @include expect(false) {
-                .#{map-get($ig-bem-namespaces, $ns)}-something {
-                    font-size: 1em;
+                @if $ns != 'theme' {
+                    .#{map-get($ig-bem-namespaces, $ns)}-something {
+                        font-size: 1em;
+                    }
+                } @else {
+                    .t-something,
+                    [class*=' t-'] .t-something {
+                        font-size: 1em;
+                    }
                 }
 
                 .another {

@@ -12,14 +12,14 @@
 ///
 /// There are comments in the mixins explaining what selector is generated. The EBNF grammar is as follows:
 ///
-///   (* Shorthands for block, element, modifier, suffix, theme *)
+///   (* Shorthands for block, element, modifier, suffix *)
 ///   entity_shorthand = "b" "e" "m" "s" "t" ;
 ///   
 ///   (* One or multiple BEMIT entities that were generated with an earlier mixin invocation *)
 ///   existing_entities = "{" entity_shorthand { "," entity_shorthand } "}" ;
 ///   
 ///   (* A BEM entity that doesn't depend on a parent entity *)
-///   generated_independent_entity = "block" | "theme" ;
+///   generated_independent_entity = "block" ;
 ///   
 ///   (* A BEM entity that is attached to a parent entity *)
 ///   generated_attached_entity = existing_entities ( "__element" | "--modifier" | "@suffix" ) ;
@@ -133,7 +133,7 @@ $ig-bem-context-id: 'bem' !default;
 /// @content [All declarations belonging to that block]
 ///
 /// @throw If $type is invalid
-/// @throw If the block is preceded by another block, element, modifier, suffix or theme
+/// @throw If the block is preceded by another block, element, modifier or suffix
 ///
 /// @example scss - Creating a new block
 ///   @include ig-bem-block('something', 'component') {
@@ -148,13 +148,11 @@ $ig-bem-context-id: 'bem' !default;
 ///
 @mixin ig-bem-block($name, $type: null) {
     //
-    // Blocks can only be used by itself or within a theme.
     // Possible outcomes:
-    //   - ({t}) block
+    //   - ({b,e,m,s}) block
     //
 
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
-    @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix');
 
     $selector: null;
 
@@ -165,37 +163,28 @@ $ig-bem-context-id: 'bem' !default;
             @error '"#{$type}" is not a valid type.';
         }
 
-        $selector: selector-parse('.' + $namespace + '-' + $name);
+        @if $type != 'theme' or & {
+            $selector: selector-parse('.' + $namespace + '-' + $name);
+        } @else if not & {
+            $selector: ig-bem-theme-selector($name);
+        }
     } @else {
         $selector: selector-parse('.' + $name);
     }
 
-    $parent-context: ig-context-get($ig-bem-context-id, 'theme');
-
-    @if $parent-context != null {
-        //
-        // Block is used within a theme.
-        // Make sure there are no selectors between theme and this mixin call.
-        //
-
-        $parent-selector: map-get(nth($parent-context, 2), 'selector');
-
-        @if not is-superselector(&, $parent-selector) {
-            @error 'Block must be an immediate child of the theme.';
-        }
-
+    @if & {
         $selector: selector-nest(&, $selector);
         $selector: ig-selector-nest-fix($selector);
-    } @else if & {
-        @error 'Block must be declared at the root level.';
     }
 
     $ig-bem-blocks: append($ig-bem-blocks, $name + if($type != null, '_' + $type, '')) !global;
 
-    @include ig-context-push($ig-bem-context-id, 'block', ('name': $name, 'selector': $selector));
+    @include ig-context-push($ig-bem-context-id, 'block', ('name': $name, 'type': $type, 'selector': $selector));
+
     @at-root #{$selector} {
         @content;
     }
+
     @include ig-context-pop($ig-bem-context-id);
 }
 
@@ -260,6 +249,19 @@ $ig-bem-context-id: 'bem' !default;
 ///
 @mixin ig-bem-scope($name) {
     @include ig-bem-block($name, 'scope') {
+        @content;
+    }
+}
+
+/// 
+/// Generate a new BEMIT theme block. It's a shorthand for ig-bem-block($name, 'theme').
+///
+/// @param {string} $name - Theme block name
+///
+/// @content [All declarations belonging to that theme block]
+///
+@mixin ig-bem-theme($name) {
+    @include ig-bem-block($name, 'theme') {
         @content;
     }
 }
@@ -459,7 +461,7 @@ $ig-bem-context-id: 'bem' !default;
 
     @each $name in join($name, $names) {
         $sel:            null;
-        $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'theme');
+        $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'at-theme');
 
         @if index('element' 'modifier' 'suffix', nth($parent-context, 1)) {
             //
@@ -475,7 +477,7 @@ $ig-bem-context-id: 'bem' !default;
             $sel: ig-selector-nest-fix($sel);
         } @else {
             //
-            // Parent context is block or theme.
+            // Parent context is block.
             //
 
             $parent-selector: map-get(nth($parent-context, 2), 'selector');
@@ -497,7 +499,7 @@ $ig-bem-context-id: 'bem' !default;
                 //   - {b} [manual selector] {b}__element
                 //
 
-                @if nth($parent-context, 1) == 'theme' {
+                @if nth($parent-context, 1) == 'at-theme' {
                     $block-context:  ig-context-get($ig-bem-context-id, 'block');
                     $parent-selector: map-get(nth($block-context, 2), 'selector');
                 }
@@ -507,7 +509,7 @@ $ig-bem-context-id: 'bem' !default;
             }
         }
 
-        $selector:   join($selector, $sel, 'comma');
+        $selector:   join($selector, $sel, comma);
         $parts-data: append($parts-data, ('name': $name, 'selector': $sel));
     }
 
@@ -623,7 +625,7 @@ $ig-bem-context-id: 'bem' !default;
         $sel: selector-nest(&, $sign, selector-append($block-selector, $ig-bem-element-separator + $name));
         $sel: ig-selector-nest-fix($sel);
 
-        $selector:   join($selector, $sel, 'comma');
+        $selector:   join($selector, $sel, comma);
         $parts-data: append($parts-data, ('name': $name, 'selector': $sel));
     }
 
@@ -757,8 +759,9 @@ $ig-bem-context-id: 'bem' !default;
         }
 
         $sel: selector-nest($current-selector-part, '+', selector-append($block-selector, $ig-bem-element-separator + $part-name));
+        $sel: ig-selector-nest-fix($sel);
 
-        $selector:   join($selector, $sel, 'comma');
+        $selector:   join($selector, $sel, comma);
         $parts-data: append($parts-data, ('name': $part-name, 'selector': $sel));
     }
 
@@ -790,7 +793,7 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @content [All declarations belonging to that modifier]
 ///
-/// @throw If the element is not preceded by a block, element, modifier, suffix or theme.
+/// @throw If the element is not preceded by a block, element, modifier or suffix.
 ///
 /// @example scss - Modifier that modifies a block or element
 ///   @include ig-bem-component('block') {
@@ -877,12 +880,12 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
-    $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'theme');
+    $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'at-theme');
     $selector:       null;
 
-    @if index('block' 'element' 'theme', nth($parent-context, 1)) or $extend == true {
+    @if index('block' 'element' 'at-theme', nth($parent-context, 1)) or $extend == true {
         //
-        // Either the parent context is block, element or theme, or a modifier or suffix
+        // Either the parent context is block or element, or a modifier or suffix
         // is to be extended.
         //
 
@@ -937,7 +940,7 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @content [All declarations belonging to that suffix]
 ///
-/// @throw If the element is not preceded by a block, modifier or theme.
+/// @throw If the element is not preceded by a block or modifier.
 ///
 /// @example scss - Using a suffix
 ///   @include ig-bem-utility('hidden') {
@@ -976,14 +979,14 @@ $ig-bem-context-id: 'bem' !default;
 ///
 @mixin ig-bem-suffix($name) {
     //
-    // Suffixes can be used on block, element, modifier and theme.
+    // Suffixes can be used on block, element and modifier.
     //
 
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
     @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'suffix');
 
-    $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'theme');
+    $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'at-theme');
     $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
     @if not is-superselector(&, $parent-selector) {
@@ -1017,100 +1020,52 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a new BEMIT theme.
+/// Generate a new BEMIT theme block. It's a shorthand for ig-bem-block($name, 'theme').
 ///
-/// The way themes work is a bit more complicated than described in the article about BEMIT. If you nest
-/// themes in the DOM, it needs to be guaranteed that always the definitions in the latest theme take precedence.
-/// To achieve this, the generated selector looks as follows: .t-theme, [class*=" t-"] .t-theme
-/// Unfortunately, this only covers the case that two themes are nested as the number of matched elements
-/// with [class*=" t-"] doesn't increase the importance of the style definitions. However, I have yet to run into
-/// any problems.
+/// @param {string} $name - Theme block name
 ///
-/// @param {string} $name             - Theme name
-/// @param {string} $sub-theme [null] - If set to a non-null value, this mixin generates a theme that modifies the original theme $name.
+/// @content [All declarations belonging to that theme block]
 ///
-/// @content [All declarations belonging to that theme]
-///
-/// @throw If the element is preceded by another theme.
-///
-/// @example scss - Modifier that modifies a block or element
-///   @include ig-bem-component('block') {
-///     background-color: #eee;
-///     
-///     @include ig-bem-theme('dark') {
-///       background-color: #222;
-///     }
-///   }
-///   
-///   // Generates:
-///   
-///   .c-block {
-///     background-color: #eee;
-///   }
-///   
-///   .t-dark .c-block, [class*=" t-"] .t-dark .c-block {
-///     background-color: #222;
-///   }
-///
-@mixin ig-bem-theme($theme, $sub-theme: null) {
-    //
-    // Themes can only be used by itself or as immediate child of a block.
-    // Possible outcomes:
-    //   - theme ({b})
-    //
+@mixin ig-bem-at-theme($name...) {
+    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
-    @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
-    @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'element' 'modifier' 'suffix' 'theme');
+    $parent-context:  ig-context-get($ig-bem-context-id, 'block');
+    $parent-selector: map-get(nth($parent-context, 2), 'selector');
+    $parent-name:     map-get(nth($parent-context, 2), 'name');
 
-    $parent-context: ig-context-get($ig-bem-context-id, 'block');
-    $selector:       ig-bem-theme-selector($theme, $sub-theme);
-
-    @if $parent-context != null {
-        //
-        // Theme is used within a block.
-        // Make sure there are no selectors between block and this mixin call.
-        //
-
-        $parent-selector: map-get(nth($parent-context, 2), 'selector');
-
-        @if not is-superselector(&, $parent-selector) {
-            @error 'Theme must be an immediate child of the block.';
-        }
-
-        $selector: selector-nest($selector, &);
-        $selector: ig-selector-nest-fix($selector);
-    } @else if & {
-        @error 'Theme must be declared at the root level.';
+    @if not is-superselector(&, $parent-selector) {
+        @error 'An at-theme rule must be an immediate child of a block or another at-theme rule';
     }
 
-    @include ig-context-push($ig-bem-context-id, 'theme', ('selector': $selector));
+    $selector: ig-bem-theme-selector($name...);
+    $selector: selector-nest($selector, &);
+    $selector: ig-selector-nest-fix($selector);
+
+    @include ig-context-push($ig-bem-context-id, 'at-theme', ('name': $name, 'selector': $selector));
     @at-root #{$selector} {
         @content;
     }
     @include ig-context-pop($ig-bem-context-id);
 }
 
-/// 
-/// Generate the selector for a BEMIT theme.
-///
-/// @param {string} $name             - Theme name
-/// @param {string} $sub-theme [null] - If set to a non-null value, this function generates a theme selector that modifies the original theme $name
-///
-/// @access private
-///
-@function ig-bem-theme-selector($name, $sub-theme: null) {
-    $namespace:      map-get($ig-bem-namespaces, 'theme') + '-';
-    $theme-selector: '.' + $namespace + $name;
-    $selector:       selector-parse('#{$theme-selector}, [class*=" t-"] #{$theme-selector}');
+//
 
-    @if $sub-theme != null {
-        $sub-theme-selector: '.' + $namespace + $sub-theme;
-        $selector:           selector-parse('#{$theme-selector} #{$sub-theme-selector}, #{$theme-selector}#{$sub-theme-selector}');
+@function ig-bem-theme-selector($name...) {
+    $namespace: map-get($ig-bem-namespaces, 'theme');
+    $selector:  null;
+
+    @each $n in $name {
+        $sel: '.' + $namespace + '-' + $n;
+
+        @if $selector == null {
+            $selector: join(selector-parse($sel), selector-parse('[class*=\' t-\'] ' + $sel), comma);
+        } @else {
+            $selector: selector-nest($selector, $sel);
+            $selector: ig-selector-nest-fix($selector);
+        }
     }
 
     @return $selector;
 }
-
-//
 
 @include ig-context-stack-create($ig-bem-context-id);
