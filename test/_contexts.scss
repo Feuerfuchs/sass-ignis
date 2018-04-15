@@ -1,11 +1,11 @@
 @include describe('Contexts') {
     @include it('Creating / deleting context stacks') {
-        @include assert-true(ig-context-stack-create('test'), 'Check if context stack was created');
-        @include assert-true(ig-context-stack-delete('test'), 'Check if context stack was deleted');
+        @include assert-equal(ig-context-stack-create('test'), null, 'Check if context stack was created');
+        @include assert-equal(ig-context-stack-delete('test'), null, 'Check if context stack was deleted');
     }
 
     @include it('Adding / removing contexts') {
-        @include assert-true(ig-context-stack-create('test'), 'Check if context stack was created');
+        @include assert-equal(ig-context-stack-create('test'), null, 'Check if context stack was created');
 
         @include assert-equal(ig-context-push('test', 'ctx', 1234),       'ctx' 1234,       'Check if context 1 was pushed');
         @include assert-equal(ig-context-push('test', 'another', 'text'), 'another' 'text', 'Check if context 2 was pushed');
@@ -15,27 +15,27 @@
         @include assert-equal(ig-context-pop('test'), 'another' 'text', 'Check if context 2 was popped');
         @include assert-equal(ig-context-pop('test'), 'ctx' 1234,       'Check if context 1 was popped');
 
-        @include assert-true(ig-context-stack-delete('test'), 'Check if context stack was deleted');
+        @include assert-equal(ig-context-stack-delete('test'), null, 'Check if context stack was deleted');
     }
 
     @include it('Clearing / counting context stacks') {
-        @include assert-true(ig-context-stack-create('test'), 'Check if context stack was created');
+        @include assert-equal(ig-context-stack-create('test'), null, 'Check if context stack was created');
 
         @include assert-equal(ig-context-push('test', 'ctx', 1234),       'ctx' 1234,       'Check if context 1 was pushed');
         @include assert-equal(ig-context-push('test', 'another', 'text'), 'another' 'text', 'Check if context 2 was pushed');
         @include assert-equal(ig-context-push('test', 'ctx', 56),         'ctx' 56,         'Check if context 3 was pushed');
 
-        @include assert-equal(ig-context-stack-count('test'), 3, 'Check if context stack contains 3 contexts');
-        @include assert-equal(ig-context-pop('test'), 'ctx' 56,  'Check if context 3 was popped');
-        @include assert-equal(ig-context-stack-count('test'), 2, 'Check if context stack contains 2 contexts');
-        @include assert-true(ig-context-stack-clear('test'),     'Check if context stack was cleared');
-        @include assert-equal(ig-context-stack-count('test'), 0, 'Check if context stack contains no contexts');
+        @include assert-equal(ig-context-stack-count('test'), 3,    'Check if context stack contains 3 contexts');
+        @include assert-equal(ig-context-pop('test'), 'ctx' 56,     'Check if context 3 was popped');
+        @include assert-equal(ig-context-stack-count('test'), 2,    'Check if context stack contains 2 contexts');
+        @include assert-equal(ig-context-stack-clear('test'), null, 'Check if context stack was cleared');
+        @include assert-equal(ig-context-stack-count('test'), 0,    'Check if context stack contains no contexts');
 
-        @include assert-true(ig-context-stack-delete('test'), 'Check if context stack was deleted');
+        @include assert-equal(ig-context-stack-delete('test'), null, 'Check if context stack was deleted');
     }
 
     @include it('Retrieving contexts') {
-        @include assert-true(ig-context-stack-create('test'), 'Check if context stack was created');
+        @include assert-equal(ig-context-stack-create('test'), null, 'Check if context stack was created');
 
         @include assert-equal(ig-context-push('test', 'ctx', 1234),       'ctx' 1234,       'Check if context 1 was pushed');
         @include assert-equal(ig-context-push('test', 'another', 'text'), 'another' 'text', 'Check if context 2 was pushed');
@@ -55,11 +55,11 @@
         @include assert-equal(ig-context-get('test', 1),      'more' 'string', 'Check if context at position 1 is context 4');
         @include assert-equal(ig-context-get('test', 'more'), 'more' 'string', 'Check if latest context with id "more" is context 4');
 
-        @include  assert-equal(ig-context-pop('test'), 'more' 'string',  'Check if context 4 was popped');
-        @include  assert-equal(ig-context-pop('test'), 'another' 'text', 'Check if context 2 was popped');
+        @include assert-equal(ig-context-pop('test'), 'more' 'string',  'Check if context 4 was popped');
+        @include assert-equal(ig-context-pop('test'), 'another' 'text', 'Check if context 2 was popped');
 
         @include assert-equal(ig-context-get('test', 1), ig-context-get('test', -1), 'Check if first and last context are context 1');
 
-        @include assert-true(ig-context-stack-delete('test'), 'Check if context stack was deleted');
+        @include assert-equal(ig-context-stack-delete('test'), null, 'Check if context stack was deleted');
     }
 }
