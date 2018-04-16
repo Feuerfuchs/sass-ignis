@@ -17,6 +17,13 @@
         @include assert-equal(ig-list-slice($list, -1, 1),  'list' 'this',    'Extract first and last item');
     }
 
+    @include it('ig-list-prepend') {
+        $list: 'this' 'is' 'a' 'list';
+
+        @include assert-equal(ig-list-prepend($list, 'and'), 'and' 'this' 'is' 'a' 'list', 'Prepend "and"');
+        @include assert-equal(ig-list-prepend($list, 2),     2 'this' 'is' 'a' 'list', 'Prepend 2');
+    }
+
     @include it('ig-quicksort') {
         @include assert-equal(ig-quicksort(1 2 3 4 5),     1 2 3 4 5,     'Already sorted list of 5 items');
         @include assert-equal(ig-quicksort(1 3 2),         1 2 3,         'Random list of 3 items');

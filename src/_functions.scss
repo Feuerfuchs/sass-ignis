@@ -35,13 +35,33 @@
 /// @param {number} $start [1]             - Indices before this value will be discarded
 /// @param {number} $end   [length($list)] - Indices starting after this value will be discarded
 ///
-/// @return {list} A list with new length $end - $start
+/// @return {list} A slice of the list
 ///
 @function ig-list-slice($list, $start: 1, $end: length($list)) {
     $result: ();
 
     @for $i from $start through $end {
         @if $i != 0 {
+            $result: append($result, nth($list, $i), list-separator($list));
+        }
+    }
+
+    @return $result;
+}
+
+/// 
+/// Add a new item to the beginning of a list.
+///
+/// @param {list}   $list
+/// @param {number} $value
+///
+/// @return {list} A list with $value at the beginning, followed by the other items
+///
+@function ig-list-prepend($list, $value) {
+    $result: append((), $value, list-separator($list));
+
+    @if length($list) > 0 {
+        @for $i from 1 through length($list) {
             $result: append($result, nth($list, $i), list-separator($list));
         }
     }
