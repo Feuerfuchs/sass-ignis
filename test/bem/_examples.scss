@@ -1,0 +1,194 @@
+// sass-lint:disable class-name-format force-element-nesting force-pseudo-nesting mixins-before-declarations no-empty-rulesets
+
+//
+// Included test cases:
+//  - /// 1 /// - Media object
+//  - /// 2 /// - Tabs
+/// - /// 3 /// - Accordion
+//
+
+@include it('Examples') {
+    @include assert('Media object') { /// 1 ///
+        @include output(false) {
+            @include ig-bem-object('media') {
+                display:         flex;
+                align-items:     flex-start;
+                justify-content: flex-start;
+
+                @include ig-bem-element('image') {
+                    display:  block;
+                    flex:     0 0 auto;
+                    overflow: hidden;
+                }
+
+                @include ig-bem-element('body') {
+                    // nothing to do
+                }
+            }
+        }
+
+        @include expect(false) {
+            .o-media {
+                display:         flex;
+                align-items:     flex-start;
+                justify-content: flex-start;
+            }
+
+            .o-media__image {
+                display:  block;
+                flex:     0 0 auto;
+                overflow: hidden;
+            }
+        }
+    }
+
+    @include assert('Tabs') { /// 2 ///
+        @include output(false) {
+            @include ig-bem-component('tabs') {
+                position: relative;
+
+                @include ig-bem-element('tab') {
+                    float: left;
+                }
+
+                @include ig-bem-element('tabRadio') {
+                    position: absolute;
+                    top:      -9999px;
+                    left:     -9999px;
+
+                    &:checked {
+                        @include ig-bem-sibling-element('tabLabel') {
+                            font-weight: bold;
+                        }
+
+                        @include ig-bem-sibling-element('tabContent') {
+                            display: block;
+                        }
+                    }
+                }
+
+                @include ig-bem-element('tabLabel') {
+                    cursor: pointer;
+
+                    &:hover,
+                    &:active {
+                        text-decoration: underline;
+                    }
+                }
+
+                @include ig-bem-element('tabContent') {
+                    position: absolute;
+                    left:     0;
+                    display:  none;
+                }
+            }
+        }
+
+        @include expect(false) {
+            .c-tabs {
+                position: relative;
+            }
+
+            .c-tabs__tab {
+                float: left;
+            }
+
+            .c-tabs__tabRadio {
+                position: absolute;
+                top:      -9999px;
+                left:     -9999px;
+            }
+
+            .c-tabs__tabRadio:checked ~ .c-tabs__tabLabel {
+                font-weight: bold;
+            }
+
+            .c-tabs__tabRadio:checked ~ .c-tabs__tabContent {
+                display: block;
+            }
+
+            .c-tabs__tabLabel {
+                cursor: pointer;
+            }
+
+            .c-tabs__tabLabel:hover,
+            .c-tabs__tabLabel:active {
+                text-decoration: underline;
+            }
+
+            .c-tabs__tabContent {
+                position: absolute;
+                left:     0;
+                display:  none;
+            }
+        }
+    }
+
+    @include assert('Accordion') { /// 3 ///
+        @include output(false) {
+            @include ig-bem-component('accordion') {
+                @include ig-bem-element('section') {
+                    // nothing to do
+                }
+
+                @include ig-bem-element('sectionCheckbox') {
+                    position: absolute;
+                    top:      -9999px;
+                    left:     -9999px;
+
+                    &:checked {
+                        @include ig-bem-sibling-element('sectionLabel') {
+                            font-weight: bold;
+                        }
+
+                        @include ig-bem-sibling-element('sectionContent') {
+                            display: block;
+                        }
+                    }
+                }
+
+                @include ig-bem-element('sectionLabel') {
+                    cursor: pointer;
+
+                    &:hover,
+                    &:active {
+                        text-decoration: underline;
+                    }
+                }
+
+                @include ig-bem-element('sectionContent') {
+                    display: none;
+                }
+            }
+        }
+
+        @include expect(false) {
+            .c-accordion__sectionCheckbox {
+                position: absolute;
+                top:      -9999px;
+                left:     -9999px;
+            }
+
+            .c-accordion__sectionCheckbox:checked ~ .c-accordion__sectionLabel {
+                font-weight: bold;
+            }
+
+            .c-accordion__sectionCheckbox:checked ~ .c-accordion__sectionContent {
+                display: block;
+            }
+
+            .c-accordion__sectionLabel {
+                cursor: pointer;
+            }
+
+            .c-accordion__sectionLabel:hover,
+            .c-accordion__sectionLabel:active {
+                text-decoration: underline;
+            }
+
+            .c-accordion__sectionContent {
+                display:  none;
+            }
+        }
+    }
+}

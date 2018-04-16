@@ -153,10 +153,10 @@
 }
 
 ///
-/// @alias ig-bem-theme
+/// @alias ig-bem-at-theme
 ///
-@mixin theme($theme, $sub-theme: null) {
-    @include ig-bem-theme($theme, $sub-theme) {
+@mixin at-theme($name...) {
+    @include ig-bem-at-theme($name...) {
         @content;
     }
 }
@@ -164,8 +164,8 @@
 ///
 /// @alias theme
 ///
-@mixin t($theme, $sub-theme: null) {
-    @include theme($theme, $sub-theme) {
+@mixin at($name...) {
+    @include at-theme($name...) {
         @content;
     }
 }
