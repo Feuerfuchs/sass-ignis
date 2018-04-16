@@ -158,6 +158,24 @@ $ig-bem-context-id: 'bem' !default;
 
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
 
+    $selector: ig-bem-block-selector($name, $type);
+
+    @if $type != null {
+        $ig-bem-blocks: append($ig-bem-blocks, $name + '_' + $type) !global;
+    } @else {
+        $ig-bem-blocks: append($ig-bem-blocks, $name) !global;
+    }
+
+    @include ig-context-push($ig-bem-context-id, 'block', ('name': $name, 'type': $type, 'selector': $selector));
+
+    @at-root #{$selector} {
+        @content;
+    }
+
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+@function ig-bem-block-selector($name, $type: null) {
     $selector: null;
 
     @if $type != null {
@@ -170,7 +188,7 @@ $ig-bem-context-id: 'bem' !default;
         @if $type != 'theme' or & {
             $selector: selector-parse('.' + $namespace + '-' + $name);
         } @else if not & {
-            $selector: ig-bem-theme-selector($name);
+            $selector: ig-bem-theme-selector-priv($name);
         }
     } @else {
         $selector: selector-parse('.' + $name);
@@ -181,15 +199,7 @@ $ig-bem-context-id: 'bem' !default;
         $selector: ig-selector-nest-fix($selector);
     }
 
-    $ig-bem-blocks: append($ig-bem-blocks, $name + if($type != null, '_' + $type, '')) !global;
-
-    @include ig-context-push($ig-bem-context-id, 'block', ('name': $name, 'type': $type, 'selector': $selector));
-
-    @at-root #{$selector} {
-        @content;
-    }
-
-    @include ig-context-pop($ig-bem-context-id);
+    @return $selector;
 }
 
 /// 
@@ -205,6 +215,10 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+@function ig-bem-object-selector($name) {
+    @return ig-bem-block-selector($name, 'object');
+}
+
 /// 
 /// Generate a new BEMIT component block. It's a shorthand for ig-bem-block($name, 'component').
 ///
@@ -216,6 +230,10 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-bem-block($name, 'component') {
         @content;
     }
+}
+
+@function ig-bem-component-selector($name) {
+    @return ig-bem-block-selector($name, 'component');
 }
 
 /// 
@@ -231,6 +249,10 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+@function ig-bem-layout-selector($name) {
+    @return ig-bem-block-selector($name, 'layout');
+}
+
 /// 
 /// Generate a new BEMIT utility block. It's a shorthand for ig-bem-block($name, 'utility').
 ///
@@ -242,6 +264,10 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-bem-block($name, 'utility') {
         @content;
     }
+}
+
+@function ig-bem-utility-selector($name) {
+    @return ig-bem-block-selector($name, 'utility');
 }
 
 /// 
@@ -257,6 +283,10 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+@function ig-bem-scope-selector($name) {
+    @return ig-bem-block-selector($name, 'scope');
+}
+
 /// 
 /// Generate a new BEMIT theme block. It's a shorthand for ig-bem-block($name, 'theme').
 ///
@@ -268,6 +298,10 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-bem-block($name, 'theme') {
         @content;
     }
+}
+
+@function ig-bem-theme-selector($name) {
+    @return ig-bem-block-selector($name, 'theme');
 }
 
 /// 
@@ -283,6 +317,10 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+@function ig-bem-js-selector($name) {
+    @return ig-bem-block-selector($name, 'js');
+}
+
 /// 
 /// Generate a new BEMIT QA block. It's a shorthand for ig-bem-block($name, 'qa').
 ///
@@ -294,6 +332,10 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-bem-block($name, 'qa') {
         @content;
     }
+}
+
+@function ig-bem-qa-selector($name) {
+    @return ig-bem-block-selector($name, 'qa');
 }
 
 /// 
@@ -309,6 +351,10 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+@function ig-bem-hack-selector($name) {
+    @return ig-bem-block-selector($name, 'hack');
+}
+
 /// 
 /// Assert that a block or element is composed of another block. In BEM, such a relationship is referred to
 /// as a "mix": https://en.bem.info/methodology/key-concepts/#mix
@@ -317,11 +363,11 @@ $ig-bem-context-id: 'bem' !default;
 /// defined in the right order so that composed blocks/elements will actually override the foreign
 /// declarations without having to artificially increase the specificity.
 ///
-/// @param {string} $name - Block name
-/// @param {string} $type - BEMIT namespace of the block
+/// @param {string | list} $block  - Either first block name, or list with two items: 1. block name, 2. block type
+/// @param {string | list} $blocks - Either other block names, or list with two items: 1. block name, 2. block type
 ///
-/// @throw If $type is invalid 
-/// @throw If the block doesn't exist
+/// @throw If a block type is invalid 
+/// @throw If a block doesn't exist
 ///
 /// @example scss - Successful assertion
 ///   @include ig-bem-component('someBlock') {
@@ -332,7 +378,7 @@ $ig-bem-context-id: 'bem' !default;
 ///     /* some definitions */
 ///     
 ///     @include ig-bem-element('elem') {
-///       @include ig-bem-composed-of('someBlock', 'component');
+///       @include ig-bem-composed-of('someBlock' 'component');
 ///       
 ///       /* some definitions */
 ///     }
@@ -345,7 +391,7 @@ $ig-bem-context-id: 'bem' !default;
 ///     /* some definitions */
 ///     
 ///     @include ig-bem-element('elem') {
-///       @include ig-bem-composed-of('someBlock', 'component');
+///       @include ig-bem-composed-of('someBlock' 'component');
 ///       
 ///       /* some definitions */
 ///     }
@@ -357,13 +403,24 @@ $ig-bem-context-id: 'bem' !default;
 ///   
 ///   // Compilation will fail because c-someBlock is defined after c-anotherBlock__elem
 ///
-@mixin ig-bem-composed-of($name, $type: null) {
-    @if $type != null and not map-get($ig-bem-namespaces, $type) {
-        @error '"#{$type}" is not a valid type.';
-    }
+@mixin ig-bem-composed-of($block, $blocks...) {
+    @each $block in append($blocks, $block) {
+        @if type-of($block) == string {
+            @if not index($ig-bem-blocks, $block) {
+                @error 'Block "#{$block}" does not exist.';
+            }
+        } @else {
+            $name: nth($block, 1);
+            $type: nth($block, 2);
 
-    @if not index($ig-bem-blocks, $name + if($type != null, '_' + $type, '')) {
-        @error 'Block "#{$name}" does not exist.';
+            @if not map-get($ig-bem-namespaces, $type) {
+                @error '"#{$type}" is not a valid type.';
+            }
+
+            @if not index($ig-bem-blocks, $name + '_' + $type) {
+                @error 'Block "#{$name}" does not exist.';
+            }
+        }
     }
 }
 
@@ -451,7 +508,23 @@ $ig-bem-context-id: 'bem' !default;
 ///
 @mixin ig-bem-element($name, $names...) {
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
-    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
+    
+    $selector-data: ig-bem-element-selector($name, $names...);
+    $parts-data:    nth($selector-data, 1);
+    $selector:      nth($selector-data, 2);
+
+    @include ig-context-push($ig-bem-context-id, 'element', (
+            'parts':    $parts-data,
+            'selector': $selector
+    ));
+    @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+@function ig-bem-element-selector($name, $names...) {
+    $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
     $block-context:  ig-context-get($ig-bem-context-id, 'block');
     $block-selector: map-get(nth($block-context, 2), 'selector');
@@ -514,14 +587,7 @@ $ig-bem-context-id: 'bem' !default;
         }
     }
 
-    @include ig-context-push($ig-bem-context-id, 'element', (
-            'parts':    $parts-data,
-            'selector': $selector
-    ));
-    @at-root #{$selector} {
-        @content;
-    }
-    @include ig-context-pop($ig-bem-context-id);
+    @return $parts-data $selector;
 }
 
 /// 
@@ -611,7 +677,23 @@ $ig-bem-context-id: 'bem' !default;
     //
 
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
-    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'element');
+
+    $selector-data: ig-bem-related-element-selector($sign, $name, $names...);
+    $parts-data:    nth($selector-data, 1);
+    $selector:      nth($selector-data, 2);
+
+    @include ig-context-push($ig-bem-context-id, 'element', (
+            'parts':    $parts-data,
+            'selector': $selector
+    ));
+    @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+@function ig-bem-related-element-selector($sign, $name, $names...) {
+    $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'element');
 
     @if $sign != '+' and $sign != '~' {
         @error 'Invalid relationship sign #{inspect($sign)}.';
@@ -631,14 +713,7 @@ $ig-bem-context-id: 'bem' !default;
         $parts-data: append($parts-data, ('name': $name, 'selector': $sel));
     }
 
-    @include ig-context-push($ig-bem-context-id, 'element', (
-            'parts':    $parts-data,
-            'selector': $selector
-    ));
-    @at-root #{$selector} {
-        @content;
-    }
-    @include ig-context-pop($ig-bem-context-id);
+    @return $parts-data $selector;
 }
 
 /// 
@@ -657,6 +732,10 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+@function ig-bem-sibling-element-selector($name, $names...) {
+    @return ig-bem-related-element-selector('~', $name, $names...);
+}
+
 /// 
 /// Generate a BEM element that is the successor of the current element.
 ///
@@ -671,6 +750,10 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-bem-related-element('+', $name, $names...) {
         @content;
     }
+}
+
+@function ig-bem-next-element-selector($name, $names...) {
+    @return ig-bem-related-element-selector('+', $name, $names...);
 }
 
 /// 
@@ -727,7 +810,23 @@ $ig-bem-context-id: 'bem' !default;
 ///
 @mixin ig-bem-next-twin-element {
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
-    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'element');
+
+    $selector-data: ig-bem-next-twin-element-selector();
+    $parts-data:    nth($selector-data, 1);
+    $selector:      nth($selector-data, 2);
+
+    @include ig-context-push($ig-bem-context-id, 'element', (
+            'parts':    $parts-data,
+            'selector': $selector
+    ));
+    @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+@function ig-bem-next-twin-element-selector() {
+    $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'element');
 
     $element-context: ig-context-get($ig-bem-context-id, 'element');
 
@@ -769,14 +868,7 @@ $ig-bem-context-id: 'bem' !default;
         $parts-data: append($parts-data, ('name': $part-name, 'selector': $sel));
     }
 
-    @include ig-context-push($ig-bem-context-id, 'element', (
-            'parts':    $parts-data,
-            'selector': $selector
-    ));
-    @at-root #{$selector} {
-        @content;
-    }
-    @include ig-context-pop($ig-bem-context-id);
+    @return $parts-data $selector;
 }
 
 /// 
@@ -882,7 +974,18 @@ $ig-bem-context-id: 'bem' !default;
 ///
 @mixin ig-bem-modifier($name, $extend: false) {
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
-    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
+    
+    $selector: ig-bem-modifier-selector($name, $extend);
+
+    @include ig-context-push($ig-bem-context-id, 'modifier', ('name': $name, 'selector': $selector));
+    @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+@function ig-bem-modifier-selector($name, $extend: false) {
+    $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
     $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'at-theme');
     $selector:       null;
@@ -930,11 +1033,7 @@ $ig-bem-context-id: 'bem' !default;
         $selector: selector-append(&, $parent-selector, $ig-bem-modifier-separator + $name);
     }
 
-    @include ig-context-push($ig-bem-context-id, 'modifier', ('name': $name, 'selector': $selector));
-    @at-root #{$selector} {
-        @content;
-    }
-    @include ig-context-pop($ig-bem-context-id);
+    @return $selector;
 }
 
 /// 
@@ -987,8 +1086,19 @@ $ig-bem-context-id: 'bem' !default;
     //
 
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
-    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
-    @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'suffix');
+    
+    $selector: ig-bem-suffix-selector($name);
+
+    @include ig-context-push($ig-bem-context-id, 'suffix', ('name': $name, 'selector': $selector));
+    @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+@function ig-bem-suffix-selector($name) {
+    $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
+    $noop: ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'suffix');
 
     $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'at-theme');
     $parent-selector: map-get(nth($parent-context, 2), 'selector');
@@ -1016,17 +1126,14 @@ $ig-bem-context-id: 'bem' !default;
 
     $selector: selector-append(&, $ig-bem-suffix-separator + $name);
 
-    @include ig-context-push($ig-bem-context-id, 'suffix', ('name': $name, 'selector': $selector));
-    @at-root #{$selector} {
-        @content;
-    }
-    @include ig-context-pop($ig-bem-context-id);
+    @return $selector;
 }
 
 /// 
 /// Create a new is-state modifier.
 ///
-/// @param {string} $state - Name of the state
+/// @param {string} $state  - First state name
+/// @param {list}   $states - List of more state names
 ///
 /// @content
 ///
@@ -1070,6 +1177,14 @@ $ig-bem-context-id: 'bem' !default;
 ///   }
 ///
 @mixin ig-bem-is($state, $states...) {
+    $selector: ig-bem-is-selector($state, $states...);
+
+    @at-root #{$selector} {
+        @content;
+    }
+}
+
+@function ig-bem-is-selector($state, $states...) {
     $selector: ();
 
     @each $state in join($state, $states) {
@@ -1078,15 +1193,14 @@ $ig-bem-context-id: 'bem' !default;
         $selector: join($selector, $sel, comma);
     }
 
-    @at-root #{$selector} {
-        @content;
-    }
+    @return $selector;
 }
 
 /// 
 /// Create a new has-state modifier.
 ///
-/// @param {string} $state - Name of the state
+/// @param {string} $state  - First state name
+/// @param {list}   $states - List of more state names
 ///
 /// @content
 ///
@@ -1130,6 +1244,14 @@ $ig-bem-context-id: 'bem' !default;
 ///   }
 ///
 @mixin ig-bem-has($state, $states...) {
+    $selector: ig-bem-has-selector($state, $states...);
+
+    @at-root #{$selector} {
+        @content;
+    }
+}
+
+@function ig-bem-has-selector($state, $states...) {
     $selector: ();
 
     @each $state in join($state, $states) {
@@ -1138,20 +1260,28 @@ $ig-bem-context-id: 'bem' !default;
         $selector: join($selector, $sel, comma);
     }
 
-    @at-root #{$selector} {
-        @content;
-    }
+    @return $selector;
 }
 
 /// 
 /// Declare new rules for the current block for when this theme is active.
 ///
-/// @param {string | left} $name - Theme block name or list of theme block names
+/// @param {string | list} $name - Theme block name or list of theme block names
 ///
 /// @content
 ///
 @mixin ig-bem-at-theme($name, $names...) {
-    @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
+    $selector: ig-bem-at-theme-selector($name, $names...);
+
+    @include ig-context-push($ig-bem-context-id, 'at-theme', ('name': join($name, $names), 'selector': $selector));
+    @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+@function ig-bem-at-theme-selector($name, $names...) {
+    $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
     $parent-context:  ig-context-get($ig-bem-context-id, 'block');
     $parent-selector: map-get(nth($parent-context, 2), 'selector');
@@ -1161,11 +1291,37 @@ $ig-bem-context-id: 'bem' !default;
         @error 'An at-theme rule must be an immediate child of a block or another at-theme rule';
     }
 
-    $selector: ig-bem-theme-selector($name, $names...);
+    $selector: ig-bem-theme-selector-priv($name, $names...);
     $selector: selector-nest($selector, &);
     $selector: ig-selector-nest-fix($selector);
 
-    @include ig-context-push($ig-bem-context-id, 'at-theme', ('name': join($name, $names), 'selector': $selector));
+    @return $selector;
+}
+
+/// 
+/// Declare new rules for the current block for when this theme is active.
+///
+/// @param {string | list} $first  - First selector. Either a string for a manual selector, or a list with the first items standing for a BEM mixin and other items being passed as argument to said mixin.
+/// @param {string | list} $others - Other selectors. Either a string for a manual selector, or a list with the first items standing for a BEM mixin and other items being passed as argument to said mixin.
+///
+/// @content
+///
+@mixin ig-bem-multi($first, $others...) {
+    $selector:   ();
+    $parts-data: ();
+
+    @each $sel in append($others, $first) {
+        @if type-of($sel) == string {
+
+        } @else {
+
+        }
+    }
+
+    @include ig-context-push($ig-bem-context-id, 'multi', (
+            'parts':    $parts-data,
+            'selector': $selector)
+    );
     @at-root #{$selector} {
         @content;
     }
@@ -1177,7 +1333,7 @@ $ig-bem-context-id: 'bem' !default;
 //
 // @access private
 //
-@function ig-bem-theme-selector($name, $names...) {
+@function ig-bem-theme-selector-priv($name, $names...) {
     $namespace: map-get($ig-bem-namespaces, 'theme');
     $selector:  null;
 
