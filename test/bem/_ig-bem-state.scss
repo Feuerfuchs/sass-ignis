@@ -1,0 +1,177 @@
+// sass-lint:disable class-name-format force-element-nesting force-pseudo-nesting mixins-before-declarations
+
+//
+// Included test cases:
+//  - /// 1 /// - single block, single state
+//  - /// 2 /// - single element, single state
+//  - /// 3 /// - single block, multiple states
+//  - /// 4 /// - single element, multiple states
+//  - /// 5 /// - multiple elements, single state
+//  - /// 6 /// - multiple elements, multiple states
+//
+
+@include it('ig-bem-state') {
+    @include assert('single block, single state') { /// 1 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-is('active') {
+                    font-size: 1.25em;
+                }
+
+                @include ig-bem-has('state') {
+                    font-size: 1.75em;
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something.is-active {
+                font-size: 1.25em;
+            }
+
+            .something.has-state {
+                font-size: 1.75em;
+            }
+        }
+    }
+
+    @include assert('single element, single state') { /// 2 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child') {
+                    @include ig-bem-is('active') {
+                        font-size: 2.25em;
+                    }
+
+                    @include ig-bem-has('state') {
+                        font-size: 2.75em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child.is-active {
+                font-size: 2.25em;
+            }
+
+            .something__child.has-state {
+                font-size: 2.75em;
+            }
+        }
+    }
+
+    @include assert('single block, multiple states') { /// 3 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-is('active', 'primary') {
+                    font-size: 1.25em;
+                }
+
+                @include ig-bem-has('state', 'indicator') {
+                    font-size: 1.75em;
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something.is-active,
+            .something.is-primary {
+                font-size: 1.25em;
+            }
+
+            .something.has-state,
+            .something.has-indicator {
+                font-size: 1.75em;
+            }
+        }
+    }
+
+    @include assert('single element, multiple states') { /// 4 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child') {
+                    @include ig-bem-is('active', 'primary') {
+                        font-size: 2.25em;
+                    }
+
+                    @include ig-bem-has('state', 'indicator') {
+                        font-size: 2.75em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child.is-active,
+            .something__child.is-primary {
+                font-size: 2.25em;
+            }
+
+            .something__child.has-state,
+            .something__child.has-indicator {
+                font-size: 2.75em;
+            }
+        }
+    }
+
+    @include assert('multiple elements, single state') { /// 5 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1', 'child2') {
+                    @include ig-bem-is('active') {
+                        font-size: 2.25em;
+                    }
+
+                    @include ig-bem-has('state') {
+                        font-size: 2.75em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1.is-active,
+            .something__child2.is-active {
+                font-size: 2.25em;
+            }
+
+            .something__child1.has-state,
+            .something__child2.has-state {
+                font-size: 2.75em;
+            }
+        }
+    }
+
+    @include assert('multiple elements, multiple states') { /// 6 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1', 'child2') {
+                    @include ig-bem-is('active', 'primary') {
+                        font-size: 2.25em;
+                    }
+
+                    @include ig-bem-has('state', 'indicator') {
+                        font-size: 2.75em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1.is-active,
+            .something__child2.is-active,
+            .something__child1.is-primary,
+            .something__child2.is-primary {
+                font-size: 2.25em;
+            }
+
+            .something__child1.has-state,
+            .something__child2.has-state,
+            .something__child1.has-indicator,
+            .something__child2.has-indicator {
+                font-size: 2.75em;
+            }
+        }
+    }
+}

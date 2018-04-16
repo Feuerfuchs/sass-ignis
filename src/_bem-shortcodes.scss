@@ -1,7 +1,7 @@
 ////
 /// Shorter version of the bem-related mixins. Useful to reduce clutter.
 ///
-/// @group BEM Aliases
+/// @group BEM Shortcodes
 ///
 /// @access public
 ////
@@ -22,6 +22,141 @@
 ///
 @mixin b($name, $type) {
     @include block($name, $type) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-object
+///
+@mixin object($name) {
+    @include ig-bem-object($name) {
+        @content;
+    }
+}
+
+///
+/// @alias object
+///
+@mixin ob($name) {
+    @include object($name) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-component
+///
+@mixin component($name) {
+    @include ig-bem-component($name) {
+        @content;
+    }
+}
+
+///
+/// @alias component
+///
+@mixin cb($name, $type) {
+    @include component($name) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-layout
+///
+@mixin layout($name) {
+    @include ig-bem-layout($name) {
+        @content;
+    }
+}
+
+///
+/// @alias layout
+///
+@mixin lb($name, $type) {
+    @include layout($name) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-utility
+///
+@mixin utility($name) {
+    @include ig-bem-utility($name) {
+        @content;
+    }
+}
+
+///
+/// @alias utility
+///
+@mixin ub($name, $type) {
+    @include utility($name) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-scope
+///
+@mixin scope($name) {
+    @include ig-bem-scope($name) {
+        @content;
+    }
+}
+
+///
+/// @alias scope
+///
+@mixin sb($name, $type) {
+    @include scope($name) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-theme
+///
+@mixin theme($name) {
+    @include ig-bem-theme($name) {
+        @content;
+    }
+}
+
+///
+/// @alias theme
+///
+@mixin tb($name, $type) {
+    @include theme($name) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-js
+///
+@mixin js($name) {
+    @include ig-bem-js($name) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-qa
+///
+@mixin qa($name) {
+    @include ig-bem-qa($name) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-hack
+///
+@mixin hack($name) {
+    @include ig-bem-hack($name) {
         @content;
     }
 }
@@ -153,10 +288,28 @@
 }
 
 ///
+/// @alias ig-bem-is
+///
+@mixin is($state, $states...) {
+    @include ig-bem-is($state, $states...) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-has
+///
+@mixin has($state, $states...) {
+    @include ig-bem-has($state, $states...) {
+        @content;
+    }
+}
+
+///
 /// @alias ig-bem-at-theme
 ///
-@mixin at-theme($name...) {
-    @include ig-bem-at-theme($name...) {
+@mixin at-theme($name, $names...) {
+    @include ig-bem-at-theme($name, $names...) {
         @content;
     }
 }
@@ -164,8 +317,8 @@
 ///
 /// @alias theme
 ///
-@mixin at($name...) {
-    @include at-theme($name...) {
+@mixin at($name, $names...) {
+    @include at-theme($name, $names...) {
         @content;
     }
 }

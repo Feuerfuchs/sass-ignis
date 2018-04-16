@@ -106,12 +106,16 @@ $ig-bem-blocks: ();
 $ig-bem-max-depth: 99 !default;
 
 ///
-/// Indicates if nesting elements is allowed.
-/// Related elements are excluded from this option.
-/// 
-/// @type bool
+/// Indicates how nested elements should be handled.
 ///
-$ig-bem-allow-nested-elements: true !default;
+/// 'allow' means elements will be nested, i.e. the result will be {e} {b}__element.
+/// 'disallow' means an error will be emitted.
+/// 'append' means the element name will be appended to the parent element, i.e. the result will be {e}__element.
+/// Any other value is treated as 'allow'.
+/// 
+/// @type string
+///
+$ig-bem-element-nesting-policy: 'allow' !default;
 
 ///
 /// Context ID used for all BEM-related mixins.
@@ -130,7 +134,7 @@ $ig-bem-context-id: 'bem' !default;
 /// @param {string} $name        - Block name
 /// @param {string} $type [null] - BEMIT namespace of the block
 ///
-/// @content [All declarations belonging to that block]
+/// @content
 ///
 /// @throw If $type is invalid
 /// @throw If the block is preceded by another block, element, modifier or suffix
@@ -193,7 +197,7 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @param {string} $name - Object block name
 ///
-/// @content [All declarations belonging to that object block]
+/// @content
 ///
 @mixin ig-bem-object($name) {
     @include ig-bem-block($name, 'object') {
@@ -206,7 +210,7 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @param {string} $name - Component block name
 ///
-/// @content [All declarations belonging to that component block]
+/// @content
 ///
 @mixin ig-bem-component($name) {
     @include ig-bem-block($name, 'component') {
@@ -219,7 +223,7 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @param {string} $name - Layout block name
 ///
-/// @content [All declarations belonging to that layout block]
+/// @content
 ///
 @mixin ig-bem-layout($name) {
     @include ig-bem-block($name, 'layout') {
@@ -232,7 +236,7 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @param {string} $name - Utility block name
 ///
-/// @content [All declarations belonging to that utility block]
+/// @content
 ///
 @mixin ig-bem-utility($name) {
     @include ig-bem-block($name, 'utility') {
@@ -245,7 +249,7 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @param {string} $name - Scope block name
 ///
-/// @content [All declarations belonging to that scope block]
+/// @content
 ///
 @mixin ig-bem-scope($name) {
     @include ig-bem-block($name, 'scope') {
@@ -258,7 +262,7 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @param {string} $name - Theme block name
 ///
-/// @content [All declarations belonging to that theme block]
+/// @content
 ///
 @mixin ig-bem-theme($name) {
     @include ig-bem-block($name, 'theme') {
@@ -271,7 +275,7 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @param {string} $name - JS block name
 ///
-/// @content [All declarations belonging to that JS block]
+/// @content
 ///
 @mixin ig-bem-js($name) {
     @include ig-bem-block($name, 'js') {
@@ -284,7 +288,7 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @param {string} $name - QA block name
 ///
-/// @content [All declarations belonging to that QA block]
+/// @content
 ///
 @mixin ig-bem-qa($name) {
     @include ig-bem-block($name, 'qa') {
@@ -297,7 +301,7 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @param {string} $name - Hack block name
 ///
-/// @content [All declarations belonging to that hack block]
+/// @content
 ///
 @mixin ig-bem-hack($name) {
     @include ig-bem-block($name, 'hack') {
@@ -371,9 +375,10 @@ $ig-bem-context-id: 'bem' !default;
 /// nested inside the parent selector. This means, you may nest elements inside
 /// other elements, modifiers or any kind of selector such as &:hover.
 ///
-/// @param {string} $name - Element name
+/// @param {string} $name  - First element name
+/// @param {list}   $names - List of more element names
 ///
-/// @content [All declarations belonging to that element]
+/// @content
 ///
 /// @throw If the element is not preceded by a block, element, modifier or suffix.
 ///
@@ -448,69 +453,65 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
-    @if not $ig-bem-allow-nested-elements {
-        //
-        // Element nesting was forbidden by the user
-        //
-
-        @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'element');
-    }
+    $block-context:  ig-context-get($ig-bem-context-id, 'block');
+    $block-selector: map-get(nth($block-context, 2), 'selector');
 
     $selector:   ();
     $parts-data: ();
 
-    @each $name in join($name, $names) {
-        $sel:            null;
-        $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'at-theme');
+    $element-context: ig-context-get($ig-bem-context-id, 'element');
 
-        @if index('element' 'modifier' 'suffix', nth($parent-context, 1)) {
+    @if $element-context != null {
+        @if $ig-bem-element-nesting-policy == 'disallow' {
+            @error 'Element nesting is forbidden.';
+        }
+
+        $element-selector: map-get(nth($element-context, 2), 'selector');
+
+        @if $ig-bem-element-nesting-policy == 'append' {
+            @if not is-superselector(&, $element-selector) {
+                @error 'A nested element must be an immediate children of the parent element.';
+            }
+
             //
-            // Parent context is element, modifier or suffix.
             // Possible outcomes:
+            //   - {e}__element
+            //
+
+            @each $name in join($name, $names) {
+                $sel:        selector-append(&, $ig-bem-element-separator + $name);
+                $selector:   join($selector, $sel, comma);
+                $parts-data: append($parts-data, ('name': $name, 'selector': $sel));
+            }
+        }
+    }
+
+    @if length($selector) == 0 {
+        @if is-superselector(&, $block-selector) {
+            //
+            // Possible outcomes:
+            //   - {b}__element
+            //
+
+            @each $name in join($name, $names) {
+                $sel:        selector-append(&, $ig-bem-element-separator + $name);
+                $selector:   join($selector, $sel, comma);
+                $parts-data: append($parts-data, ('name': $name, 'selector': $sel));
+            }
+        } @else {
+            //
+            // Possible outcomes:
+            //   - {b} [manual selector] {b}__element
             //   - {e,m,s} ([manual selector]) {b}__element
             //
 
-            $block-context:  ig-context-get($ig-bem-context-id, 'block');
-            $block-selector: map-get(nth($block-context, 2), 'selector');
-
-            $sel: selector-nest(&, selector-append($block-selector, $ig-bem-element-separator + $name));
-            $sel: ig-selector-nest-fix($sel);
-        } @else {
-            //
-            // Parent context is block.
-            //
-
-            $parent-selector: map-get(nth($parent-context, 2), 'selector');
-
-            @if is-superselector(&, $parent-selector) {
-                //
-                // The current selector matches the parent selector.
-                // The element part can simply be appended.
-                // Possible outcomes:
-                //   - {b}__element
-                //
-
-                $sel: selector-append(&, $ig-bem-element-separator + $name);
-            } @else {
-                //
-                // The current selector doesn't match the parent selector.
-                // The user manually added a selector between parent context and this mixin call.
-                // Possible outcomes:
-                //   - {b} [manual selector] {b}__element
-                //
-
-                @if nth($parent-context, 1) == 'at-theme' {
-                    $block-context:  ig-context-get($ig-bem-context-id, 'block');
-                    $parent-selector: map-get(nth($block-context, 2), 'selector');
-                }
-
-                $sel: selector-nest(&, selector-append($parent-selector, $ig-bem-element-separator + $name));
-                $sel: ig-selector-nest-fix($sel);
+            @each $name in join($name, $names) {
+                $sel:        selector-nest(&, selector-append($block-selector, $ig-bem-element-separator + $name));
+                $sel:        ig-selector-nest-fix($sel);
+                $selector:   join($selector, $sel, comma);
+                $parts-data: append($parts-data, ('name': $name, 'selector': $sel));
             }
         }
-
-        $selector:   join($selector, $sel, comma);
-        $parts-data: append($parts-data, ('name': $name, 'selector': $sel));
     }
 
     @include ig-context-push($ig-bem-context-id, 'element', (
@@ -529,10 +530,11 @@ $ig-bem-context-id: 'bem' !default;
 /// The generated element selector is appended to the current element selector. The $sign
 /// determines the relationship.
 ///
-/// @param {string} $name - Element name
-/// @param {string} $sign - Relationshop sign, either '+' or '~'
+/// @param {string} $sign  - Relationshop sign, either '+' or '~'
+/// @param {string} $name  - First element name
+/// @param {list}   $names - List of more element names
 ///
-/// @content [All declarations belonging to that element]
+/// @content
 ///
 /// @throw If the element is not preceded by an element.
 ///
@@ -644,9 +646,10 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// It's a shorthand for ig-bem-related-element('~', $name).
 ///
-/// @param {string} $name - Element name
+/// @param {string} $name  - First element name
+/// @param {list}   $names - List of more element names
 ///
-/// @content [All declarations belonging to that element]
+/// @content
 ///
 @mixin ig-bem-sibling-element($name, $names...) {
     @include ig-bem-related-element('~', $name, $names...) {
@@ -659,9 +662,10 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// It's a shorthand for ig-bem-related-element('+', $name).
 ///
-/// @param {string} $name - Element name
+/// @param {string} $name  - First element name
+/// @param {list}   $names - List of more element names
 ///
-/// @content [All declarations belonging to that element]
+/// @content
 ///
 @mixin ig-bem-next-element($name, $names...) {
     @include ig-bem-related-element('+', $name, $names...) {
@@ -677,7 +681,7 @@ $ig-bem-context-id: 'bem' !default;
 /// However, if it is applied to multiple elements, each twin element only will influence
 /// their other twin, which is not replicable with ig-bem-related-element.
 ///
-/// @content [All declarations belonging to that element]
+/// @content
 ///
 /// @example scss - Two twin elements
 ///   @include ig-bem-component('block') {
@@ -791,7 +795,7 @@ $ig-bem-context-id: 'bem' !default;
 /// @param {string} $name           - Modifier name
 /// @param {bool}   $extend [false] - Indicate if the parent modifier or suffix will be extended
 ///
-/// @content [All declarations belonging to that modifier]
+/// @content
 ///
 /// @throw If the element is not preceded by a block, element, modifier or suffix.
 ///
@@ -938,7 +942,7 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @param {string} $name - Suffix name
 ///
-/// @content [All declarations belonging to that suffix]
+/// @content
 ///
 /// @throw If the element is not preceded by a block or modifier.
 ///
@@ -1020,13 +1024,133 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a new BEMIT theme block. It's a shorthand for ig-bem-block($name, 'theme').
+/// Create a new is-state modifier.
 ///
-/// @param {string} $name - Theme block name
+/// @param {string} $state - Name of the state
 ///
-/// @content [All declarations belonging to that theme block]
+/// @content
 ///
-@mixin ig-bem-at-theme($name...) {
+/// @example scss - Using single is-state
+///   @include ig-bem-object('menu') {
+///     display: none;
+///     
+///     @include ig-bem-is('open') {
+///       display: block;
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .o-menu {
+///     display: none;
+///   }
+///   
+///   .o-menu.is-open {
+///     display: block;
+///   }
+///
+/// @example scss - Using multiple is-states
+///   @include ig-bem-object('menu') {
+///     display: none;
+///     
+///     @include ig-bem-is('open', 'visible') {
+///       display: block;
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .o-menu {
+///     display: none;
+///   }
+///   
+///   .o-menu.is-open,
+///   .o-menu.is-visible {
+///     display: block;
+///   }
+///
+@mixin ig-bem-is($state, $states...) {
+    $selector: ();
+
+    @each $state in join($state, $states) {
+        $sel:      selector-nest(&, '&.is-#{$state}');
+        $sel:      ig-selector-nest-fix($sel);
+        $selector: join($selector, $sel, comma);
+    }
+
+    @at-root #{$selector} {
+        @content;
+    }
+}
+
+/// 
+/// Create a new has-state modifier.
+///
+/// @param {string} $state - Name of the state
+///
+/// @content
+///
+/// @example scss - Using single has-state
+///   @include ig-bem-object('buttonstrip') {
+///     display: none;
+///     
+///     @include ig-bem-has('buttons') {
+///       display: block;
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .o-buttonstrip {
+///     display: none;
+///   }
+///   
+///   .o-buttonstrip.has-buttons {
+///     display: block;
+///   }
+///
+/// @example scss - Using multiple has-states
+///   @include ig-bem-object('buttonstrip') {
+///     display: none;
+///     
+///     @include ig-bem-has('buttons', 'textfields') {
+///       display: block;
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .o-buttonstrip {
+///     display: none;
+///   }
+///   
+///   .o-buttonstrip.has-buttons,
+///   .o-buttonstrip.has-textfields {
+///     display: block;
+///   }
+///
+@mixin ig-bem-has($state, $states...) {
+    $selector: ();
+
+    @each $state in join($state, $states) {
+        $sel:      selector-nest(&, '&.has-#{$state}');
+        $sel:      ig-selector-nest-fix($sel);
+        $selector: join($selector, $sel, comma);
+    }
+
+    @at-root #{$selector} {
+        @content;
+    }
+}
+
+/// 
+/// Declare new rules for the current block for when this theme is active.
+///
+/// @param {string | left} $name - Theme block name or list of theme block names
+///
+/// @content
+///
+@mixin ig-bem-at-theme($name, $names...) {
     @include ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
     $parent-context:  ig-context-get($ig-bem-context-id, 'block');
@@ -1037,11 +1161,11 @@ $ig-bem-context-id: 'bem' !default;
         @error 'An at-theme rule must be an immediate child of a block or another at-theme rule';
     }
 
-    $selector: ig-bem-theme-selector($name...);
+    $selector: ig-bem-theme-selector($name, $names...);
     $selector: selector-nest($selector, &);
     $selector: ig-selector-nest-fix($selector);
 
-    @include ig-context-push($ig-bem-context-id, 'at-theme', ('name': $name, 'selector': $selector));
+    @include ig-context-push($ig-bem-context-id, 'at-theme', ('name': join($name, $names), 'selector': $selector));
     @at-root #{$selector} {
         @content;
     }
@@ -1050,12 +1174,15 @@ $ig-bem-context-id: 'bem' !default;
 
 //
 
-@function ig-bem-theme-selector($name...) {
+//
+// @access private
+//
+@function ig-bem-theme-selector($name, $names...) {
     $namespace: map-get($ig-bem-namespaces, 'theme');
     $selector:  null;
 
-    @each $n in $name {
-        $sel: '.' + $namespace + '-' + $n;
+    @each $name in join($name, $names) {
+        $sel: '.' + $namespace + '-' + $name;
 
         @if $selector == null {
             $selector: join(selector-parse($sel), selector-parse('[class*=\' t-\'] ' + $sel), comma);
