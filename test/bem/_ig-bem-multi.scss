@@ -17,6 +17,9 @@
 //  - /// 13 /// - in multiple elements, 1 element, 1 & selector
 //  - /// 14 /// - in related elements, 2 elements, 1 modifier
 //  - /// 15 /// - in related elements, 1 element, 1 & selector
+//  - /// 16 /// - in element, 2 related elements, 1 modifier
+//  - /// 17 /// - in element, 1 twin element, 1 modifier
+//  - /// 18 /// - in multiple elements, 1 twin element, 1 modifier
 //
 
 @include it('ig-bem-state') {
@@ -71,7 +74,7 @@
     @include assert('in block, 2 elements') { /// 3 ///
         @include output(false) {
             @include ig-bem-block('something') {
-                @include ig-bem-multi('element' 'child1', 'element' 'child2') {
+                @include ig-bem-multi('element' 'child1' 'child2') {
                     font-size: 2em;
 
                     @include ig-bem-modifier('mod') {
@@ -82,18 +85,12 @@
         }
 
         @include expect(false) {
-            .something__child1 {
-                font-size: 2em;
-            }
-
-            .something__child1--mod {
-                font-size: 2.5em;
-            }
-
+            .something__child1,
             .something__child2 {
                 font-size: 2em;
             }
 
+            .something__child1--mod,
             .something__child2--mod {
                 font-size: 2.5em;
             }
@@ -232,7 +229,7 @@
         @include output(false) {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
-                    @include ig-bem-multi('element' 'subchild1', 'element' 'subchild2', 'modifier' 'mod1') {
+                    @include ig-bem-multi('element' 'subchild1' 'subchild2', 'modifier' 'mod1') {
                         font-size: 3em;
 
                         @include ig-bem-modifier('mod2') {
@@ -244,18 +241,12 @@
         }
 
         @include expect(false) {
-            .something__child .something__subchild1 {
-                font-size: 3em;
-            }
-
-            .something__child .something__subchild1--mod2 {
-                font-size: 3.5em;
-            }
-
+            .something__child .something__subchild1,
             .something__child .something__subchild2 {
                 font-size: 3em;
             }
 
+            .something__child .something__subchild1--mod2,
             .something__child .something__subchild2--mod2 {
                 font-size: 3.5em;
             }
@@ -309,7 +300,7 @@
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     &:hover {
-                        @include ig-bem-multi('element' 'subchild1', 'element' 'subchild2') {
+                        @include ig-bem-multi('element' 'subchild1' 'subchild2') {
                             font-size: 3em;
 
                             @include ig-bem-modifier('mod2') {
@@ -322,18 +313,12 @@
         }
 
         @include expect(false) {
-            .something__child:hover .something__subchild1 {
-                font-size: 3em;
-            }
-
-            .something__child:hover .something__subchild1--mod2 {
-                font-size: 3.5em;
-            }
-
+            .something__child:hover .something__subchild1,
             .something__child:hover .something__subchild2 {
                 font-size: 3em;
             }
 
+            .something__child:hover .something__subchild1--mod2,
             .something__child:hover .something__subchild2--mod2 {
                 font-size: 3.5em;
             }
@@ -368,7 +353,7 @@
         @include output(false) {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
-                    @include ig-bem-multi('element' 'subchild1', 'element' 'subchild2', 'modifier' 'mod') {
+                    @include ig-bem-multi('element' 'subchild1' 'subchild2', 'modifier' 'mod') {
                         font-size: 3em;
                     }
                 }
@@ -377,12 +362,9 @@
 
         @include expect(false) {
             .something__child1 .something__subchild1,
-            .something__child2 .something__subchild1 {
-                font-size: 3em;
-            }
-
+            .something__child2 .something__subchild1,
             .something__child1 .something__subchild2,
-            .something__child2 .something__subchild2 {
+            .something__child2 .something__subchild2  {
                 font-size: 3em;
             }
 
@@ -436,7 +418,7 @@
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1') {
                     @include ig-bem-next-element('child2', 'child3') {
-                        @include ig-bem-multi('element' 'subchild1', 'element' 'subchild2', 'modifier' 'mod') {
+                        @include ig-bem-multi('element' 'subchild1' 'subchild2', 'modifier' 'mod') {
                             font-size: 3em;
                         }
                     }
@@ -446,10 +428,7 @@
 
         @include expect(false) {
             .something__child1 + .something__child2 .something__subchild1,
-            .something__child1 + .something__child3 .something__subchild1 {
-                font-size: 3em;
-            }
-
+            .something__child1 + .something__child3 .something__subchild1,
             .something__child1 + .something__child2 .something__subchild2,
             .something__child1 + .something__child3 .something__subchild2 {
                 font-size: 3em;
@@ -498,6 +477,116 @@
             .something__child1 + .something__child2--mod,
             .something__child1 + .something__child3--mod {
                 font-size: 4.5em;
+            }
+        }
+    }
+
+    @include assert('in element, 2 related elements, 1 modifier') { /// 16 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1') {
+                    @include ig-bem-multi('next-element' 'child2' 'child3', 'modifier' 'mod1') {
+                        font-size: 3em;
+
+                        @include ig-bem-modifier('mod2') {
+                            font-size: 3.5em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1 + .something__child2,
+            .something__child1 + .something__child3 {
+                font-size: 3em;
+            }
+
+            .something__child1 + .something__child2--mod2,
+            .something__child1 + .something__child3--mod2 {
+                font-size: 3.5em;
+            }
+
+            .something__child1--mod1 {
+                font-size: 3em;
+            }
+
+            .something__child1--mod1.something__child1--mod2 {
+                font-size: 3.5em;
+            }
+        }
+    }
+
+    @include assert('in element, 1 twin element, 1 modifier') { /// 17 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child') {
+                    @include ig-bem-multi('next-twin-element', 'modifier' 'mod1') {
+                        font-size: 3em;
+
+                        @include ig-bem-modifier('mod2') {
+                            font-size: 3.5em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child + .something__child {
+                font-size: 3em;
+            }
+
+            .something__child + .something__child--mod2 {
+                font-size: 3.5em;
+            }
+
+            .something__child--mod1 {
+                font-size: 3em;
+            }
+
+            .something__child--mod1.something__child--mod2 {
+                font-size: 3.5em;
+            }
+        }
+    }
+
+    @include assert('in multiple elements, 1 twin element, 1 modifier') { /// 18 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child1', 'child2') {
+                    @include ig-bem-multi('next-twin-element', 'modifier' 'mod1') {
+                        font-size: 3em;
+
+                        @include ig-bem-modifier('mod2') {
+                            font-size: 3.5em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child1 + .something__child1,
+            .something__child2 + .something__child2 {
+                font-size: 3em;
+            }
+
+            .something__child1 + .something__child1--mod2,
+            .something__child2 + .something__child2--mod2 {
+                font-size: 3.5em;
+            }
+
+            .something__child1--mod1,
+            .something__child2--mod1 {
+                font-size: 3em;
+            }
+
+            .something__child1--mod1.something__child1--mod2,
+            .something__child1--mod1.something__child2--mod2,
+            .something__child2--mod1.something__child1--mod2,
+            .something__child2--mod1.something__child2--mod2 {
+                font-size: 3.5em;
             }
         }
     }

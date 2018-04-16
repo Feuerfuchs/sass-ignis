@@ -1297,47 +1297,82 @@ $ig-bem-context-id: 'bem' !default;
 /// 
 /// Generate multiple entities (BEM or not) at once.
 ///
-/// NOTE: This mixin DOES NOT generate optimized selectors in order to keep track of contexts.
-/// If there is any other suitable BEM selector, use that one since it's guaranteed to be optimized
-/// for that specific use case.
+/// NOTE: This mixin does not generate perfectly optimized selectors in order to keep track of contexts.
 ///
 /// @param {string | list} $first  - First selector. Either a string for a manual selector, or a list with the first items standing for a BEM selector function and other items being passed as argument to said function.
 /// @param {string | list} $others - Other selectors. Either a string for a manual selector, or a list with the first items standing for a BEM selector function and other items being passed as argument to said function.
 ///
 /// @content
 ///
+/// @example scss - Creating multiple elements and a modifier
+///   @include ig-bem-object('buttonstrip') {
+///     display: none;
+///     
+///     @include ig-bem-multi('modifier' 'mod', 'element' 'button' 'separator') {
+///       display: block;
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .o-buttonstrip {
+///     display: none;
+///   }
+///   
+///   .o-buttonstrip--mod {
+///     display: block;
+///   }
+///   
+///   .o-buttonstrip__button, {
+///   .o-buttonstrip__separator {
+///     display: block;
+///   }
+///
 @mixin ig-bem-multi($first, $others...) {
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
 
-    @each $sel-data in ig-list-prepend($others, $first) {
-        @if type-of($sel-data) == string {
-            $sel: if(&, selector-nest(&, $sel-data), selector-parse($sel-data));
+    @each $entity in ig-list-prepend($others, $first) {
+        $is-manual-selector: false;
+
+        @if type-of($entity) == string and not function-exists('ig-bem-' + $entity) {
+            $is-manual-selector: true;
+        }
+
+        @if $is-manual-selector {
+            $sel: if(&, selector-nest(&, $entity), selector-parse($entity));
             $sel: ig-selector-nest-fix($sel);
 
             @at-root #{$sel} {
                 @content;
             }
         } @else {
-            $sel-data-func-id: nth($sel-data, 1);
-            $sel-data:         ig-list-slice($sel-data, 2);
+            $entity-func-id: nth($entity, 1);
 
-            @if $sel-data-func-id == 'multi' {
+            @if type-of($entity) == list {
+                $entity-func-id: nth($entity, 1);
+                $entity:         ig-list-slice($entity, 2);
+            } @else {
+                $entity-func-id: $entity;
+                $entity:         ();
+            }
+
+            @if $entity-func-id == 'multi' {
                 @error 'ig-bem-multi cannot call itself.';
             }
 
             $sel-func: null;
 
-            @if function-exists('ig-bem-' + $sel-data-func-id) {
-                $sel-func: get-function('ig-bem-' + $sel-data-func-id);
-            } @else if function-exists($sel-data-func-id) {
-                $sel-func: get-function($sel-data-func-id);
+            @if function-exists('ig-bem-' + $entity-func-id) {
+                $sel-func: get-function('ig-bem-' + $entity-func-id);
+            } @else if function-exists($entity-func-id) {
+                $sel-func: get-function($entity-func-id);
             }
 
             @if $sel-func == null {
-                @error 'Function "#{inspect($sel-data-func-id)}" was not found.';
+                @error 'Function "#{inspect($entity-func-id)}" was not found.';
             }
 
-            $entity-data: call($sel-func, $sel-data...);
+            $entity-data: call($sel-func, $entity...);
 
             @at-root #{nth($entity-data, 1)} {
                 @content;
