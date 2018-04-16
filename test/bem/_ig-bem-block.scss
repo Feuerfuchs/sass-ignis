@@ -4,6 +4,8 @@
 // Included test cases:
 //  - /// 1 /// - without namespace
 //  - /// 2 /// - with namespace
+//  - /// 3 /// - nested
+//  - /// 4 /// - within selector
 //
 
 @include it('ig-bem-block') {
@@ -58,6 +60,22 @@
         @include expect(false) {
             .t-theme .t-subtheme .something,
             [class*=' t-'] .t-theme .t-subtheme .something {
+                font-size: 2em;
+            }
+        }
+    }
+
+    @include assert('within selector') { /// 4 ///
+        @include output(false) {
+            .sel {
+                @include ig-bem-block('something') {
+                    font-size: 2em;
+                }
+            }
+        }
+
+        @include expect(false) {
+            .sel .something {
                 font-size: 2em;
             }
         }

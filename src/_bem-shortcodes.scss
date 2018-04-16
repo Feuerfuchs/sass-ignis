@@ -322,3 +322,12 @@
         @content;
     }
 }
+
+///
+/// @alias ig-bem-multi
+///
+@mixin multi($first, $others...) {
+    @include ig-bem-multi($first, $others...) {
+        @content;
+    }
+}

@@ -825,12 +825,10 @@ $ig-bem-context-id: 'bem' !default;
     $parts-data: ();
 
     //
-    // To determine the twin for each element, iterate the parts from the latest element
-    // context.
-    // Then, iterate all sub-selectors from the current selector and check if it contains
-    // the element part selector. This has to be done with string comparison since none of
-    // SASS selector functions would be useful here. 
-    // Finally, the current twin will be appended to the extracted selector part as a successor
+    // To determine the twin for each element, iterate the sub-selectors from the current selector
+    // and check if it contains the currently inspected element. This has to be done with string
+    // comparison since none of SASS selector functions is of use here. 
+    // Finally, the current twin will be appended to the extracted sub-selector as a successor
     // element.
     // Possible outcomes:
     //   - {e} ({m,s}) ([manual selector]) + {e}
@@ -1018,6 +1016,8 @@ $ig-bem-context-id: 'bem' !default;
             //
             // Latest context is element. Since element contexts can consist of multiple single
             // elements, inspect all elements and append its selector with the suffix "--$name".
+            // This has to be done with string comparison since none of SASS selector functions
+            // is of use here. 
             // Possible outcomes:
             //   - {m,s}.{e}--modifier
             //
