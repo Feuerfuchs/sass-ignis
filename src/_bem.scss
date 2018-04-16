@@ -978,34 +978,29 @@ $ig-bem-context-id: 'bem' !default;
     $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
-    $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'at-theme');
-    $selector:       null;
+    $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'at-theme');
+    $parent-selector: map-get(nth($parent-context, 2), 'selector');
+    $selector:        ();
+
+    @if not is-superselector(&, $parent-selector) {
+        //
+        // The current selector doesn't match the parent selector.
+        // The user manually added a selector between parent context and this modifier call.
+        // This case is forbidden because any outcome semantically wouldn't make sense:
+        //   - {b,e,m,s} [manual selector] {b,e,m,s}--modifier
+        //   - {b,e,m,s}--modifier [manual selector]
+        // The first case would make the modifier behave like an element.
+        // The second case is unintuitive, the code would be more clear by nesting the manual
+        // selector in the modifier instead.
+        //
+
+        @error 'A modifier must be an immediate child of the parent context';
+    }
 
     @if index('block' 'element' 'at-theme', nth($parent-context, 1)) or $extend == true {
         //
         // Either the parent context is block or element, or a modifier or suffix
-        // is to be extended.
-        //
-
-        $parent-selector: map-get(nth($parent-context, 2), 'selector');
-
-        @if not is-superselector(&, $parent-selector) {
-            //
-            // The current selector doesn't match the parent selector.
-            // The user manually added a selector between parent context and this modifier call.
-            // This case is forbidden because any outcome semantically wouldn't make sense:
-            //   - {b,e,m,s} [manual selector] {b,e,m,s}--modifier
-            //   - {b,e,m,s}--modifier [manual selector]
-            // The first case would make the modifier behave like an element.
-            // The second case is unintuitive, the code would be more clear by nesting the manual
-            // selector in the modifier instead.
-            //
-
-            @error 'A modifier must be an immediate child of the parent context';
-        }
-
-        //
-        // The modifier part can simply be appended.
+        // is to be extended. The modifier part can simply be appended.
         // Possible outcomes:
         //   - {b,e,m,s}--modifier
         //
@@ -1013,15 +1008,48 @@ $ig-bem-context-id: 'bem' !default;
         $selector: selector-append(&, $ig-bem-modifier-separator + $name);
     } @else {
         //
-        // Parent context is modifier or suffix and $extend is false.
-        // Possible outcomes:
-        //   - {m,s}.{b,e}--modifier
+        // Parent context is modifier or suffix and $extend is false. Get latest element or block.
         //
 
-        $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element');
-        $parent-selector: map-get(nth($parent-context, 2), 'selector');
+        $be-context:  ig-context-get($ig-bem-context-id, 'block' 'element');
+        $be-selector: map-get(nth($be-context, 2), 'selector');
 
-        $selector: selector-append(&, $parent-selector, $ig-bem-modifier-separator + $name);
+        @if nth($be-context, 1) == 'element' {
+            //
+            // Latest context is element. Since element contexts can consist of multiple single
+            // elements, inspect all elements and append its selector with the suffix "--$name".
+            // Possible outcomes:
+            //   - {m,s}.{e}--modifier
+            //
+
+            @each $part-data in map-get(nth($be-context, 2), 'parts') {
+                $part-selector: map-get($part-data, 'selector');
+                $part-name:     map-get($part-data, 'name');
+
+                $current-selector-part: null;
+                @each $s in & {
+                    @if str-index(inspect($s), inspect($part-selector)) {
+                        $current-selector-part: $s;
+                    }
+                }
+                @if $current-selector-part == null {
+                    @error 'Could not generate twin element selector.';
+                }
+
+                $sel: selector-append($current-selector-part, selector-append($part-selector, $ig-bem-modifier-separator + $name));
+                $sel: ig-selector-nest-fix($sel);
+
+                $selector: join($selector, $sel, comma);
+            }
+        } @else {
+            //
+            // Latest context is block. Just append the modifier part.
+            // Possible outcomes:
+            //   - {m,s}.{b}--modifier
+            //
+
+            $selector: selector-append(&, $be-selector, $ig-bem-modifier-separator + $name);
+        }
     }
 
     $noop: ig-context-push($ig-bem-context-id, 'modifier', ('name': $name, 'selector': $selector));

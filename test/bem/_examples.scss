@@ -18,11 +18,24 @@
                 @include ig-bem-element('image') {
                     display:  block;
                     flex:     0 0 auto;
+                    order:    1;
                     overflow: hidden;
                 }
 
                 @include ig-bem-element('body') {
-                    // nothing to do
+                    order: 2;
+                }
+
+                @include ig-bem-modifier('rtl') {
+                    justify-content: flex-end;
+
+                    @include ig-bem-element('image') {
+                        order: 2;
+                    }
+
+                    @include ig-bem-element('body') {
+                        order: 1;
+                    }
                 }
             }
         }
@@ -37,7 +50,24 @@
             .o-media__image {
                 display:  block;
                 flex:     0 0 auto;
+                order:    1;
                 overflow: hidden;
+            }
+
+            .o-media__body {
+                order: 2;
+            }
+
+            .o-media--rtl {
+                justify-content: flex-end;
+
+                .o-media__image {
+                    order: 2;
+                }
+
+                .o-media__body {
+                    order: 1;
+                }
             }
         }
     }
