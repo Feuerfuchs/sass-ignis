@@ -9,12 +9,14 @@
 //  - /// 5 ///  - in block, 1 element, 1 extending modifier
 //  - /// 6 ///  - in block, 1 element, 1 & selector
 //  - /// 7 ///  - in block, 1 element, 1 manual selector
-//  - /// 8 ///  - in element, 2 elements
+//  - /// 8 ///  - in element, 2 elements, 1 modifier
 //  - /// 9 ///  - in element, 1 element, 1 & selector
-//  - /// 10 /// - in multiple elements, 2 elements, 1 modifier
-//  - /// 11 /// - in multiple elements, 1 element, 1 & selector
-//  - /// 12 /// - in related elements, 2 elements, 1 modifier
-//  - /// 13 /// - in related elements, 1 element, 1 & selector
+//  - /// 10 /// - in element in manual selector, 2 elements
+//  - /// 11 /// - in element in manual selector, 1 element, 1 & selector
+//  - /// 12 /// - in multiple elements, 2 elements, 1 modifier
+//  - /// 13 /// - in multiple elements, 1 element, 1 & selector
+//  - /// 14 /// - in related elements, 2 elements, 1 modifier
+//  - /// 15 /// - in related elements, 1 element, 1 & selector
 //
 
 @include it('ig-bem-state') {
@@ -302,7 +304,67 @@
         }
     }
 
-    @include assert('in multiple elements, 2 elements, 1 modifier') { /// 10 ///
+    @include assert('in element in manual selector, 2 elements') { /// 10 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child') {
+                    &:hover {
+                        @include ig-bem-multi('element' 'subchild1', 'element' 'subchild2') {
+                            font-size: 3em;
+
+                            @include ig-bem-modifier('mod2') {
+                                font-size: 3.5em;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child:hover .something__subchild1 {
+                font-size: 3em;
+            }
+
+            .something__child:hover .something__subchild1--mod2 {
+                font-size: 3.5em;
+            }
+
+            .something__child:hover .something__subchild2 {
+                font-size: 3em;
+            }
+
+            .something__child:hover .something__subchild2--mod2 {
+                font-size: 3.5em;
+            }
+        }
+    }
+
+    @include assert('in element in manual selector, 1 element, 1 & selector') { /// 11 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-element('child') {
+                    &:hover {
+                        @include ig-bem-multi('element' 'subchild', '&') {
+                            font-size: 3em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .something__child:hover .something__subchild {
+                font-size: 3em;
+            }
+
+            .something__child:hover {
+                font-size: 3em;
+            }
+        }
+    }
+
+    @include assert('in multiple elements, 2 elements, 1 modifier') { /// 12 ///
         @include output(false) {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
@@ -331,7 +393,7 @@
         }
     }
 
-    @include assert('in multiple elements, 1 element, 1 & selector') { /// 11 ///
+    @include assert('in multiple elements, 1 element, 1 & selector') { /// 13 ///
         @include output(false) {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
@@ -369,7 +431,7 @@
         }
     }
 
-    @include assert('in related elements, 2 elements, 1 modifier') { /// 12 ///
+    @include assert('in related elements, 2 elements, 1 modifier') { /// 14 ///
         @include output(false) {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1') {
@@ -400,7 +462,7 @@
         }
     }
 
-    @include assert('in related elements, 1 element, 1 & selector') { /// 13 ///
+    @include assert('in related elements, 1 element, 1 & selector') { /// 15 ///
         @include output(false) {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1') {
