@@ -159,6 +159,13 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-context-pop($ig-bem-context-id);
 }
 
+///
+/// Generate a new BEMIT block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-block
+///
 @function ig-bem-block($name, $type: null) {
     //
     // Possible outcomes:
@@ -214,6 +221,13 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+///
+/// Generate a new BEMIT object block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-object
+///
 @function ig-bem-object($name) {
     @return ig-bem-block($name, 'object');
 }
@@ -231,6 +245,13 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+///
+/// Generate a new BEMIT component block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-component
+///
 @function ig-bem-component($name) {
     @return ig-bem-block($name, 'component');
 }
@@ -248,6 +269,13 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+///
+/// Generate a new BEMIT layout block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-layout
+///
 @function ig-bem-layout($name) {
     @return ig-bem-block($name, 'layout');
 }
@@ -265,6 +293,13 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+///
+/// Generate a new BEMIT utility block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-utility
+///
 @function ig-bem-utility($name) {
     @return ig-bem-block($name, 'utility');
 }
@@ -282,6 +317,13 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+///
+/// Generate a new BEMIT scope block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-scope
+///
 @function ig-bem-scope($name) {
     @return ig-bem-block($name, 'scope');
 }
@@ -299,6 +341,13 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+///
+/// Generate a new BEMIT theme block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-theme
+///
 @function ig-bem-theme($name) {
     @return ig-bem-block($name, 'theme');
 }
@@ -316,6 +365,13 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+///
+/// Generate a new BEMIT JS block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-js
+///
 @function ig-bem-js($name) {
     @return ig-bem-block($name, 'js');
 }
@@ -333,6 +389,13 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+///
+/// Generate a new BEMIT QA block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-qa
+///
 @function ig-bem-qa($name) {
     @return ig-bem-block($name, 'qa');
 }
@@ -350,6 +413,13 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+///
+/// Generate a new BEMIT hack block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-hack
+///
 @function ig-bem-hack($name) {
     @return ig-bem-block($name, 'hack');
 }
@@ -514,6 +584,13 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-context-pop($ig-bem-context-id);
 }
 
+///
+/// Generate a new BEM element. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-element
+///
 @function ig-bem-element($name, $names...) {
     $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
@@ -673,6 +750,14 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-context-pop($ig-bem-context-id);
 }
 
+///
+/// Generate a new BEM element that is related to the current element.
+/// Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-related-element
+///
 @function ig-bem-related-element($sign, $name, $names...) {
     //
     // Generating this selector is simple: Take the latest block context, use it
@@ -726,6 +811,14 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+///
+/// Generate a new BEM element that is a sibling of the current element.
+/// Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-sibling-element
+///
 @function ig-bem-sibling-element($name, $names...) {
     @return ig-bem-related-element('~', $name, $names...);
 }
@@ -746,6 +839,14 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+///
+/// Generate a new BEM element that is the successor of the current element.
+/// Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-next-element
+///
 @function ig-bem-next-element($name, $names...) {
     @return ig-bem-related-element('+', $name, $names...);
 }
@@ -811,6 +912,14 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-context-pop($ig-bem-context-id);
 }
 
+///
+/// Generate the current BEM element as a successor of itself.
+/// Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-next-twin-element
+///
 @function ig-bem-next-twin-element() {
     $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'element');
@@ -971,6 +1080,13 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-context-pop($ig-bem-context-id);
 }
 
+///
+/// Generate a new BEM modifier. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-modifier
+///
 @function ig-bem-modifier($name, $extend: false) {
     $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
@@ -1107,6 +1223,13 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-context-pop($ig-bem-context-id);
 }
 
+///
+/// Generate a new BEMIT suffix. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-suffix
+///
 @function ig-bem-suffix($name) {
     //
     // Suffixes can be used on block, element and modifier.
@@ -1202,6 +1325,13 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+///
+/// Generate a new is-state modifier. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-is
+///
 @function ig-bem-is($state, $states...) {
     $selector: ();
 
@@ -1270,6 +1400,13 @@ $ig-bem-context-id: 'bem' !default;
     }
 }
 
+///
+/// Generate a new has-state modifier. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-has
+///
 @function ig-bem-has($state, $states...) {
     $selector: ();
 
@@ -1299,6 +1436,14 @@ $ig-bem-context-id: 'bem' !default;
     @include ig-context-pop($ig-bem-context-id);
 }
 
+///
+/// Declare new rules for the current block for when this theme is active.
+/// Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-at-theme
+///
 @function ig-bem-at-theme($name, $names...) {
     $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
