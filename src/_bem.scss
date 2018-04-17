@@ -179,7 +179,7 @@ $ig-bem-context-id: 'bem' !default;
         @if $type != 'theme' or & {
             $selector: selector-parse('.' + $namespace + '-' + $name);
         } @else if not & {
-            $selector: ig-bem-theme-selector-priv($name);
+            $selector: ig-bem-theme-selector($name);
         }
     } @else {
         $selector: selector-parse('.' + $name);
@@ -696,9 +696,8 @@ $ig-bem-context-id: 'bem' !default;
     $parts-data: ();
 
     @each $name in join($name, $names) {
-        $sel: selector-nest(&, $sign, selector-append($block-selector, $ig-bem-element-separator + $name));
-        $sel: ig-selector-nest-fix($sel);
-
+        $sel:        selector-nest(&, $sign, selector-append($block-selector, $ig-bem-element-separator + $name));
+        $sel:        ig-selector-nest-fix($sel);
         $selector:   join($selector, $sel, comma);
         $parts-data: append($parts-data, ('name': $name, 'selector': $sel));
     }
@@ -1033,12 +1032,10 @@ $ig-bem-context-id: 'bem' !default;
                     }
                 }
                 @if $current-selector-part == null {
-                    @error 'Could not generate twin element selector.';
+                    @error 'Could not generate modifier selector.';
                 }
 
-                $sel: selector-append($current-selector-part, selector-append($part-selector, $ig-bem-modifier-separator + $name));
-                $sel: ig-selector-nest-fix($sel);
-
+                $sel:      selector-unify($current-selector-part, selector-append($part-selector, $ig-bem-modifier-separator + $name));
                 $selector: join($selector, $sel, comma);
             }
         } @else {
@@ -1313,7 +1310,7 @@ $ig-bem-context-id: 'bem' !default;
         @error 'An at-theme rule must be an immediate child of a block or another at-theme rule';
     }
 
-    $selector: ig-bem-theme-selector-priv($name, $names...);
+    $selector: ig-bem-theme-selector($name, $names...);
     $selector: selector-nest($selector, &);
     $selector: ig-selector-nest-fix($selector);
 
@@ -1418,7 +1415,7 @@ $ig-bem-context-id: 'bem' !default;
 //
 // @access private
 //
-@function ig-bem-theme-selector-priv($name, $names...) {
+@function ig-bem-theme-selector($name, $names...) {
     $namespace: map-get($ig-bem-namespaces, 'theme');
     $selector:  null;
 
