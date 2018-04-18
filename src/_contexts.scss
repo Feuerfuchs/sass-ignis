@@ -117,7 +117,7 @@ $ig-context-stacks: ();
 /// @param {string} $id        - ID of new context
 /// @param {any}    $data [()] - Data that belongs to the context
 ///
-/// @return {list | string} If context was pushed, a list with two items: 1 = context id, 2 = context data; otherwise a string with an error message
+/// @return {list} A list with two items: 1 = context id, 2 = context data
 ///
 @function ig-context-push($stack-id, $id, $data: ()) {
     @if not map-has-key($ig-context-stacks, $stack-id) {

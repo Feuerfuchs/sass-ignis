@@ -3,16 +3,16 @@
 //
 // Included test cases:
 //  - /// 1 ///  - block modifier
-//  - /// 2 ///  - element modifier, single element
-//  - /// 3 ///  - element modifier, multiple elements
-//  - /// 4 ///  - element modifier, single related element
-//  - /// 5 ///  - element modifier, multiple related elements
-//  - /// 6 ///  - element modifier, single element, manual selector before
-//  - /// 7 ///  - element modifier, multiple elements, manual selector before
-//  - /// 8 ///  - element modifier, single related element, manual selector before
-//  - /// 9 ///  - element modifier, multiple related elements, manual selector before
-//  - /// 10 /// - nested block modifiers
-//  - /// 11 /// - nested element modifiers
+//  - /// 2 ///  - block modifier, in at-theme
+//  - /// 3 ///  - element modifier, single element
+//  - /// 4 ///  - element modifier, multiple elements
+//  - /// 5 ///  - element modifier, single related element
+//  - /// 6 ///  - element modifier, multiple related elements
+//  - /// 7 ///  - element modifier, single element, manual selector before
+//  - /// 8 ///  - element modifier, multiple elements, manual selector before
+//  - /// 9 ///  - element modifier, single related element, manual selector before
+//  - /// 10 /// - element modifier, multiple related elements, manual selector before
+//  - /// 11 /// - element modifier, in at-theme
 //  - /// 12 /// - nested block modifiers, extending
 //  - /// 13 /// - nested element modifiers, extending
 //  - /// 14 /// - block and element modifiers, single element
@@ -44,7 +44,35 @@
         }
     }
 
-    @include assert('element modifier, single element') { /// 2 ///
+    @include assert('block modifier, in at-theme') { /// 2 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-at-theme('dark') {
+                    @include ig-bem-modifier('mod') {
+                        font-size: 1.5em;
+
+                        @include ig-bem-modifier('submod') {
+                            font-size: 1.75em;
+                        }
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .t-dark .something--mod,
+            [class*=' t-'] .t-dark .something--mod {
+                font-size: 1.5em;
+            }
+
+            .t-dark .something--mod.something--submod,
+            [class*=' t-'] .t-dark .something--mod.something--submod {
+                font-size: 1.75em;
+            }
+        }
+    }
+
+    @include assert('element modifier, single element') { /// 3 ///
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
@@ -70,7 +98,7 @@
         }
     }
 
-    @include assert('element modifier, multiple elements') { /// 3 ///
+    @include assert('element modifier, multiple elements') { /// 4 ///
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
@@ -100,7 +128,7 @@
 
     // FAILING: https://github.com/sass/libsass/issues/2633
     /*
-    @include assert('element modifier, single related element') { /// 4 ///
+    @include assert('element modifier, single related element') { /// 5 ///
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1') {
@@ -129,7 +157,7 @@
     }
     */
 
-    @include assert('element modifier, multiple related elements') { /// 5 ///
+    @include assert('element modifier, multiple related elements') { /// 6 ///
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1') {
@@ -159,7 +187,7 @@
         }
     }
 
-    @include assert('element modifier, single element, manual selector before') { /// 6 ///
+    @include assert('element modifier, single element, manual selector before') { /// 7 ///
         @include output {
             @include ig-bem-block('something') {
                 &:hover {
@@ -187,7 +215,7 @@
         }
     }
 
-    @include assert('element modifier, multiple elements, manual selector before') { /// 7 ///
+    @include assert('element modifier, multiple elements, manual selector before') { /// 8 ///
         @include output {
             @include ig-bem-block('something') {
                 &:hover {
@@ -217,7 +245,7 @@
         }
     }
 
-    @include assert('element modifier, single related element, manual selector before') { /// 8 ///
+    @include assert('element modifier, single related element, manual selector before') { /// 9 ///
         @include output {
             @include ig-bem-block('something') {
                 &:hover {
@@ -269,7 +297,7 @@
         }
     }
 
-    @include assert('element modifier, multiple related elements, manual selector before') { /// 9 ///
+    @include assert('element modifier, multiple related elements, manual selector before') { /// 10 ///
         @include output {
             @include ig-bem-block('something') {
                 &:hover {
@@ -325,51 +353,31 @@
         }
     }
 
-    @include assert('nested block modifiers') { /// 10 ///
-        @include output {
+    @include assert('element modifier, in at-theme') { /// 11 ///
+        @include output(false) {
             @include ig-bem-block('something') {
-                @include ig-bem-modifier('mod') {
-                    font-size: 1.5em;
+                @include ig-bem-at-theme('dark') {
+                    @include ig-bem-element('child') {
+                        @include ig-bem-modifier('mod') {
+                            font-size: 2.5em;
 
-                    @include ig-bem-modifier('submod') {
-                        font-size: 1.75em;
-                    }
-                }
-            }
-        }
-
-        @include expect {
-            .something--mod {
-                font-size: 1.5em;
-            }
-
-            .something--mod.something--mod--submod {
-                font-size: 1.75em;
-            }
-        }
-    }
-
-    @include assert('nested element modifiers') { /// 11 ///
-        @include output {
-            @include ig-bem-block('something') {
-                @include ig-bem-element('child') {
-                    @include ig-bem-modifier('mod') {
-                        font-size: 2.5em;
-
-                        @include ig-bem-modifier('submod') {
-                            font-size: 2.75em;
+                            @include ig-bem-modifier('submod') {
+                                font-size: 2.75em;
+                            }
                         }
                     }
                 }
             }
         }
 
-        @include expect {
-            .something__child--mod {
+        @include expect(false) {
+            .t-dark .something__child--mod,
+            [class*=' t-'] .t-dark .something__child--mod {
                 font-size: 2.5em;
             }
 
-            .something__child--mod.something__child--submod {
+            .t-dark .something__child--mod.something__child--submod,
+            [class*=' t-'] .t-dark .something__child--mod.something__child--submod {
                 font-size: 2.75em;
             }
         }

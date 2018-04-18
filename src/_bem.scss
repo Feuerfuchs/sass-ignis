@@ -973,18 +973,27 @@ $ig-bem-context-id: 'bem' !default;
         $part-selector: map-get($part-data, 'selector');
         $part-name:     map-get($part-data, 'name');
 
-        $current-selector-part: null;
-        @each $s in & {
-            @if str-index(inspect($s), inspect($part-selector)) {
-                $current-selector-part: $s;
+        $sel: ();
+        @if type-of($part-selector) == string {
+            @each $s in & {
+                @if str-index(inspect($s), inspect($part-selector)) {
+                    $sel: selector-nest($s, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
+                    $sel: ig-selector-nest-fix($sel);
+                }
+            }
+        } @else {
+            @each $s in & {
+                @each $ps in $part-selector {
+                    @if str-index(inspect($s), inspect($ps)) {
+                        $sel: selector-nest($s, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
+                        $sel: ig-selector-nest-fix($sel);
+                    }
+                }
             }
         }
-        @if $current-selector-part == null {
+        @if length($sel) == 0 {
             @error 'Could not generate twin element selector.';
         }
-
-        $sel: selector-nest($current-selector-part, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
-        $sel: ig-selector-nest-fix($sel);
 
         $selector:   join($selector, $sel, comma);
         $parts-data: append($parts-data, (
@@ -1171,17 +1180,26 @@ $ig-bem-context-id: 'bem' !default;
                 $part-selector: map-get($part-data, 'selector');
                 $part-name:     map-get($part-data, 'name');
 
-                $current-selector-part: null;
-                @each $s in & {
-                    @if str-index(inspect($s), inspect($part-selector)) {
-                        $current-selector-part: $s;
+                $sel: ();
+                @if type-of($part-selector) == string {
+                    @each $s in & {
+                        @if str-index(inspect($s), inspect($part-selector)) {
+                            $sel: append($sel, selector-unify($s, selector-append($part-selector, $ig-bem-modifier-separator + $name)));
+                        }
+                    }
+                } @else {
+                    @each $s in & {
+                        @each $ps in $part-selector {
+                            @if str-index(inspect($s), inspect($ps)) {
+                                $sel: append($sel, selector-unify($s, selector-append($ps, $ig-bem-modifier-separator + $name)));
+                            }
+                        }
                     }
                 }
-                @if $current-selector-part == null {
+                @if length($sel) == 0 {
                     @error 'Could not generate modifier selector.';
                 }
 
-                $sel:      selector-unify($current-selector-part, selector-append($part-selector, $ig-bem-modifier-separator + $name));
                 $selector: join($selector, $sel, comma);
             }
         } @else {
@@ -1487,7 +1505,6 @@ $ig-bem-context-id: 'bem' !default;
 
     $parent-context:  ig-context-get($ig-bem-context-id, 'block');
     $parent-selector: map-get(nth($parent-context, 2), 'selector');
-    $parent-name:     map-get(nth($parent-context, 2), 'name');
 
     @if not is-superselector(&, $parent-selector) {
         @error 'An at-theme rule must be an immediate child of a block or another at-theme rule';
