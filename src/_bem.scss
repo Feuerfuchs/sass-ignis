@@ -966,9 +966,10 @@ $ig-bem-context-id: 'bem' !default;
     // and check if it contains the currently inspected element. This has to be done with string
     // comparison since none of SASS selector functions is of use here.
     //
-    // This leads to one large weakness: If an element's name starts with the full name of a sibling
-    // element, it will be considered equivalent to said sibling element. Thus, the resulting
-    // selector contains too many sub-selectors.
+    // For the cases where selectors have been added since the latest element, this leads to one
+    // large weakness: If an element's name starts with the full name of a sibling element, it will
+    // be considered equivalent to said sibling element. Thus, the resulting selector contains too
+    // many sub-selectors.
     //
     // Finally, the current twin will be appended to the extracted sub-selector as a successor
     // element.
