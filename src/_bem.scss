@@ -952,7 +952,8 @@ $ig-bem-context-id: 'bem' !default;
     $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'element');
 
-    $element-context: ig-context-get($ig-bem-context-id, 'element');
+    $element-context:  ig-context-get($ig-bem-context-id, 'element');
+    $element-selector: map-get(nth($element-context, 2), 'selector');
 
     $block-context:       ig-context-get($ig-bem-context-id, 'block');
     $block-base-selector: map-get(nth($block-context, 2), 'base-selector');
@@ -963,7 +964,12 @@ $ig-bem-context-id: 'bem' !default;
     //
     // To determine the twin for each element, iterate the sub-selectors from the current selector
     // and check if it contains the currently inspected element. This has to be done with string
-    // comparison since none of SASS selector functions is of use here. 
+    // comparison since none of SASS selector functions is of use here.
+    //
+    // This leads to one large weakness: If an element's name starts with the full name of a sibling
+    // element, it will be considered equivalent to said sibling element. Thus, the resulting
+    // selector contains too many sub-selectors.
+    //
     // Finally, the current twin will be appended to the extracted sub-selector as a successor
     // element.
     // Possible outcomes:
@@ -974,19 +980,23 @@ $ig-bem-context-id: 'bem' !default;
         $part-name:     map-get($part-data, 'name');
 
         $sel: ();
-        @if type-of($part-selector) == string {
+        @if is-superselector(&, $element-selector) {
             @each $s in & {
-                @if str-index(inspect($s), inspect($part-selector)) {
-                    $sel: selector-nest($s, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
-                    $sel: ig-selector-nest-fix($sel);
+                @each $ps in $part-selector {
+                    @if $s == $ps {
+                        $sel-ent: selector-nest($s, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
+                        $sel-ent: ig-selector-nest-fix($sel-ent);
+                        $sel:     append($sel, $sel-ent);
+                    }
                 }
             }
         } @else {
             @each $s in & {
                 @each $ps in $part-selector {
-                    @if str-index(inspect($s), inspect($ps)) {
-                        $sel: selector-nest($s, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
-                        $sel: ig-selector-nest-fix($sel);
+                    @if str-index(inspect($s), inspect($ps)) == 1 {
+                        $sel-ent: selector-nest($s, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
+                        $sel-ent: ig-selector-nest-fix($sel-ent);
+                        $sel:     append($sel, $sel-ent);
                     }
                 }
             }
@@ -1181,18 +1191,10 @@ $ig-bem-context-id: 'bem' !default;
                 $part-name:     map-get($part-data, 'name');
 
                 $sel: ();
-                @if type-of($part-selector) == string {
-                    @each $s in & {
-                        @if str-index(inspect($s), inspect($part-selector)) {
-                            $sel: append($sel, selector-unify($s, selector-append($part-selector, $ig-bem-modifier-separator + $name)));
-                        }
-                    }
-                } @else {
-                    @each $s in & {
-                        @each $ps in $part-selector {
-                            @if str-index(inspect($s), inspect($ps)) {
-                                $sel: append($sel, selector-unify($s, selector-append($ps, $ig-bem-modifier-separator + $name)));
-                            }
+                @each $s in & {
+                    @each $ps in $part-selector {
+                        @if (str-index(inspect($s), inspect($ps) + $ig-bem-modifier-separator) == 1) or (str-index(inspect($s), inspect($ps) + $ig-bem-suffix-separator) == 1) {
+                            $sel: append($sel, selector-unify($s, selector-append($ps, $ig-bem-modifier-separator + $name)));
                         }
                     }
                 }
