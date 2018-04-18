@@ -604,17 +604,17 @@ $ig-bem-context-id: 'bem' !default;
     $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
+    $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'at-theme');
+
     $selector:   ();
     $parts-data: ();
 
-    $be-context: ig-context-get($ig-bem-context-id, 'block' 'element');
-
-    @if nth($be-context, 1) == 'element' {
+    @if nth($parent-context, 1) == 'element' {
         @if $ig-bem-element-nesting-policy == 'disallow' {
             @error 'Element nesting is forbidden.';
         }
 
-        $element-selector: map-get(nth($be-context, 2), 'selector');
+        $element-selector: map-get(nth($parent-context, 2), 'selector');
 
         @if $ig-bem-element-nesting-policy == 'append' {
             @if not is-superselector(&, $element-selector) {
@@ -636,13 +636,13 @@ $ig-bem-context-id: 'bem' !default;
             }
         }
 
-        $be-context: ig-context-get($ig-bem-context-id, 'block');
+        $parent-context: ig-context-get($ig-bem-context-id, 'block' 'at-theme');
     }
 
     @if length($selector) == 0 {
-        $block-selector: map-get(nth($be-context, 2), 'selector');
+        $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
-        @if is-superselector(&, $block-selector) {
+        @if is-superselector(&, $parent-selector) {
             //
             // Possible outcomes:
             //   - {b}__element
@@ -663,7 +663,11 @@ $ig-bem-context-id: 'bem' !default;
             //   - {e,m,s} ([manual selector]) {b}__element
             //
 
-            $block-base-selector: map-get(nth($be-context, 2), 'base-selector');
+            @if nth($parent-context, 1) != 'block' {
+                $parent-context: ig-context-get($ig-bem-context-id, 'block');
+            }
+
+            $block-base-selector: map-get(nth($parent-context, 2), 'base-selector');
 
             @each $name in join($name, $names) {
                 $sel:        selector-nest(&, selector-append($block-base-selector, $ig-bem-element-separator + $name));

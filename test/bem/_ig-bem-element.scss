@@ -8,12 +8,14 @@
 //  - /// 4 ///  - single element, nested
 //  - /// 5 ///  - single element, nested, manual selector in-between
 //  - /// 6 ///  - single element, nested, modifier in-between
-//  - /// 7 ///  - multiple elements
-//  - /// 8 ///  - multiple elements, manual selector in-between
-//  - /// 9 ///  - multiple elements, modifier in-between
-//  - /// 10 /// - multiple elements, nested
-//  - /// 11 /// - multiple elements, nested, manual selector in-between
-//  - /// 12 /// - multiple elements, nested, modifier in-between
+//  - /// 7 ///  - single element, in at-theme
+//  - /// 8 ///  - multiple elements
+//  - /// 9 ///  - multiple elements, manual selector in-between
+//  - /// 10 /// - multiple elements, modifier in-between
+//  - /// 11 /// - multiple elements, nested
+//  - /// 12 /// - multiple elements, nested, manual selector in-between
+//  - /// 13 /// - multiple elements, nested, modifier in-between
+//  - /// 14 /// - single element, in at-theme
 //
 
 @include it('ig-bem-element') {
@@ -181,7 +183,26 @@
         }
     }
 
-    @include assert('multiple elements') { /// 7 ///
+    @include assert('single element, in at-theme') { /// 7 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-at-theme('dark') {
+                    @include ig-bem-element('child') {
+                        font-size: 2em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .t-dark .something__child,
+            [class*=' t-'] .t-dark .something__child {
+                font-size: 2em;
+            }
+        }
+    }
+
+    @include assert('multiple elements') { /// 8 ///
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
@@ -198,7 +219,7 @@
         }
     }
 
-    @include assert('multiple elements, manual selector in-between') { /// 8 ///
+    @include assert('multiple elements, manual selector in-between') { /// 9 ///
         @include output {
             @include ig-bem-block('something') {
                 &:hover {
@@ -217,7 +238,7 @@
         }
     }
 
-    @include assert('multiple elements, modifier in-between') { /// 9 ///
+    @include assert('multiple elements, modifier in-between') { /// 10 ///
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-modifier('mod') {
@@ -236,7 +257,7 @@
         }
     }
 
-    @include assert('multiple elements, nested') { /// 10 ///
+    @include assert('multiple elements, nested') { /// 11 ///
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
@@ -279,7 +300,7 @@
         }
     }
 
-    @include assert('multiple elements, nested, manual selector in-between') { /// 11 ///
+    @include assert('multiple elements, nested, manual selector in-between') { /// 12 ///
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
@@ -326,7 +347,7 @@
         }
     }
 
-    @include assert('multiple elements, nested, modifier in-between') { /// 12 ///
+    @include assert('multiple elements, nested, modifier in-between') { /// 13 ///
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
@@ -369,6 +390,27 @@
             .something__child3--mod .something__subchild2,
             .something__child3--mod .something__subchild3 {
                 font-size: 3em;
+            }
+        }
+    }
+
+    @include assert('multiple elements, in at-theme') { /// 14 ///
+        @include output(false) {
+            @include ig-bem-block('something') {
+                @include ig-bem-at-theme('dark') {
+                    @include ig-bem-element('child1', 'child2') {
+                        font-size: 2em;
+                    }
+                }
+            }
+        }
+
+        @include expect(false) {
+            .t-dark .something__child1,
+            [class*=' t-'] .t-dark .something__child1,
+            .t-dark .something__child2,
+            [class*=' t-'] .t-dark .something__child2 {
+                font-size: 2em;
             }
         }
     }
