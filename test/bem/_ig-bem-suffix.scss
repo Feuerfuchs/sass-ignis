@@ -10,7 +10,7 @@
 
 @include it('ig-bem-suffix') {
     @include assert('block suffix') { /// 1 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-suffix('sm') {
                     font-size: 1.5em;
@@ -18,7 +18,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something\@sm {
                 font-size: 1.5em;
             }
@@ -26,7 +26,7 @@
     }
 
     @include assert('element suffix') { /// 2 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     @include ig-bem-suffix('sm') {
@@ -36,7 +36,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child\@sm {
                 font-size: 2.5em;
             }
@@ -44,7 +44,7 @@
     }
 
     @include assert('modifier suffix') { /// 3 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-modifier('mod1') {
                     @include ig-bem-suffix('sm') {
@@ -62,7 +62,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something--mod1\@sm {
                 font-size: 1.75em;
             }
@@ -74,7 +74,7 @@
     }
 
     @include assert('multiple element suffix') { /// 4 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
                     @include ig-bem-suffix('sm') {
@@ -84,7 +84,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1\@sm,
             .something__child2\@sm {
                 font-size: 2.5em;

@@ -8,7 +8,7 @@
 
 @include it('ig-bem-at-theme') {
     @include assert('single theme') { /// 1 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-at-theme('theme') {
                     font-size: 2em;
@@ -16,7 +16,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .t-theme .something,
             [class*=' t-'] .t-theme .something {
                 font-size: 2em;
@@ -25,7 +25,7 @@
     }
 
     @include assert('with sub-theme') { /// 2 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-at-theme('theme') {
                     font-size: 2em;
@@ -37,7 +37,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .t-theme .something,
             [class*=' t-'] .t-theme .something {
                 font-size: 2em;

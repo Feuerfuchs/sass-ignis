@@ -24,7 +24,7 @@
 
 @include it('ig-bem-state') {
     @include assert('in root, 2 blocks') { /// 1 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-multi('component' 'block1', 'object' 'block2') {
                 font-size: 1em;
 
@@ -34,7 +34,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .c-block1 {
                 font-size: 1em;
             }
@@ -54,13 +54,13 @@
     }
 
     @include assert('in root, 1 block, 1 manual selector') { /// 2 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-multi('component' 'block1', 'a:hover') {
                 font-size: 1em;
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .c-block1 {
                 font-size: 1em;
             }
@@ -72,7 +72,7 @@
     }
 
     @include assert('in block, 2 elements') { /// 3 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-multi('element' 'child1' 'child2') {
                     font-size: 2em;
@@ -84,7 +84,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1,
             .something__child2 {
                 font-size: 2em;
@@ -98,7 +98,7 @@
     }
 
     @include assert('in block, 1 element, 1 modifier') { /// 4 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-multi('element' 'child', 'modifier' 'mod1') {
                     font-size: 2em;
@@ -110,7 +110,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child {
                 font-size: 2em;
             }
@@ -130,7 +130,7 @@
     }
 
     @include assert('in block, 1 element, 1 extending modifier') { /// 5 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-multi('element' 'child', 'modifier' 'mod1') {
                     font-size: 2em;
@@ -142,7 +142,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child {
                 font-size: 2em;
             }
@@ -162,7 +162,7 @@
     }
 
     @include assert('in block, 1 element, 1 & selector') { /// 6 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-multi('&', 'element' 'child') {
                     font-size: 2em;
@@ -174,7 +174,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something {
                 font-size: 2em;
             }
@@ -194,7 +194,7 @@
     }
 
     @include assert('in block, 1 element, 1 manual selector') { /// 7 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-multi('> a:hover', 'element' 'child1') {
                     font-size: 2em;
@@ -206,7 +206,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something > a:hover {
                 font-size: 2em;
             }
@@ -226,7 +226,7 @@
     }
 
     @include assert('in element, 2 elements, 1 modifier') { /// 8 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     @include ig-bem-multi('element' 'subchild1' 'subchild2', 'modifier' 'mod1') {
@@ -240,7 +240,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child .something__subchild1,
             .something__child .something__subchild2 {
                 font-size: 3em;
@@ -262,7 +262,7 @@
     }
 
     @include assert('in element, 1 element, 1 & selector') { /// 9 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     @include ig-bem-multi('element' 'subchild', '&') {
@@ -276,7 +276,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child .something__subchild {
                 font-size: 3em;
             }
@@ -296,7 +296,7 @@
     }
 
     @include assert('in element in manual selector, 2 elements') { /// 10 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     &:hover {
@@ -312,7 +312,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child:hover .something__subchild1,
             .something__child:hover .something__subchild2 {
                 font-size: 3em;
@@ -326,7 +326,7 @@
     }
 
     @include assert('in element in manual selector, 1 element, 1 & selector') { /// 11 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     &:hover {
@@ -338,7 +338,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child:hover .something__subchild {
                 font-size: 3em;
             }
@@ -350,7 +350,7 @@
     }
 
     @include assert('in multiple elements, 2 elements, 1 modifier') { /// 12 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
                     @include ig-bem-multi('element' 'subchild1' 'subchild2', 'modifier' 'mod') {
@@ -360,7 +360,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1 .something__subchild1,
             .something__child2 .something__subchild1,
             .something__child1 .something__subchild2,
@@ -376,7 +376,7 @@
     }
 
     @include assert('in multiple elements, 1 element, 1 & selector') { /// 13 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
                     @include ig-bem-multi('element' 'subchild', '&') {
@@ -390,7 +390,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1 .something__subchild,
             .something__child2 .something__subchild {
                 font-size: 3em;
@@ -414,7 +414,7 @@
     }
 
     @include assert('in related elements, 2 elements, 1 modifier') { /// 14 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1') {
                     @include ig-bem-next-element('child2', 'child3') {
@@ -426,7 +426,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1 + .something__child2 .something__subchild1,
             .something__child1 + .something__child3 .something__subchild1,
             .something__child1 + .something__child2 .something__subchild2,
@@ -442,7 +442,7 @@
     }
 
     @include assert('in related elements, 1 element, 1 & selector') { /// 15 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1') {
                     @include ig-bem-next-element('child2', 'child3') {
@@ -458,7 +458,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1 + .something__child2 .something__subchild,
             .something__child1 + .something__child3 .something__subchild {
                 font-size: 4em;
@@ -482,7 +482,7 @@
     }
 
     @include assert('in element, 2 related elements, 1 modifier') { /// 16 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1') {
                     @include ig-bem-multi('next-element' 'child2' 'child3', 'modifier' 'mod1') {
@@ -496,7 +496,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1 + .something__child2,
             .something__child1 + .something__child3 {
                 font-size: 3em;
@@ -518,7 +518,7 @@
     }
 
     @include assert('in element, 1 twin element, 1 modifier') { /// 17 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     @include ig-bem-multi('next-twin-element', 'modifier' 'mod1') {
@@ -532,7 +532,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child + .something__child {
                 font-size: 3em;
             }
@@ -552,7 +552,7 @@
     }
 
     @include assert('in multiple elements, 1 twin element, 1 modifier') { /// 18 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
                     @include ig-bem-multi('next-twin-element', 'modifier' 'mod1') {
@@ -566,7 +566,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1 + .something__child1,
             .something__child2 + .something__child2 {
                 font-size: 3em;

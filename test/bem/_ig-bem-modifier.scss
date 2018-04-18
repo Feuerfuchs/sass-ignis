@@ -21,7 +21,7 @@
 
 @include it('ig-bem-modifier') {
     @include assert('block modifier') { /// 1 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-modifier('mod') {
                     font-size: 1.5em;
@@ -33,7 +33,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something--mod {
                 font-size: 1.5em;
             }
@@ -45,7 +45,7 @@
     }
 
     @include assert('element modifier, single element') { /// 2 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     @include ig-bem-modifier('mod') {
@@ -59,7 +59,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child--mod {
                 font-size: 2.5em;
             }
@@ -71,7 +71,7 @@
     }
 
     @include assert('element modifier, multiple elements') { /// 3 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
                     @include ig-bem-modifier('mod') {
@@ -85,7 +85,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1--mod,
             .something__child2--mod {
                 font-size: 2.5em;
@@ -101,7 +101,7 @@
     // FAILING: https://github.com/sass/libsass/issues/2633
     /*
     @include assert('element modifier, single related element') { /// 4 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1') {
                     @include ig-bem-next-element('child2') {
@@ -117,7 +117,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1 + .something__child2--mod {
                 font-size: 2.5em;
             }
@@ -130,7 +130,7 @@
     */
 
     @include assert('element modifier, multiple related elements') { /// 5 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1') {
                     @include ig-bem-next-element('child2', 'child3') {
@@ -146,7 +146,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1 + .something__child2--mod,
             .something__child1 + .something__child3--mod {
                 font-size: 2.5em;
@@ -160,7 +160,7 @@
     }
 
     @include assert('element modifier, single element, manual selector before') { /// 6 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 &:hover {
                     @include ig-bem-element('child') {
@@ -176,7 +176,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something:hover .something__child--mod {
                 font-size: 2.5em;
             }
@@ -188,7 +188,7 @@
     }
 
     @include assert('element modifier, multiple elements, manual selector before') { /// 7 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 &:hover {
                     @include ig-bem-element('child1', 'child2') {
@@ -204,7 +204,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something:hover .something__child1--mod,
             .something:hover .something__child2--mod {
                 font-size: 2.5em;
@@ -218,7 +218,7 @@
     }
 
     @include assert('element modifier, single related element, manual selector before') { /// 8 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 &:hover {
                     @include ig-bem-element('child1') {
@@ -250,7 +250,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something:hover .something__child1 + .something__child2--mod1 {
                 font-size: 2.5em;
             }
@@ -270,7 +270,7 @@
     }
 
     @include assert('element modifier, multiple related elements, manual selector before') { /// 9 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 &:hover {
                     @include ig-bem-element('child1') {
@@ -302,7 +302,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something:hover .something__child1 + .something__child2--mod1,
             .something:hover .something__child1 + .something__child3--mod1 {
                 font-size: 2.5em;
@@ -326,7 +326,7 @@
     }
 
     @include assert('nested block modifiers') { /// 10 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-modifier('mod') {
                     font-size: 1.5em;
@@ -338,7 +338,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something--mod {
                 font-size: 1.5em;
             }
@@ -350,7 +350,7 @@
     }
 
     @include assert('nested element modifiers') { /// 11 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     @include ig-bem-modifier('mod') {
@@ -364,7 +364,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child--mod {
                 font-size: 2.5em;
             }
@@ -376,7 +376,7 @@
     }
 
     @include assert('nested block modifiers, extending') { /// 12 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-modifier('mod') {
                     font-size: 1.5em;
@@ -388,7 +388,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something--mod {
                 font-size: 1.5em;
             }
@@ -400,7 +400,7 @@
     }
 
     @include assert('nested element modifiers, extending') { /// 13 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     @include ig-bem-modifier('mod') {
@@ -414,7 +414,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child--mod {
                 font-size: 2.5em;
             }
@@ -426,7 +426,7 @@
     }
 
     @include assert('block and element modifiers, single element') { /// 14 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-modifier('mod1') {
                     font-size: 1.5em;
@@ -448,7 +448,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something--mod1 {
                 font-size: 1.5em;
             }
@@ -468,7 +468,7 @@
     }
 
     @include assert('block and element modifiers, multiple elements') { /// 15 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-modifier('mod1') {
                     font-size: 1.5em;
@@ -490,7 +490,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something--mod1 {
                 font-size: 1.5em;
             }

@@ -12,7 +12,7 @@
 
 @include it('ig-bem-next-twin-element') {
     @include assert('single element') { /// 1 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     @include ig-bem-next-twin-element {
@@ -22,7 +22,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child + .something__child {
                 font-size: 2em;
             }
@@ -30,7 +30,7 @@
     }
 
     @include assert('single element, manual selector in-between') { /// 2 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     &:hover {
@@ -42,7 +42,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child:hover + .something__child {
                 font-size: 2em;
             }
@@ -50,7 +50,7 @@
     }
 
     @include assert('single element, modifier in-between') { /// 3 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     @include ig-bem-modifier('mod') {
@@ -62,7 +62,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child--mod + .something__child {
                 font-size: 2.5em;
             }
@@ -70,7 +70,7 @@
     }
 
     @include assert('multiple elements') { /// 4 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
                     @include ig-bem-next-twin-element {
@@ -80,7 +80,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1 + .something__child1,
             .something__child2 + .something__child2 {
                 font-size: 2em;
@@ -89,7 +89,7 @@
     }
 
     @include assert('multiple elements') { /// 5 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
                     &:hover {
@@ -101,7 +101,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1:hover + .something__child1,
             .something__child2:hover + .something__child2 {
                 font-size: 2em;
@@ -110,7 +110,7 @@
     }
 
     @include assert('multiple elements') { /// 6 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
                     @include ig-bem-modifier('mod') {
@@ -122,7 +122,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1--mod + .something__child1,
             .something__child2--mod + .something__child2 {
                 font-size: 2.5em;

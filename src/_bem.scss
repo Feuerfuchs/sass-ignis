@@ -174,7 +174,8 @@ $ig-bem-context-id: 'bem' !default;
 
     $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
 
-    $selector: null;
+    $selector:      null;
+    $base-selector: null;
 
     @if $type != null {
         $namespace: map-get($ig-bem-namespaces, $type);
@@ -183,13 +184,16 @@ $ig-bem-context-id: 'bem' !default;
             @error '"#{$type}" is not a valid type.';
         }
 
+        $base-selector: selector-parse('.' + $namespace + '-' + $name);
+
         @if $type != 'theme' or & {
-            $selector: selector-parse('.' + $namespace + '-' + $name);
+            $selector: $base-selector;
         } @else if not & {
             $selector: ig-bem-theme-selector($name);
         }
     } @else {
-        $selector: selector-parse('.' + $name);
+        $base-selector: selector-parse('.' + $name);
+        $selector:      $base-selector;
     }
 
     @if & {
@@ -203,7 +207,12 @@ $ig-bem-context-id: 'bem' !default;
         $ig-bem-blocks: append($ig-bem-blocks, $name) !global;
     }
 
-    $noop: ig-context-push($ig-bem-context-id, 'block', ('name': $name, 'type': $type, 'selector': $selector));
+    $noop: ig-context-push($ig-bem-context-id, 'block', (
+            'name':          $name,
+            'type':          $type,
+            'selector':      $selector,
+            'base-selector': $base-selector
+    ));
 
     @return $selector true;
 }
@@ -595,20 +604,17 @@ $ig-bem-context-id: 'bem' !default;
     $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
-    $block-context:  ig-context-get($ig-bem-context-id, 'block');
-    $block-selector: map-get(nth($block-context, 2), 'selector');
-
     $selector:   ();
     $parts-data: ();
 
-    $element-context: ig-context-get($ig-bem-context-id, 'element');
+    $be-context: ig-context-get($ig-bem-context-id, 'block' 'element');
 
-    @if $element-context != null {
+    @if nth($be-context, 1) == 'element' {
         @if $ig-bem-element-nesting-policy == 'disallow' {
             @error 'Element nesting is forbidden.';
         }
 
-        $element-selector: map-get(nth($element-context, 2), 'selector');
+        $element-selector: map-get(nth($be-context, 2), 'selector');
 
         @if $ig-bem-element-nesting-policy == 'append' {
             @if not is-superselector(&, $element-selector) {
@@ -623,12 +629,19 @@ $ig-bem-context-id: 'bem' !default;
             @each $name in join($name, $names) {
                 $sel:        selector-append(&, $ig-bem-element-separator + $name);
                 $selector:   join($selector, $sel, comma);
-                $parts-data: append($parts-data, ('name': $name, 'selector': $sel));
+                $parts-data: append($parts-data, (
+                        'name':     $name,
+                        'selector': $sel
+                ));
             }
         }
+
+        $be-context: ig-context-get($ig-bem-context-id, 'block');
     }
 
     @if length($selector) == 0 {
+        $block-selector: map-get(nth($be-context, 2), 'selector');
+
         @if is-superselector(&, $block-selector) {
             //
             // Possible outcomes:
@@ -638,7 +651,10 @@ $ig-bem-context-id: 'bem' !default;
             @each $name in join($name, $names) {
                 $sel:        selector-append(&, $ig-bem-element-separator + $name);
                 $selector:   join($selector, $sel, comma);
-                $parts-data: append($parts-data, ('name': $name, 'selector': $sel));
+                $parts-data: append($parts-data, (
+                        'name':     $name,
+                        'selector': $sel
+                ));
             }
         } @else {
             //
@@ -647,11 +663,16 @@ $ig-bem-context-id: 'bem' !default;
             //   - {e,m,s} ([manual selector]) {b}__element
             //
 
+            $block-base-selector: map-get(nth($be-context, 2), 'base-selector');
+
             @each $name in join($name, $names) {
-                $sel:        selector-nest(&, selector-append($block-selector, $ig-bem-element-separator + $name));
+                $sel:        selector-nest(&, selector-append($block-base-selector, $ig-bem-element-separator + $name));
                 $sel:        ig-selector-nest-fix($sel);
                 $selector:   join($selector, $sel, comma);
-                $parts-data: append($parts-data, ('name': $name, 'selector': $sel));
+                $parts-data: append($parts-data, (
+                        'name':     $name,
+                        'selector': $sel
+                ));
             }
         }
     }
@@ -774,17 +795,20 @@ $ig-bem-context-id: 'bem' !default;
         @error 'Invalid relationship sign #{inspect($sign)}.';
     }
 
-    $block-context:  ig-context-get($ig-bem-context-id, 'block');
-    $block-selector: map-get(nth($block-context, 2), 'selector');
+    $block-context:       ig-context-get($ig-bem-context-id, 'block');
+    $block-base-selector: map-get(nth($block-context, 2), 'base-selector');
 
     $selector:   ();
     $parts-data: ();
 
     @each $name in join($name, $names) {
-        $sel:        selector-nest(&, $sign, selector-append($block-selector, $ig-bem-element-separator + $name));
+        $sel:        selector-nest(&, $sign, selector-append($block-base-selector, $ig-bem-element-separator + $name));
         $sel:        ig-selector-nest-fix($sel);
         $selector:   join($selector, $sel, comma);
-        $parts-data: append($parts-data, ('name': $name, 'selector': $sel));
+        $parts-data: append($parts-data, (
+                'name':     $name,
+                'selector': $sel
+        ));
     }
 
     $noop: ig-context-push($ig-bem-context-id, 'element', (
@@ -926,8 +950,8 @@ $ig-bem-context-id: 'bem' !default;
 
     $element-context: ig-context-get($ig-bem-context-id, 'element');
 
-    $block-context:  ig-context-get($ig-bem-context-id, 'block');
-    $block-selector: map-get(nth($block-context, 2), 'selector');
+    $block-context:       ig-context-get($ig-bem-context-id, 'block');
+    $block-base-selector: map-get(nth($block-context, 2), 'base-selector');
 
     $selector:   ();
     $parts-data: ();
@@ -955,11 +979,14 @@ $ig-bem-context-id: 'bem' !default;
             @error 'Could not generate twin element selector.';
         }
 
-        $sel: selector-nest($current-selector-part, '+', selector-append($block-selector, $ig-bem-element-separator + $part-name));
+        $sel: selector-nest($current-selector-part, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
         $sel: ig-selector-nest-fix($sel);
 
         $selector:   join($selector, $sel, comma);
-        $parts-data: append($parts-data, ('name': $part-name, 'selector': $sel));
+        $parts-data: append($parts-data, (
+                'name':     $part-name,
+                'selector': $sel
+        ));
     }
 
     $noop: ig-context-push($ig-bem-context-id, 'element', (
@@ -1124,8 +1151,7 @@ $ig-bem-context-id: 'bem' !default;
         // Parent context is modifier or suffix and $extend is false. Get latest element or block.
         //
 
-        $be-context:  ig-context-get($ig-bem-context-id, 'block' 'element');
-        $be-selector: map-get(nth($be-context, 2), 'selector');
+        $be-context: ig-context-get($ig-bem-context-id, 'block' 'element');
 
         @if nth($be-context, 1) == 'element' {
             //
@@ -1161,11 +1187,16 @@ $ig-bem-context-id: 'bem' !default;
             //   - {m,s}.{b}--modifier
             //
 
-            $selector: selector-append(&, $be-selector, $ig-bem-modifier-separator + $name);
+            $block-base-selector: map-get(nth($be-context, 2), 'base-selector');
+
+            $selector: selector-append(&, $block-base-selector, $ig-bem-modifier-separator + $name);
         }
     }
 
-    $noop: ig-context-push($ig-bem-context-id, 'modifier', ('name': $name, 'selector': $selector));
+    $noop: ig-context-push($ig-bem-context-id, 'modifier', (
+            'name':     $name,
+            'selector': $selector
+    ));
 
     @return $selector true;
 }
@@ -1265,7 +1296,10 @@ $ig-bem-context-id: 'bem' !default;
 
     $selector: selector-append(&, $ig-bem-suffix-separator + $name);
 
-    $noop: ig-context-push($ig-bem-context-id, 'suffix', ('name': $name, 'selector': $selector));
+    $noop: ig-context-push($ig-bem-context-id, 'suffix', (
+            'name':     $name,
+            'selector': $selector
+    ));
 
     @return $selector true;
 }
@@ -1459,7 +1493,10 @@ $ig-bem-context-id: 'bem' !default;
     $selector: selector-nest($selector, &);
     $selector: ig-selector-nest-fix($selector);
 
-    $noop: ig-context-push($ig-bem-context-id, 'at-theme', ('name': join($name, $names), 'selector': $selector));
+    $noop: ig-context-push($ig-bem-context-id, 'at-theme', (
+            'name':     join($name, $names),
+            'selector': $selector
+    ));
 
     @return $selector true;
 }

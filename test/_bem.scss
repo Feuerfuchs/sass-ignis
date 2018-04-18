@@ -1,4 +1,10 @@
 @include describe('BEM') {
+    //
+    // The following unit tests only test the BEM mixins.
+    // Since they are wrappers for the BEM functions, the latter are
+    // automatically covered.
+    //
+
     @import 'bem/ig-bem-block';
     @import 'bem/ig-bem-composed-of';
     @import 'bem/ig-bem-element';

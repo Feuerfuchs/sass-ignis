@@ -18,7 +18,7 @@
 
 @include it('ig-bem-element') {
     @include assert('single element') { /// 1 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     font-size: 2em;
@@ -26,7 +26,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child {
                 font-size: 2em;
             }
@@ -34,7 +34,7 @@
     }
 
     @include assert('single element, manual selector in-between') { /// 2 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 &:hover {
                     @include ig-bem-element('child') {
@@ -44,7 +44,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something:hover .something__child {
                 font-size: 2em;
             }
@@ -52,7 +52,7 @@
     }
 
     @include assert('single element, modifier in-between') { /// 3 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-modifier('mod') {
                     @include ig-bem-element('child') {
@@ -62,7 +62,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something--mod .something__child {
                 font-size: 2em;
             }
@@ -70,7 +70,7 @@
     }
 
     @include assert('single element, nested') { /// 4 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     font-size: 2em;
@@ -82,7 +82,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child {
                 font-size: 2em;
             }
@@ -94,7 +94,7 @@
     }
 
     @include assert('single element, nested, manual selector in-between') { /// 5 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 &:hover {
                     @include ig-bem-element('child') {
@@ -118,7 +118,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something:hover .something__child {
                 font-size: 2em;
             }
@@ -138,7 +138,7 @@
     }
 
     @include assert('single element, nested, modifier in-between') { /// 6 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-modifier('mod') {
                     @include ig-bem-element('child') {
@@ -162,7 +162,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something--mod .something__child {
                 font-size: 2em;
             }
@@ -182,7 +182,7 @@
     }
 
     @include assert('multiple elements') { /// 7 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
                     font-size: 2em;
@@ -190,7 +190,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1,
             .something__child2 {
                 font-size: 2em;
@@ -199,7 +199,7 @@
     }
 
     @include assert('multiple elements, manual selector in-between') { /// 8 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 &:hover {
                     @include ig-bem-element('child1', 'child2') {
@@ -209,7 +209,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something:hover .something__child1,
             .something:hover .something__child2 {
                 font-size: 2em;
@@ -218,7 +218,7 @@
     }
 
     @include assert('multiple elements, modifier in-between') { /// 9 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-modifier('mod') {
                     @include ig-bem-element('child1', 'child2') {
@@ -228,7 +228,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something--mod .something__child1,
             .something--mod .something__child2 {
                 font-size: 2em;
@@ -237,7 +237,7 @@
     }
 
     @include assert('multiple elements, nested') { /// 10 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
                     font-size: 2em;
@@ -257,7 +257,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1,
             .something__child2 {
                 font-size: 2em;
@@ -280,7 +280,7 @@
     }
 
     @include assert('multiple elements, nested, manual selector in-between') { /// 11 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
                     font-size: 2em;
@@ -304,7 +304,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1,
             .something__child2 {
                 font-size: 2em;
@@ -327,7 +327,7 @@
     }
 
     @include assert('multiple elements, nested, modifier in-between') { /// 12 ///
-        @include output(false) {
+        @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
                     font-size: 2em;
@@ -351,7 +351,7 @@
             }
         }
 
-        @include expect(false) {
+        @include expect {
             .something__child1,
             .something__child2 {
                 font-size: 2em;
