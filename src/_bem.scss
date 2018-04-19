@@ -1620,7 +1620,7 @@ $ig-bem-context-id: 'bem' !default;
                 @content;
             }
         } @else {
-            $entity-func-id: nth($entity, 1);
+            $entity-func-id: null;
 
             @if type-of($entity) == list {
                 $entity-func-id: nth($entity, 1);
@@ -1628,6 +1628,10 @@ $ig-bem-context-id: 'bem' !default;
             } @else {
                 $entity-func-id: $entity;
                 $entity:         ();
+            }
+
+            @if str-slice($entity-func-id, str-length($entity-func-id)) == ':' {
+                $entity-func-id: str-slice($entity-func-id, 1, str-length($entity-func-id) - 1);
             }
 
             @if $entity-func-id == 'multi' {

@@ -25,7 +25,7 @@
 @include it('ig-bem-state') {
     @include assert('in root, 2 blocks') { /// 1 ///
         @include output {
-            @include ig-bem-multi('component' 'block1', 'object' 'block2') {
+            @include ig-bem-multi('component:' 'block1', 'object:' 'block2') {
                 font-size: 1em;
 
                 @include ig-bem-element('child2') {
@@ -55,7 +55,7 @@
 
     @include assert('in root, 1 block, 1 manual selector') { /// 2 ///
         @include output {
-            @include ig-bem-multi('component' 'block1', 'a:hover') {
+            @include ig-bem-multi('component:' 'block1', 'a:hover') {
                 font-size: 1em;
             }
         }
@@ -74,7 +74,7 @@
     @include assert('in block, 2 elements') { /// 3 ///
         @include output {
             @include ig-bem-block('something') {
-                @include ig-bem-multi('element' 'child1' 'child2') {
+                @include ig-bem-multi('element:' 'child1' 'child2') {
                     font-size: 2em;
 
                     @include ig-bem-modifier('mod') {
@@ -100,7 +100,7 @@
     @include assert('in block, 1 element, 1 modifier') { /// 4 ///
         @include output {
             @include ig-bem-block('something') {
-                @include ig-bem-multi('element' 'child', 'modifier' 'mod1') {
+                @include ig-bem-multi('element:' 'child', 'modifier:' 'mod1') {
                     font-size: 2em;
 
                     @include ig-bem-modifier('mod2') {
@@ -132,7 +132,7 @@
     @include assert('in block, 1 element, 1 extending modifier') { /// 5 ///
         @include output {
             @include ig-bem-block('something') {
-                @include ig-bem-multi('element' 'child', 'modifier' 'mod1') {
+                @include ig-bem-multi('element:' 'child', 'modifier:' 'mod1') {
                     font-size: 2em;
 
                     @include ig-bem-modifier('mod2', true) {
@@ -164,7 +164,7 @@
     @include assert('in block, 1 element, 1 & selector') { /// 6 ///
         @include output {
             @include ig-bem-block('something') {
-                @include ig-bem-multi('&', 'element' 'child') {
+                @include ig-bem-multi('&', 'element:' 'child') {
                     font-size: 2em;
 
                     @include ig-bem-modifier('mod') {
@@ -196,7 +196,7 @@
     @include assert('in block, 1 element, 1 manual selector') { /// 7 ///
         @include output {
             @include ig-bem-block('something') {
-                @include ig-bem-multi('> a:hover', 'element' 'child1') {
+                @include ig-bem-multi('> a:hover', 'element:' 'child1') {
                     font-size: 2em;
 
                     @include ig-bem-element('child2') {
@@ -229,7 +229,7 @@
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
-                    @include ig-bem-multi('element' 'subchild1' 'subchild2', 'modifier' 'mod1') {
+                    @include ig-bem-multi('element:' 'subchild1' 'subchild2', 'modifier:' 'mod1') {
                         font-size: 3em;
 
                         @include ig-bem-modifier('mod2') {
@@ -265,7 +265,7 @@
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
-                    @include ig-bem-multi('element' 'subchild', '&') {
+                    @include ig-bem-multi('element:' 'subchild', '&') {
                         font-size: 3em;
 
                         @include ig-bem-modifier('mod') {
@@ -300,7 +300,7 @@
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     &:hover {
-                        @include ig-bem-multi('element' 'subchild1' 'subchild2') {
+                        @include ig-bem-multi('element:' 'subchild1' 'subchild2') {
                             font-size: 3em;
 
                             @include ig-bem-modifier('mod2') {
@@ -330,7 +330,7 @@
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
                     &:hover {
-                        @include ig-bem-multi('element' 'subchild', '&') {
+                        @include ig-bem-multi('element:' 'subchild', '&') {
                             font-size: 3em;
                         }
                     }
@@ -353,7 +353,7 @@
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
-                    @include ig-bem-multi('element' 'subchild1' 'subchild2', 'modifier' 'mod') {
+                    @include ig-bem-multi('element:' 'subchild1' 'subchild2', 'modifier:' 'mod') {
                         font-size: 3em;
                     }
                 }
@@ -379,7 +379,7 @@
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
-                    @include ig-bem-multi('element' 'subchild', '&') {
+                    @include ig-bem-multi('element:' 'subchild', '&') {
                         font-size: 3em;
 
                         @include ig-bem-modifier('mod') {
@@ -418,7 +418,7 @@
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1') {
                     @include ig-bem-next-element('child2', 'child3') {
-                        @include ig-bem-multi('element' 'subchild1' 'subchild2', 'modifier' 'mod') {
+                        @include ig-bem-multi('element:' 'subchild1' 'subchild2', 'modifier:' 'mod') {
                             font-size: 3em;
                         }
                     }
@@ -446,7 +446,7 @@
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1') {
                     @include ig-bem-next-element('child2', 'child3') {
-                        @include ig-bem-multi('element' 'subchild', '&') {
+                        @include ig-bem-multi('element:' 'subchild', '&') {
                             font-size: 4em;
 
                             @include ig-bem-modifier('mod') {
@@ -485,7 +485,7 @@
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1') {
-                    @include ig-bem-multi('next-element' 'child2' 'child3', 'modifier' 'mod1') {
+                    @include ig-bem-multi('next-element:' 'child2' 'child3', 'modifier:' 'mod1') {
                         font-size: 3em;
 
                         @include ig-bem-modifier('mod2') {
@@ -521,7 +521,7 @@
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child') {
-                    @include ig-bem-multi('next-twin-element', 'modifier' 'mod1') {
+                    @include ig-bem-multi('next-twin-element', 'modifier:' 'mod1') {
                         font-size: 3em;
 
                         @include ig-bem-modifier('mod2') {
@@ -555,7 +555,7 @@
         @include output {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
-                    @include ig-bem-multi('next-twin-element', 'modifier' 'mod1') {
+                    @include ig-bem-multi('next-twin-element', 'modifier:' 'mod1') {
                         font-size: 3em;
 
                         @include ig-bem-modifier('mod2') {
