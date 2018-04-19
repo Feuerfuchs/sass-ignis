@@ -965,16 +965,8 @@ $ig-bem-context-id: 'bem' !default;
     // To determine the twin for each element, iterate the sub-selectors from the current selector
     // and check if it contains the currently inspected element. This has to be done with string
     // comparison since none of SASS selector functions is of use here.
-    //
-    // For the cases where selectors have been added since the latest element, this leads to one
-    // large weakness: If an element's name starts with the full name of a sibling element, it will
-    // be considered equivalent to said sibling element. Thus, the resulting selector contains too
-    // many sub-selectors.
-    //
     // Finally, the current twin will be appended to the extracted sub-selector as a successor
     // element.
-    // Possible outcomes:
-    //   - {e} ({m,s}) ([manual selector]) + {e}
     //
     @each $part-data in map-get(nth($element-context, 2), 'parts') {
         $part-selector: map-get($part-data, 'selector');
@@ -982,27 +974,54 @@ $ig-bem-context-id: 'bem' !default;
 
         $sel: ();
         @if is-superselector(&, $element-selector) {
+            //
+            // This mixin is included in the selector the last element mixin created.
+            // Possible outcomes:
+            //   - {e} + {e}
+            //
+
             @each $s in & {
                 @each $ps in $part-selector {
                     @if $s == $ps {
                         $sel-ent: selector-nest($s, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
                         $sel-ent: ig-selector-nest-fix($sel-ent);
-                        $sel:     append($sel, $sel-ent);
+                        $sel:     append($sel, $sel-ent, comma);
                     }
                 }
             }
         } @else {
+            //
+            // This mixin is NOT included in the selector the last element mixin created.
+            // Possible outcomes:
+            //   - {e} {m,s} + {e}
+            //   - {e} [manual selector] + {e}
+            //   - {e} {m,s} [manual selector] + {e}
+            //
+
             @each $s in & {
                 @each $ps in $part-selector {
                     @if str-index(inspect($s), inspect($ps)) == 1 {
-                        $sel-ent: selector-nest($s, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
-                        $sel-ent: ig-selector-nest-fix($sel-ent);
-                        $sel:     append($sel, $sel-ent);
+                        $char-index: str-length(inspect($ps)) + 1;
+                        $match:      index(' ' ':' ',', str-slice(inspect($s), $char-index, $char-index)) != null;
+
+                        @if not $match {
+                            @each $separator in $ig-bem-element-separator $ig-bem-modifier-separator $ig-bem-suffix-separator {
+                                @if str-slice(inspect($s), $char-index, $char-index + str-length($separator) - 1) == $separator {
+                                    $match: true;
+                                }
+                            }
+                        }
+
+                        @if $match {
+                            $sel-ent: selector-nest($s, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
+                            $sel-ent: ig-selector-nest-fix($sel-ent);
+                            $sel:     append($sel, $sel-ent, comma);
+                        }
                     }
                 }
             }
         }
-        @if length($sel) == 0 {
+        @if length($sel) != length($part-selector) {
             @error 'Could not generate twin element selector.';
         }
 
@@ -1034,8 +1053,8 @@ $ig-bem-context-id: 'bem' !default;
 /// If it's true, you signalize that the modifier extends the parent modifier or suffix and can only be
 /// used in conjunction with it.
 ///
-/// @param {string} $name           - Modifier name
-/// @param {bool}   $extend [false] - Indicate if the parent modifier or suffix will be extended
+/// @param {string | list} $names          - Modifier name or list of modifier names
+/// @param {bool}          $extend [false] - Indicate if the parent modifier or suffix will be extended
 ///
 /// @content
 ///
@@ -1122,8 +1141,8 @@ $ig-bem-context-id: 'bem' !default;
 ///     background-color: #222;
 ///   }
 ///
-@mixin ig-bem-modifier($name, $extend: false) {
-    $selector: nth(ig-bem-modifier($name, $extend), 1);
+@mixin ig-bem-modifier($names, $extend: false) {
+    $selector: nth(ig-bem-modifier($names, $extend), 1);
 
     @at-root #{$selector} {
         @content;
@@ -1138,13 +1157,14 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @see {mixin} ig-bem-modifier
 ///
-@function ig-bem-modifier($name, $extend: false) {
+@function ig-bem-modifier($names, $extend: false) {
     $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
     $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'at-theme');
     $parent-selector: map-get(nth($parent-context, 2), 'selector');
     $selector:        ();
+    $parts-data:      ();
 
     @if not is-superselector(&, $parent-selector) {
         //
@@ -1169,7 +1189,14 @@ $ig-bem-context-id: 'bem' !default;
         //   - {b,e,m,s}--modifier
         //
 
-        $selector: selector-append(&, $ig-bem-modifier-separator + $name);
+        @each $name in $names {
+            $sel:        selector-append(&, $ig-bem-modifier-separator + $name);
+            $selector:   join($selector, $sel, comma);
+            $parts-data: append($parts-data, (
+                    'name':     $name,
+                    'selector': $sel
+            ));
+        }
     } @else {
         //
         // Parent context is modifier or suffix and $extend is false. Get latest element or block.
@@ -1187,23 +1214,32 @@ $ig-bem-context-id: 'bem' !default;
             //   - {m,s}.{e}--modifier
             //
 
-            @each $part-data in map-get(nth($be-context, 2), 'parts') {
-                $part-selector: map-get($part-data, 'selector');
-                $part-name:     map-get($part-data, 'name');
+            @each $name in $names {
+                $nsel: ();
 
-                $sel: ();
-                @each $s in & {
-                    @each $ps in $part-selector {
-                        @if (str-index(inspect($s), inspect($ps) + $ig-bem-modifier-separator) == 1) or (str-index(inspect($s), inspect($ps) + $ig-bem-suffix-separator) == 1) {
-                            $sel: append($sel, selector-unify($s, selector-append($ps, $ig-bem-modifier-separator + $name)));
+                @each $elem-part-data in map-get(nth($be-context, 2), 'parts') {
+                    $elem-part-selector: map-get($elem-part-data, 'selector');
+
+                    $sel: ();
+                    @each $s in & {
+                        @each $ps in $elem-part-selector {
+                            @if (str-index(inspect($s), inspect($ps) + $ig-bem-modifier-separator) == 1) or (str-index(inspect($s), inspect($ps) + $ig-bem-suffix-separator) == 1) {
+                                $sel: append($sel, selector-unify($s, selector-append($ps, $ig-bem-modifier-separator + $name)), comma);
+                            }
                         }
                     }
-                }
-                @if length($sel) == 0 {
-                    @error 'Could not generate modifier selector.';
+                    @if length($sel) == 0 {
+                        @error 'Could not generate modifier selector.';
+                    }
+
+                    $nsel: join($nsel, $sel, comma);
                 }
 
-                $selector: join($selector, $sel, comma);
+                $selector:   join($selector, $nsel, comma);
+                $parts-data: append($parts-data, (
+                        'name':     $name,
+                        'selector': $nsel
+                ));
             }
         } @else {
             //
@@ -1214,12 +1250,19 @@ $ig-bem-context-id: 'bem' !default;
 
             $block-base-selector: map-get(nth($be-context, 2), 'base-selector');
 
-            $selector: selector-append(&, $block-base-selector, $ig-bem-modifier-separator + $name);
+            @each $name in $names {
+                $sel:        selector-append(&, $block-base-selector, $ig-bem-modifier-separator + $name);
+                $selector:   join($selector, $sel, comma);
+                $parts-data: append($parts-data, (
+                        'name':     $name,
+                        'selector': $sel
+                ));
+            }
         }
     }
 
     $noop: ig-context-push($ig-bem-context-id, 'modifier', (
-            'name':     $name,
+            'parts':    $parts-data,
             'selector': $selector
     ));
 
