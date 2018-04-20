@@ -35,7 +35,7 @@
 ///
 /// @example scss - Responsive font size
 ///   .something {
-///     @include ig-responsive-property(font-size, 1rem, 2.5rem, 320px, 720px);
+///     @include ig-fluid-property(font-size, 1rem, 2.5rem, 320px, 720px);
 ///   }
 ///   
 ///   // Generates:
@@ -58,8 +58,8 @@
 ///     }
 ///   }
 ///
-@mixin ig-responsive-property($prop, $min-value, $max-value, $min-width, $max-width, $root-size: $ig-root-size, $include-gt-max: true, $include-lt-min: true) {
-    $calc: ig-responsive-generate-calc($min-value, $max-value, $min-width, $max-width, $root-size);
+@mixin ig-fluid-property($prop, $min-value, $max-value, $min-width, $max-width, $root-size: $ig-root-size, $include-gt-max: true, $include-lt-min: true) {
+    $calc: ig-fluid-property-calc($min-value, $max-value, $min-width, $max-width, $root-size);
 
     @media (min-width: $min-width) and (max-width: $max-width) {
         #{$prop}: $calc;
@@ -79,7 +79,7 @@
 }
 
 /// 
-/// Version of ig-responsive-property that uses include-media for media queries.
+/// Version of ig-fluid-property that uses include-media for media queries.
 ///
 /// @param {string} $prop                           - Property to scale
 /// @param {number} $min-value                      - Minimum value
@@ -90,13 +90,13 @@
 /// @param {bool}   $include-gt-max [true]          - If false, the media query for viewport > $max-width will not be generated
 /// @param {bool}   $include-lt-min [true]          - If false, the media query for viewport < $min-width will not be generated
 ///
-/// @see {mixin} ig-responsive-property
+/// @see {mixin} ig-fluid-property
 /// 
-@mixin ig-responsive-property-im($prop, $min-value, $max-value, $min-bp, $max-bp, $root-size: $ig-root-size, $include-gt-max: true, $include-lt-min: true) {
+@mixin ig-fluid-property-im($prop, $min-value, $max-value, $min-bp, $max-bp, $root-size: $ig-root-size, $include-gt-max: true, $include-lt-min: true) {
     $min-width: if(map-has-key($breakpoints, $min-bp), map-get($breakpoints, $min-bp), $min-bp);
     $max-width: if(map-has-key($breakpoints, $max-bp), map-get($breakpoints, $max-bp), $max-bp);
 
-    $calc: ig-responsive-generate-calc($min-value, $max-value, $min-width, $max-width, $root-size);
+    $calc: ig-fluid-property-calc($min-value, $max-value, $min-width, $max-width, $root-size);
 
     @include media('>#{$min-width}', '<=#{$max-width}') {
         #{$prop}: $calc;
@@ -127,7 +127,7 @@
 ///
 /// @access private
 ///
-@function ig-responsive-generate-calc($min-value, $max-value, $min-width, $max-width, $root-size: $ig-root-size) {
+@function ig-fluid-property-calc($min-value, $max-value, $min-width, $max-width, $root-size: $ig-root-size) {
     @if (unit($min-value) != unit($max-value)) or (unit($min-width) != unit($max-width)) {
         @error 'Units of $min-value and $max-value, $min-width and $max-width must match.';
     }

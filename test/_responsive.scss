@@ -1,7 +1,7 @@
 @include describe('Responsive') {
-    @include it('ig-responsive-generate-calc') {
-        @include assert-equal(ig-responsive-generate-calc(2rem, 4rem, 600px, 800px), 'calc(2rem + 2 * ((100vw - 600px) / 200))', 'Responsive value from 2rem to 4rem over 600px to 800px');
-        @include assert-equal(ig-responsive-generate-calc(4px, 12px, 600px, 800px),  'calc(4px + 8 * ((100vw - 600px) / 200))',  'Responsive value from 4px to 12px over 600px to 800px');
-        @include assert-equal(ig-responsive-generate-calc(1em, 5em, 800px, 1200px),  'calc(1em + 4 * ((100vw - 800px) / 400))',  'Responsive value from 1em to 5em over 800px to 1200px');
+    @include it('ig-fluid-property-calc') {
+        @include assert-equal(ig-fluid-property-calc(2rem, 4rem, 600px, 800px), 'calc(2rem + 2 * ((100vw - 600px) / 200))', 'Responsive value from 2rem to 4rem over 600px to 800px');
+        @include assert-equal(ig-fluid-property-calc(4px, 12px, 600px, 800px),  'calc(4px + 8 * ((100vw - 600px) / 200))',  'Responsive value from 4px to 12px over 600px to 800px');
+        @include assert-equal(ig-fluid-property-calc(1em, 5em, 800px, 1200px),  'calc(1em + 4 * ((100vw - 800px) / 400))',  'Responsive value from 1em to 5em over 800px to 1200px');
     }
 }
