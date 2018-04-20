@@ -141,6 +141,39 @@
     @return if(map-has-key($map, $key), map-get($map, $key), $default);
 }
 
+///
+/// Get the value for a map within a map (or deeper).
+///
+/// @param {map}                  $map
+/// @param {string | list}        $key
+/// @param {any}           [null] $default
+///
+/// @return {any} Either the value assigned to $key or $default
+///
+@function ig-map-get-deep($map, $key, $default: null) {
+    $value: null;
+
+    @if type-of($key) == list {
+        $value: $map;
+
+        @each $k in $key {
+            $value: map-get($value, $k);
+
+            @if $value == null {
+                @return $default;
+            }
+        }
+    } @else {
+        $value: map-get($map, $key);
+
+        @if $value == null {
+            @return $default;
+        }
+    }
+
+    @return $value;
+}
+
 /// 
 /// Merge two maps recursively.
 ///

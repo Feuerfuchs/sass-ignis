@@ -21,7 +21,7 @@
         $list: 'this' 'is' 'a' 'list';
 
         @include assert-equal(ig-list-prepend($list, 'and'), 'and' 'this' 'is' 'a' 'list', 'Prepend "and"');
-        @include assert-equal(ig-list-prepend($list, 2),     2 'this' 'is' 'a' 'list', 'Prepend 2');
+        @include assert-equal(ig-list-prepend($list, 2),     2 'this' 'is' 'a' 'list',     'Prepend 2');
     }
 
     @include it('ig-quicksort') {
@@ -38,9 +38,29 @@
         @include assert-equal(ig-map-get-default($map, 'index',   'nothing'), 'nothing',                'Get missing value');
     }
 
+    @include it('ig-map-get-deep') {
+        $map: (
+            'key': 'value',
+            'sub': (
+                'item1': 1,
+                'item2': 2,
+                'subsub': (
+                    'item1': 11,
+                    'item2': 12,
+                )
+            )
+        );
+
+        @include assert-equal(ig-map-get-deep($map, 'key'),                  map-get($map, 'key'),                                      'Get value in root level');
+        @include assert-equal(ig-map-get-deep($map, 'sub' 'item1'),          map-get(map-get($map, 'sub'), 'item1'),                    'Get value in first level');
+        @include assert-equal(ig-map-get-deep($map, 'sub' 'item2'),          map-get(map-get($map, 'sub'), 'item2'),                    'Get value in first level');
+        @include assert-equal(ig-map-get-deep($map, 'sub' 'subsub' 'item1'), map-get(map-get(map-get($map, 'sub'), 'subsub'), 'item1'), 'Get value in second level');
+        @include assert-equal(ig-map-get-deep($map, 'sub' 'subsub' 'item2'), map-get(map-get(map-get($map, 'sub'), 'subsub'), 'item2'), 'Get value in second level');
+    }
+
     @include it('ig-map-merge-recursive') {
         $map1: (
-            'key':     'value',
+            'key': 'value',
             'sub': (
                 'item1': 1,
                 'item3': 2
