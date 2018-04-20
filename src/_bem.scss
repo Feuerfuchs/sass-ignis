@@ -511,7 +511,7 @@ $ig-bem-context-id: 'bem' !default;
 /// other elements, modifiers or any kind of selector such as &:hover.
 ///
 /// @param {string} $name  - First element name
-/// @param {list}   $names - List of more element names
+/// @param {string} $names - More element names
 ///
 /// @content
 ///
@@ -697,7 +697,7 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @param {string} $sign  - Relationshop sign, either '+' or '~'
 /// @param {string} $name  - First element name
-/// @param {list}   $names - List of more element names
+/// @param {string} $names - More element names
 ///
 /// @content
 ///
@@ -857,7 +857,7 @@ $ig-bem-context-id: 'bem' !default;
 /// It's a shorthand for ig-bem-related-element('+', $name).
 ///
 /// @param {string} $name  - First element name
-/// @param {list}   $names - List of more element names
+/// @param {string} $names - More element names
 ///
 /// @content
 ///
@@ -1053,8 +1053,8 @@ $ig-bem-context-id: 'bem' !default;
 /// If it's true, you signalize that the modifier extends the parent modifier or suffix and can only be
 /// used in conjunction with it.
 ///
-/// @param {string | list} $names          - Modifier name or list of modifier names
-/// @param {bool}          $extend [false] - Indicate if the parent modifier or suffix will be extended
+/// @param {string | list} $name  - First element name or list with two items: 1. first element name, 2. bool indicating if the modifier is extending
+/// @param {string | list} $names - More element names or lists with two items: 1. element name, 2. bool indicating if the modifier is extending
 ///
 /// @content
 ///
@@ -1121,7 +1121,7 @@ $ig-bem-context-id: 'bem' !default;
 ///     @include ig-bem-modifier('dark') {
 ///       /* some definitions */
 ///       
-///       @include ig-bem-modifier('mod', true) {
+///       @include ig-bem-modifier('mod' true) {
 ///         background-color: #222;
 ///       }
 ///     }
@@ -1141,8 +1141,8 @@ $ig-bem-context-id: 'bem' !default;
 ///     background-color: #222;
 ///   }
 ///
-@mixin ig-bem-modifier($names, $extend: false) {
-    $selector: nth(ig-bem-modifier($names, $extend), 1);
+@mixin ig-bem-modifier($name, $names...) {
+    $selector: nth(ig-bem-modifier($name, $names...), 1);
 
     @at-root #{$selector} {
         @content;
@@ -1157,7 +1157,7 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// @see {mixin} ig-bem-modifier
 ///
-@function ig-bem-modifier($names, $extend: false) {
+@function ig-bem-modifier($name, $names...) {
     $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
@@ -1181,40 +1181,44 @@ $ig-bem-context-id: 'bem' !default;
         @error 'A modifier must be an immediate child of the parent context';
     }
 
-    @if index('block' 'element' 'at-theme', nth($parent-context, 1)) or $extend == true {
-        //
-        // Either the parent context is block or element, or a modifier or suffix
-        // is to be extended. The modifier part can simply be appended.
-        // Possible outcomes:
-        //   - {b,e,m,s}--modifier
-        //
+    @each $name in ig-list-prepend($names, $name) {
+        $extend: false;
+        @if type-of($name) == list {
+            $extend: nth($name, 2);
+            $name:   nth($name, 1);
+        }
 
-        @each $name in $names {
+        @if index('block' 'element' 'at-theme', nth($parent-context, 1)) or $extend == true {
+            //
+            // Either the parent context is block or element, or a modifier or suffix
+            // is to be extended. The modifier part can simply be appended.
+            // Possible outcomes:
+            //   - {b,e,m,s}--modifier
+            //
+
             $sel:        selector-append(&, $ig-bem-modifier-separator + $name);
             $selector:   join($selector, $sel, comma);
             $parts-data: append($parts-data, (
                     'name':     $name,
                     'selector': $sel
             ));
-        }
-    } @else {
-        //
-        // Parent context is modifier or suffix and $extend is false. Get latest element or block.
-        //
-
-        $be-context: ig-context-get($ig-bem-context-id, 'block' 'element');
-
-        @if nth($be-context, 1) == 'element' {
+        } @else {
             //
-            // Latest context is element. Since element contexts can consist of multiple single
-            // elements, inspect all elements and append its selector with the suffix "--$name".
-            // This has to be done with string comparison since none of SASS selector functions
-            // is of use here. 
-            // Possible outcomes:
-            //   - {m,s}.{e}--modifier
+            // Parent context is modifier or suffix and $extend is false. Get latest element or block.
             //
 
-            @each $name in $names {
+            $be-context: ig-context-get($ig-bem-context-id, 'block' 'element');
+
+            @if nth($be-context, 1) == 'element' {
+                //
+                // Latest context is element. Since element contexts can consist of multiple single
+                // elements, inspect all elements and append its selector with the suffix "--$name".
+                // This has to be done with string comparison since none of SASS selector functions
+                // is of use here. 
+                // Possible outcomes:
+                //   - {m,s}.{e}--modifier
+                //
+
                 $nsel: ();
 
                 @each $elem-part-data in map-get(nth($be-context, 2), 'parts') {
@@ -1240,17 +1244,15 @@ $ig-bem-context-id: 'bem' !default;
                         'name':     $name,
                         'selector': $nsel
                 ));
-            }
-        } @else {
-            //
-            // Latest context is block. Just append the modifier part.
-            // Possible outcomes:
-            //   - {m,s}.{b}--modifier
-            //
+            } @else {
+                //
+                // Latest context is block. Just append the modifier part.
+                // Possible outcomes:
+                //   - {m,s}.{b}--modifier
+                //
 
-            $block-base-selector: map-get(nth($be-context, 2), 'base-selector');
+                $block-base-selector: map-get(nth($be-context, 2), 'base-selector');
 
-            @each $name in $names {
                 $sel:        selector-append(&, $block-base-selector, $ig-bem-modifier-separator + $name);
                 $selector:   join($selector, $sel, comma);
                 $parts-data: append($parts-data, (
@@ -1525,7 +1527,8 @@ $ig-bem-context-id: 'bem' !default;
 /// 
 /// Declare new rules for the current block for when this theme is active.
 ///
-/// @param {string | list} $name - Theme block name or list of theme block names
+/// @param {string} $name  - First theme block name
+/// @param {string} $names - More theme block names
 ///
 /// @content
 ///

@@ -135,7 +135,7 @@
                 @include ig-bem-multi('element:' 'child', 'modifier:' 'mod1') {
                     font-size: 2em;
 
-                    @include ig-bem-modifier('mod2', true) {
+                    @include ig-bem-modifier('mod2' true) {
                         font-size: 2.5em;
                     }
                 }

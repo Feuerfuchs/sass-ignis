@@ -254,8 +254,8 @@
 ///
 /// @alias ig-bem-modifier
 ///
-@mixin modifier($name, $extend: false) {
-    @include ig-bem-modifier($name, $extend) {
+@mixin modifier($name, $names...) {
+    @include ig-bem-modifier($name, $names...) {
         @content;
     }
 }
@@ -263,8 +263,8 @@
 ///
 /// @alias modifier
 ///
-@mixin m($name, $extend: false) {
-    @include modifier($name, $extend) {
+@mixin m($name, $names...) {
+    @include modifier($name, $names...) {
         @content;
     }
 }

@@ -389,7 +389,7 @@
                 @include ig-bem-modifier('mod') {
                     font-size: 1.5em;
 
-                    @include ig-bem-modifier('submod', true) {
+                    @include ig-bem-modifier('submod' true) {
                         font-size: 1.75em;
                     }
                 }
@@ -414,7 +414,7 @@
                     @include ig-bem-modifier('mod') {
                         font-size: 2.5em;
 
-                        @include ig-bem-modifier('submod', true) {
+                        @include ig-bem-modifier('submod' true) {
                             font-size: 2.75em;
                         }
                     }
