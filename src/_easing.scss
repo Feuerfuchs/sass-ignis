@@ -9,6 +9,17 @@
 ////
 
 /// 
+/// Identity function for linear easing.
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number} $t
+///
+@function ig-ease-linear($t) {
+    @return $t;
+}
+
+/// 
 /// A normalized quadratic easing function (in direction).
 ///
 /// @param {number} $t - Current time between 0 and 1 inclusive

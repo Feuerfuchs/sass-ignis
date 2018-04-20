@@ -4,9 +4,9 @@
     @include it('ig-easing-gradient') {
         $gradient1: ig-easing-gradient(
             linear,
-            in-quad,
             to right,
             #000,
+            in-quad,
             transparent
         );
 
@@ -23,9 +23,9 @@
 
         $gradient2: ig-easing-gradient(
             radial,
-            out-cubic,
             1em 2em at 50% 60%,
             #000,
+            out-cubic,
             transparent
         );
 
@@ -42,9 +42,9 @@
 
         $gradient3: ig-easing-gradient(
             linear,
-            in-quad,
             to right,
             #000 2em,
+            in-quad,
             transparent 10em
         );
 
@@ -61,9 +61,9 @@
 
         $gradient4: ig-easing-gradient(
             linear,
-            in-quad,
             to right,
             #000,
+            in-quad,
             transparent,
             'calc(20% + ${x} * 10em)'
         );

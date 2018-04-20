@@ -130,7 +130,7 @@ $ig-easing-gradient-precision: 0.1 !default;
 ///     );
 ///   }
 ///
-@function ig-easing-gradient($type, $easing, $dir, $start, $stop, $pos-template: null) {
+@function ig-easing-gradient($type, $dir, $start, $easing, $stop, $pos-template: null) {
     $start-color: #000;
     $start-pos:   0%;
     $stop-color:  #000;
@@ -190,4 +190,22 @@ $ig-easing-gradient-precision: 0.1 !default;
     $result: $result + ')';
 
     @return unquote($result);
+}
+
+///
+/// Alias for ig-easing-gradient('linear',...)
+///
+/// @see {function} ig-easing-gradient
+///
+@function ig-easing-linear-gradient($dir, $start, $easing, $stop, $pos-template: null) {
+    @return ig-easing-gradient('linear', $dir, $start, $easing, $stop, $pos-template);
+}
+
+///
+/// Alias for ig-easing-gradient('radial',...)
+///
+/// @see {function} ig-easing-gradient
+///
+@function ig-easing-radial-gradient($dir, $start, $easing, $stop, $pos-template: null) {
+    @return ig-easing-gradient('radial', $dir, $start, $easing, $stop, $pos-template);
 }

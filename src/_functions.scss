@@ -144,9 +144,9 @@
 ///
 /// Get the value for a map within a map (or deeper).
 ///
-/// @param {map}                  $map
-/// @param {string | list}        $key
-/// @param {any}           [null] $default
+/// @param {map}           $map
+/// @param {string | list} $key
+/// @param {any}           $default [null]
 ///
 /// @return {any} Either the value assigned to $key or $default
 ///
