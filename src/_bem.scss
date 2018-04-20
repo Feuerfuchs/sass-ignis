@@ -33,8 +33,11 @@
 ///   (* One part of the selector *)
 ///   selector_part = existing_entities | manual_selector_part | optional_selector_part | generated_independent_entity | generated_attached_entity ;
 ///   
+///   (* How the left and right selector are related, i.e. space means right is a descendant of left, and dot means right specializes left *)
+///   selector_link = " " | "." ;
+///   
 ///   (* The whole selector *)
-///   selector = selector_part { ( " " | "." ) selector_part } ;
+///   selector = selector_part { ( selector_link ) selector_part } ;
 ///
 /// @link https://en.bem.info/                                                                   Information about BEM
 /// @link https://csswizardry.com/2015/08/bemit-taking-the-bem-naming-convention-a-step-further/ Information about BEMIT 
@@ -45,21 +48,21 @@
 ////
 
 ///
-/// Character sequence for BEM elements.
+/// Separating character sequence for elements.
 ///
 /// @type string
 ///
 $ig-bem-element-separator: '__' !default;
 
 ///
-/// Character sequence for BEM modifiers.
+/// Separating character sequence for modifiers.
 ///
 /// @type string
 ///
 $ig-bem-modifier-separator: '--' !default;
 
 ///
-/// Character sequence for BEMIT suffixes.
+/// Separating character sequence for BEMIT suffixes.
 ///
 /// @type string
 ///
@@ -68,12 +71,15 @@ $ig-bem-suffix-separator: '\\@' !default;
 ///
 /// Prefixes for all BEMIT namespaces.
 ///
-/// @prop {string} utility   ['u'] - Utility namespace
-/// @prop {string} object    ['o'] - Object namespace
-/// @prop {string} component ['c'] - Component namespace
-/// @prop {string} layout    ['l'] - Layout namespace
-/// @prop {string} scope     ['s'] - Scope namespace
-/// @prop {string} theme     ['t'] - Theme namespace
+/// @prop {string} utility   ['u']  - Utility namespace
+/// @prop {string} object    ['o']  - Object namespace
+/// @prop {string} component ['c']  - Component namespace
+/// @prop {string} layout    ['l']  - Layout namespace
+/// @prop {string} scope     ['s']  - Scope namespace
+/// @prop {string} theme     ['t']  - Theme namespace
+/// @prop {string} js        ['js'] - JS namespace
+/// @prop {string} qa        ['qa'] - QA namespace
+/// @prop {string} hack      ['_']  - Hack namespace
 ///
 /// @type map
 ///
@@ -90,7 +96,7 @@ $ig-bem-namespaces: (
 ) !default;
 
 ///
-/// A list of all generated BEMIT blocks. 
+/// A list of all generated blocks. 
 ///
 /// @type list
 ///
@@ -125,7 +131,7 @@ $ig-bem-element-nesting-policy: 'allow' !default;
 $ig-bem-context-id: 'bem' !default;
 
 /// 
-/// Generate a new BEMIT block.
+/// Generate a new block.
 ///
 /// This mixin simply creates a new block with the name {namespace}_{name},
 /// where {namespace} is the prefix assigned to $type and {name} is the
@@ -160,7 +166,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 ///
-/// Generate a new BEMIT block. Check the respective mixin documentation for more information.
+/// Generate a new block. Check the respective mixin documentation for more information.
 /// 
 /// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
 ///
@@ -218,7 +224,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a new BEMIT object block. It's a shorthand for ig-bem-block($name, 'object').
+/// Generate a new object block. It's a shorthand for ig-bem-block($name, 'object').
 ///
 /// @param {string} $name - Object block name
 ///
@@ -231,7 +237,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 ///
-/// Generate a new BEMIT object block. Check the respective mixin documentation for more information.
+/// Generate a new object block. Check the respective mixin documentation for more information.
 /// 
 /// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
 ///
@@ -242,7 +248,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a new BEMIT component block. It's a shorthand for ig-bem-block($name, 'component').
+/// Generate a new component block. It's a shorthand for ig-bem-block($name, 'component').
 ///
 /// @param {string} $name - Component block name
 ///
@@ -255,7 +261,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 ///
-/// Generate a new BEMIT component block. Check the respective mixin documentation for more information.
+/// Generate a new component block. Check the respective mixin documentation for more information.
 /// 
 /// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
 ///
@@ -266,7 +272,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a new BEMIT layout block. It's a shorthand for ig-bem-block($name, 'layout').
+/// Generate a new layout block. It's a shorthand for ig-bem-block($name, 'layout').
 ///
 /// @param {string} $name - Layout block name
 ///
@@ -279,7 +285,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 ///
-/// Generate a new BEMIT layout block. Check the respective mixin documentation for more information.
+/// Generate a new layout block. Check the respective mixin documentation for more information.
 /// 
 /// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
 ///
@@ -290,7 +296,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a new BEMIT utility block. It's a shorthand for ig-bem-block($name, 'utility').
+/// Generate a new utility block. It's a shorthand for ig-bem-block($name, 'utility').
 ///
 /// @param {string} $name - Utility block name
 ///
@@ -303,7 +309,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 ///
-/// Generate a new BEMIT utility block. Check the respective mixin documentation for more information.
+/// Generate a new utility block. Check the respective mixin documentation for more information.
 /// 
 /// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
 ///
@@ -314,7 +320,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a new BEMIT scope block. It's a shorthand for ig-bem-block($name, 'scope').
+/// Generate a new scope block. It's a shorthand for ig-bem-block($name, 'scope').
 ///
 /// @param {string} $name - Scope block name
 ///
@@ -327,7 +333,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 ///
-/// Generate a new BEMIT scope block. Check the respective mixin documentation for more information.
+/// Generate a new scope block. Check the respective mixin documentation for more information.
 /// 
 /// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
 ///
@@ -338,7 +344,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a new BEMIT theme block. It's a shorthand for ig-bem-block($name, 'theme').
+/// Generate a new theme block. It's a shorthand for ig-bem-block($name, 'theme').
 ///
 /// @param {string} $name - Theme block name
 ///
@@ -351,7 +357,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 ///
-/// Generate a new BEMIT theme block. Check the respective mixin documentation for more information.
+/// Generate a new theme block. Check the respective mixin documentation for more information.
 /// 
 /// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
 ///
@@ -362,7 +368,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a new BEMIT JS block. It's a shorthand for ig-bem-block($name, 'js').
+/// Generate a new JS block. It's a shorthand for ig-bem-block($name, 'js').
 ///
 /// @param {string} $name - JS block name
 ///
@@ -375,7 +381,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 ///
-/// Generate a new BEMIT JS block. Check the respective mixin documentation for more information.
+/// Generate a new JS block. Check the respective mixin documentation for more information.
 /// 
 /// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
 ///
@@ -386,7 +392,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a new BEMIT QA block. It's a shorthand for ig-bem-block($name, 'qa').
+/// Generate a new QA block. It's a shorthand for ig-bem-block($name, 'qa').
 ///
 /// @param {string} $name - QA block name
 ///
@@ -399,7 +405,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 ///
-/// Generate a new BEMIT QA block. Check the respective mixin documentation for more information.
+/// Generate a new QA block. Check the respective mixin documentation for more information.
 /// 
 /// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
 ///
@@ -410,7 +416,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a new BEMIT hack block. It's a shorthand for ig-bem-block($name, 'hack').
+/// Generate a new hack block. It's a shorthand for ig-bem-block($name, 'hack').
 ///
 /// @param {string} $name - Hack block name
 ///
@@ -423,7 +429,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 ///
-/// Generate a new BEMIT hack block. Check the respective mixin documentation for more information.
+/// Generate a new hack block. Check the respective mixin documentation for more information.
 /// 
 /// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
 ///
@@ -1272,7 +1278,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 /// 
-/// Generate a new BEMIT suffix.
+/// Generate a new suffix.
 ///
 /// @param {string} $name - Suffix name
 ///
@@ -1325,7 +1331,7 @@ $ig-bem-context-id: 'bem' !default;
 }
 
 ///
-/// Generate a new BEMIT suffix. Check the respective mixin documentation for more information.
+/// Generate a new suffix. Check the respective mixin documentation for more information.
 /// 
 /// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
 ///
