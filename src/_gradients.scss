@@ -148,13 +148,13 @@ $ig-easing-gradient-precision: 10 !default;
                 $stops: set-nth($stops, $i, $stop);
             }
 
-            $interpolated-stops: ig-easing-gradient-interpolate-stop-positions(
-                nth($stops, $last-positioned-stop),
-                ig-list-slice($stops, $last-positioned-stop + 1, $i - 1),
-                $stop
-            );
-
             @if $i > $last-positioned-stop + 1 {
+                $interpolated-stops: ig-easing-gradient-interpolate-stop-positions(
+                    nth($stops, $last-positioned-stop),
+                    ig-list-slice($stops, $last-positioned-stop + 1, $i - 1),
+                    $stop
+                );
+
                 $new-stops: join(
                     ig-list-slice($stops, 1, $last-positioned-stop),
                     $interpolated-stops
@@ -302,7 +302,7 @@ $ig-easing-gradient-precision: 10 !default;
 
     $stops-num: 0;
     @for $i from 1 through length($stops) {
-        @if type-of($stops) != string {
+        @if type-of(nth($stops, $i)) != string {
             $stops-num: $stops-num + 1;
         }
     }
@@ -332,9 +332,9 @@ $ig-easing-gradient-precision: 10 !default;
         }
 
         @for $i from 1 through length($stops) {
-            $perc: $cur-stop-num / ($stops-num + 1);
             $stop: nth($stops, $i);
             @if type-of($stop) != string {
+                $perc:  $cur-stop-num / ($stops-num + 1);
                 $pos:   calc(#{$prev-stop-pos} + (#{$next-stop-pos} - #{$prev-stop-pos}) * #{$perc});
                 $stops: set-nth($stops, $i, $stop $pos);
 
