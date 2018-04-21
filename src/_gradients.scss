@@ -21,7 +21,7 @@
 ///
 /// @type number
 ///
-$ig-easing-gradient-precision: 0.1 !default;
+$ig-easing-gradient-precision: 10 !default;
 
 /// 
 /// Generate a new easing background gradient.
@@ -130,66 +130,81 @@ $ig-easing-gradient-precision: 0.1 !default;
 ///     );
 ///   }
 ///
-@function ig-easing-gradient($type, $dir, $start, $easing, $stop, $pos-template: null) {
-    $start-color: #000;
-    $start-pos:   0%;
-    $stop-color:  #000;
-    $stop-pos:    100%;
+@function ig-easing-gradient($type, $dir, $stop, $stops...) {
+    $pos-template: null;
+    $stops:        ig-list-prepend($stops, $stop);
 
-    @if type-of($start) == list {
-        $start-color: nth($start, 1);
-        $start-pos:   nth($start, 2);
-    } @else {
-        $start-color: $start;
+    $last-positioned-stop: 1;
+    $generated-stops:      ();
+
+    @for $i from 1 through length($stops) {
+        $stop: nth($stops, $i);
+
+        @if ((type-of($stop) == list) and ($i != 1)) or ($i == length($stops)) {
+            @if (type-of($stop) != list) and ($i == length($stops)) {
+                $stop:  $stop 100%;
+                $stops: set-nth($stops, $i, $stop);
+            }
+
+            $stops-with-pos: ig-easing-gradient-interpolate-stop-positions(
+                nth($stops, $last-positioned-stop),
+                ig-list-slice($stops, $last-positioned-stop + 1, $i - 1),
+                $stop
+            );
+
+            $new-stops: join(
+                ig-list-slice($stops, 1, $last-positioned-stop),
+                $stops-with-pos
+            );
+            $new-stops: join(
+                $new-stops,
+                ig-list-slice($stops, $i)
+            );
+
+            $stops: $new-stops;
+
+            $j: 2;
+            @while $j <= $i {
+                $easing:    linear;
+                $prev-stop: nth($stops, $j - 1);
+                $next-stop: nth($stops, $j);
+
+                @if type-of($next-stop) == string {
+                    $j: $j + 1;
+
+                    $easing:    $next-stop;
+                    $next-stop: nth($stops, $j);
+                }
+
+                $easing-func: null;
+                @if function-exists($easing) {
+                    $easing-func: get-function($easing);
+                } @else {
+                    $easing-func: get-function('ig-ease-' + $easing);
+                }
+
+                $generated-stops: join(
+                    $generated-stops,
+                    ig-easing-gradient-ease-stops($prev-stop, $next-stop, $easing-func),
+                    comma
+                );
+
+                $j: $j + 1;
+            }
+
+            $last-positioned-stop: $i;
+        } @else if (type-of($stop) != list) and ($i == 1) {
+            $stops: set-nth($stops, $i, $stop 0);
+        }
     }
-
-    @if type-of($stop) == list {
-        $stop-color: nth($stop, 1);
-        $stop-pos:   nth($stop, 2);
-    } @else {
-        $stop-color: $stop;
-    }
-
-    @if unit($start-pos) != unit($stop-pos) {
-        @error 'Position units must match.';
-    }
-
-    $distance: $stop-pos - $start-pos;
-
-    $result: '';
 
     @if $type == 'linear' {
-        $result: 'linear-gradient(#{$dir}';
+        @return linear-gradient($dir, unquote(ig-str-implode($generated-stops, ', ')));
     } @else if $type == 'radial' {
-        $result: 'radial-gradient(#{$dir}';
+        @return radial-gradient($dir, unquote(ig-str-implode($generated-stops, ', ')));
     } @else {
         @error 'Invalid gradient type: #{inspect($type)}.';
     }
-
-    $easing-func: null;
-    @if function-exists($easing) {
-        $easing-func: get-function($easing);
-    } @else {
-        $easing-func: get-function('ig-ease-' + $easing);
-    }
-
-    $i: 0;
-    @while $i <= 1 {
-        $mix:   call($easing-func, $i);
-        $color: mix($stop-color, $start-color, $mix * 100%);
-
-        $pos: $start-pos + $i * $distance;
-        @if $pos-template != null {
-            $pos: ig-str-replace($pos-template, '${x}', $i);
-        }
-
-        $result: $result + ', ' + $color + ' ' + $pos;
-        $i:      $i + $ig-easing-gradient-precision;
-    }
-
-    $result: $result + ')';
-
-    @return unquote($result);
 }
 
 ///
@@ -197,8 +212,8 @@ $ig-easing-gradient-precision: 0.1 !default;
 ///
 /// @see {function} ig-easing-gradient
 ///
-@function ig-easing-linear-gradient($dir, $start, $easing, $stop, $pos-template: null) {
-    @return ig-easing-gradient('linear', $dir, $start, $easing, $stop, $pos-template);
+@function ig-easing-linear-gradient($dir, $stop, $stops...) {
+    @return ig-easing-gradient('linear', $dir, $stop, $stops...);
 }
 
 ///
@@ -206,6 +221,85 @@ $ig-easing-gradient-precision: 0.1 !default;
 ///
 /// @see {function} ig-easing-gradient
 ///
-@function ig-easing-radial-gradient($dir, $start, $easing, $stop, $pos-template: null) {
-    @return ig-easing-gradient('radial', $dir, $start, $easing, $stop, $pos-template);
+@function ig-easing-radial-gradient($dir, $stop, $stops...) {
+    @return ig-easing-gradient('radial', $dir, $stop, $stops...);
+}
+
+///
+/// @access private
+///
+@function ig-easing-gradient-ease-stops($prev-stop, $next-stop, $easing-func) {
+    $prev-stop-color: nth($prev-stop, 1);
+    $prev-stop-pos:   nth($prev-stop, 2);
+    $next-stop-color: nth($next-stop, 1);
+    $next-stop-pos:   nth($next-stop, 2);
+    $distance:        $next-stop-pos - $prev-stop-pos;
+
+    $stops: ();
+
+    @for $i from 0 through $ig-easing-gradient-precision {
+        $perc:  $i / $ig-easing-gradient-precision;
+        $mix:   call($easing-func, $perc);
+        $color: mix($next-stop-color, $prev-stop-color, $mix * 100%);
+
+        $pos: $prev-stop-pos + $perc * $distance;
+        //@if $pos-template != null {
+        //    $pos: ig-str-replace($pos-template, '${x}', $perc);
+        //}
+
+        $stops: append($stops, $color + ' ' + $pos, comma);
+    }
+
+    @return $stops;
+}
+
+///
+/// @access private
+///
+@function ig-easing-gradient-interpolate-stop-positions($prev-stop, $stops, $next-stop) {
+    $prev-stop-pos: nth($prev-stop, 2);
+    $next-stop-pos: nth($next-stop, 2);
+
+    $stops-num: 0;
+    @for $i from 1 through length($stops) {
+        @if type-of($stops) != string {
+            $stops-num: $stops-num + 1;
+        }
+    }
+
+    $i: 1;
+    $cur-stop-num: 1;
+
+    @if (unit($prev-stop-pos) == unit($next-stop-pos)) or ($prev-stop-pos == 0) {
+        $distance: $next-stop-pos - $prev-stop-pos;
+
+        @for $i from 1 through length($stops) {
+            $stop: nth($stops, $i);
+            @if type-of($stop) != string {
+                $pos:   $prev-stop-pos + $distance / ($stops-num + 1) * $cur-stop-num;
+                $stops: set-nth($stops, $i, $stop $pos);
+
+                $cur-stop-num: $cur-stop-num + 1;
+            }
+        }
+    } @else {
+        @for $i from 1 through length($stops) {
+            $stop: nth($stops, $i);
+            @if type-of($stop) != string {
+                $pos:   calc(#{$prev-stop-pos} + (#{$next-stop-pos} - #{$prev-stop-pos}) / #{($stops-num + 1)} * #{$cur-stop-num});
+                $stops: set-nth($stops, $i, $stop $pos);
+
+                $cur-stop-num: $cur-stop-num + 1;
+            }
+        }
+    }
+
+    @return $stops;
+}
+
+///
+/// @access private
+///
+@function ig-easing-gradient-is-color-stop($stop) {
+    @return (type-of($stop) == color) or ((type-of($stop) == list) and (type-of(nth($stop, 1)) == color));
 }
