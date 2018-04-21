@@ -1,0 +1,9 @@
+@include describe('Responsive') {
+    @include it('ig-fluid-property-calc') {
+        $rem600px: ig-px-to-rem(600px);
+        $rem800px: ig-px-to-rem(800px);
+
+        @include assert-equal(ig-fluid-property-calc(2rem, 4rem, 600px, 800px), 'calc(2rem + 2 * ((100vw - #{$rem600px}) / #{ig-strip-unit($rem800px - $rem600px)}))', 'Responsive value from 2rem to 4rem over 600px to 800px');
+        @include assert-equal(ig-fluid-property-calc(4px, 12px, 600px, 800px),  'calc(4px + 8 * ((100vw - 600px) / 200))',  'Responsive value from 4px to 12px over 600px to 800px');
+    }
+}

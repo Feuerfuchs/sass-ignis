@@ -9,9 +9,7 @@
 /// 
 /// The following adjustments were made:
 /// - Support any property passed by the user, not just font-size
-/// - Omit the unnecessary requirement that units must match or be convertible into each other
-/// - Make the media queries for viewport > max-width and viewport < min-width optional so the resize rate
-///   between different media queries can be altered without generating useless code
+/// - Allow multiple target viewports / values
 /// - Provide a variant of the mixin which integrates include-media for media queries
 ///
 /// @group Responsive
@@ -20,97 +18,86 @@
 ////
 
 /// 
-/// Scale a property uniformly from $min-value to $max-value depending on the viewport width.
-/// If the viewport is wider than $max-width, the property will have the value $max-value.
-/// Conversely, if the viewport is narrower than $min-width, the property will have the value $min-value.
+/// Scale a property uniformly between a specific set of target viewports / values.
 ///
-/// @param {string} $prop                  - Property to scale
-/// @param {number} $min-value             - Minimum value
-/// @param {number} $max-value             - Maximum value
-/// @param {number} $min-width             - Minimum viewport width
-/// @param {number} $max-width             - Maximum viewport width
-/// @param {bool}   $include-gt-max [true] - If false, the media query for viewport > $max-width will not be generated
-/// @param {bool}   $include-lt-min [true] - If false, the media query for viewport < $min-width will not be generated
+/// @param {string} $prop      - Property to set
+/// @param {number} $fluid-map - A map with keys = viewports and values = target value
 ///
 /// @example scss - Responsive font size
 ///   .something {
-///     @include ig-fluid-property(font-size, 1rem, 2.5rem, 320px, 720px);
+///     @include ig-fluid-property(font-size, ( 320px: 20px, 720px: 30px ));
 ///   }
 ///   
 ///   // Generates:
 ///   
 ///   @media (min-width: 320px) and (max-width: 720px) {
 ///     .something {
-///       font-size: calc(1rem + 1.5 * ((100vw - 20rem) / 25));
+///       font-size: calc(20px + 10 * ((100vw - 20px) / 400));
 ///     }
 ///   }
 ///   
 ///   @media (max-width: 320px) {
 ///     .something {
-///       font-size: 1rem;
+///       font-size: 20px;
 ///     }
 ///   }
 ///   
 ///   @media (min-width: 720px) {
 ///     .something {
-///       font-size: 2.5rem;
+///       font-size: 30px;
 ///     }
 ///   }
 ///
-@mixin ig-fluid-property($prop, $min-value, $max-value, $min-width, $max-width, $include-gt-max: true, $include-lt-min: true) {
-    $calc: ig-fluid-property-calc($min-value, $max-value, $min-width, $max-width);
+@mixin ig-fluid-property($prop, $fluid-map) {
+    $keys: ig-quicksort(map-keys($fluid-map));
 
-    @media (min-width: $min-width) and (max-width: $max-width) {
-        #{$prop}: $calc;
+    @if length($keys) <= 1 {
+        @error '$fluid-map must contain at least two viewports.';
     }
 
-    @if $include-lt-min {
-        @media (max-width: $min-width) {
-            #{$prop}: $min-value;
+    @for $i from 1 to length($keys) {
+        $prev-key: nth($keys, $i);
+        $next-key: nth($keys, $i + 1);
+
+        $prev-value: map-get($fluid-map, $prev-key);
+        $next-value: map-get($fluid-map, $next-key);
+
+        $calc: ig-fluid-property-calc($prev-value, $next-value, $prev-key, $next-key);
+
+        @media (min-width: $prev-key) and (max-width: $next-key) {
+            #{$prop}: $calc;
         }
     }
 
-    @if $include-gt-max {
-        @media (min-width: $max-width) {
-            #{$prop}: $max-value;
-        }
+    $first-key: nth($keys, 1);
+    $last-key:  nth($keys, length($keys));
+
+    @media (max-width: $first-key) {
+        #{$prop}: map-get($fluid-map, $first-key);
+    }
+
+    @media (min-width: $last-key) {
+        #{$prop}: map-get($fluid-map, $last-key);
     }
 }
 
 /// 
 /// Version of ig-fluid-property that uses include-media for media queries.
 ///
-/// @param {string} $prop                  - Property to scale
-/// @param {number} $min-value             - Minimum value
-/// @param {number} $max-value             - Maximum value
-/// @param {string} $min-bp                - Minimum viewport breakpoint (-> include-media)
-/// @param {string} $max-bp                - Maximum viewport breakpoint (-> include-media)
-/// @param {bool}   $include-gt-max [true] - If false, the media query for viewport > $max-width will not be generated
-/// @param {bool}   $include-lt-min [true] - If false, the media query for viewport < $min-width will not be generated
-///
 /// @see {mixin} ig-fluid-property
 /// 
-@mixin ig-fluid-property-im($prop, $min-value, $max-value, $min-bp, $max-bp, $include-gt-max: true, $include-lt-min: true) {
-    $min-width: if(map-has-key($breakpoints, $min-bp), map-get($breakpoints, $min-bp), $min-bp);
-    $max-width: if(map-has-key($breakpoints, $max-bp), map-get($breakpoints, $max-bp), $max-bp);
+@mixin ig-fluid-property-im($prop, $fluid-map) {
+    $new-map: ();
 
-    $calc: ig-fluid-property-calc($min-value, $max-value, $min-width, $max-width);
-
-    @include media('>#{$min-width}', '<=#{$max-width}') {
-        #{$prop}: $calc;
-    }
-
-    @if $include-lt-min {
-        @include media('<=#{$min-width}') {
-            #{$prop}: $min-value;
+    @each $key, $value in $fluid-map {
+        @if map-has-key($breakpoints, $key) {
+            $key: map-get($breakpoints, $key);
         }
+
+        $new-map: map-merge($new-map, ($key: $value));
     }
 
-    @if $include-gt-max {
-        @include media('>#{$max-width}') {
-            #{$prop}: $max-value;
-        }
-    }
+    @include ig-fluid-property($prop, $new-map);
 }
 
 /// 
@@ -125,8 +112,40 @@
 /// @access private
 ///
 @function ig-fluid-property-calc($min-value, $max-value, $min-width, $max-width) {
-    @if ((unit($min-value) != unit($max-value)) and ($min-value != 0) and ($max-value != 0)) or ((unit($min-width) != unit($max-width)) and ($min-width != 0) and ($max-width != 0)) {
+    $value-unit:     unit($min-value);
+    $max-value-unit: unit($max-value);
+    $width-unit:     unit($min-width);
+    $max-width-unit: unit($max-width);
+
+    @if $min-value == 0 {
+        $value-unit: $max-value-unit;
+    }
+    @if $max-value == 0 {
+        $max-value-unit: $value-unit;
+    }
+    @if $min-width == 0 {
+        $width-unit: $max-width-unit;
+    }
+    @if $max-width == 0 {
+        $max-width-unit: $width-unit;
+    }
+
+    @if ($value-unit != $max-value-unit) or ($width-unit != $max-width-unit) {
         @error 'Units of $min-value and $max-value, $min-width and $max-width must match.';
+    }
+
+    @if ($value-unit == rem) and ($width-unit == px) {
+        $min-width:  ig-px-to-rem($min-width);
+        $max-width:  ig-px-to-rem($max-width);
+        $width-unit: rem;
+    } @else if ($value-unit == px) and ($width-unit == rem) {
+        $min-value:  ig-px-to-rem($min-value);
+        $max-value:  ig-px-to-rem($max-value);
+        $value-unit: rem;
+    }
+
+    @if $value-unit != $width-unit {
+        @error 'This combination of units is not supported.';
     }
 
     $value-diff: ig-strip-unit($max-value - $min-value);
