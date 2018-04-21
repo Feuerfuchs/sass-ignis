@@ -24,14 +24,13 @@
 /// If the viewport is wider than $max-width, the property will have the value $max-value.
 /// Conversely, if the viewport is narrower than $min-width, the property will have the value $min-value.
 ///
-/// @param {string} $prop                           - Property to scale
-/// @param {number} $min-value                      - Minimum value
-/// @param {number} $max-value                      - Maximum value
-/// @param {number} $min-width                      - Minimum viewport width
-/// @param {number} $max-width                      - Maximum viewport width
-/// @param {number} $root-size      [$ig-root-size] - The reference root font size in px used for the px -> rem conversion
-/// @param {bool}   $include-gt-max [true]          - If false, the media query for viewport > $max-width will not be generated
-/// @param {bool}   $include-lt-min [true]          - If false, the media query for viewport < $min-width will not be generated
+/// @param {string} $prop                  - Property to scale
+/// @param {number} $min-value             - Minimum value
+/// @param {number} $max-value             - Maximum value
+/// @param {number} $min-width             - Minimum viewport width
+/// @param {number} $max-width             - Maximum viewport width
+/// @param {bool}   $include-gt-max [true] - If false, the media query for viewport > $max-width will not be generated
+/// @param {bool}   $include-lt-min [true] - If false, the media query for viewport < $min-width will not be generated
 ///
 /// @example scss - Responsive font size
 ///   .something {
@@ -58,8 +57,8 @@
 ///     }
 ///   }
 ///
-@mixin ig-fluid-property($prop, $min-value, $max-value, $min-width, $max-width, $root-size: $ig-root-size, $include-gt-max: true, $include-lt-min: true) {
-    $calc: ig-fluid-property-calc($min-value, $max-value, $min-width, $max-width, $root-size);
+@mixin ig-fluid-property($prop, $min-value, $max-value, $min-width, $max-width, $include-gt-max: true, $include-lt-min: true) {
+    $calc: ig-fluid-property-calc($min-value, $max-value, $min-width, $max-width);
 
     @media (min-width: $min-width) and (max-width: $max-width) {
         #{$prop}: $calc;
@@ -81,22 +80,21 @@
 /// 
 /// Version of ig-fluid-property that uses include-media for media queries.
 ///
-/// @param {string} $prop                           - Property to scale
-/// @param {number} $min-value                      - Minimum value
-/// @param {number} $max-value                      - Maximum value
-/// @param {string} $min-bp                         - Minimum viewport breakpoint (-> include-media)
-/// @param {string} $max-bp                         - Maximum viewport breakpoint (-> include-media)
-/// @param {number} $root-size      [$ig-root-size] - The reference root font size in px used for the px -> rem conversion
-/// @param {bool}   $include-gt-max [true]          - If false, the media query for viewport > $max-width will not be generated
-/// @param {bool}   $include-lt-min [true]          - If false, the media query for viewport < $min-width will not be generated
+/// @param {string} $prop                  - Property to scale
+/// @param {number} $min-value             - Minimum value
+/// @param {number} $max-value             - Maximum value
+/// @param {string} $min-bp                - Minimum viewport breakpoint (-> include-media)
+/// @param {string} $max-bp                - Maximum viewport breakpoint (-> include-media)
+/// @param {bool}   $include-gt-max [true] - If false, the media query for viewport > $max-width will not be generated
+/// @param {bool}   $include-lt-min [true] - If false, the media query for viewport < $min-width will not be generated
 ///
 /// @see {mixin} ig-fluid-property
 /// 
-@mixin ig-fluid-property-im($prop, $min-value, $max-value, $min-bp, $max-bp, $root-size: $ig-root-size, $include-gt-max: true, $include-lt-min: true) {
+@mixin ig-fluid-property-im($prop, $min-value, $max-value, $min-bp, $max-bp, $include-gt-max: true, $include-lt-min: true) {
     $min-width: if(map-has-key($breakpoints, $min-bp), map-get($breakpoints, $min-bp), $min-bp);
     $max-width: if(map-has-key($breakpoints, $max-bp), map-get($breakpoints, $max-bp), $max-bp);
 
-    $calc: ig-fluid-property-calc($min-value, $max-value, $min-width, $max-width, $root-size);
+    $calc: ig-fluid-property-calc($min-value, $max-value, $min-width, $max-width);
 
     @include media('>#{$min-width}', '<=#{$max-width}') {
         #{$prop}: $calc;
@@ -119,16 +117,15 @@
 /// Generate the calc() function that uniformly scales a value from $min-value to $max-value depending
 /// on the viewport width.
 ///
-/// @param {number} $min-value                 - Minimum value
-/// @param {number} $max-value                 - Maximum value
-/// @param {number} $min-width                 - Minimum viewport width
-/// @param {number} $max-width                 - Maximum viewport width
-/// @param {number} $root-size [$ig-root-size] - The reference root font size in px used for the px -> rem conversion
+/// @param {number} $min-value - Minimum value
+/// @param {number} $max-value - Maximum value
+/// @param {number} $min-width - Minimum viewport width
+/// @param {number} $max-width - Maximum viewport width
 ///
 /// @access private
 ///
-@function ig-fluid-property-calc($min-value, $max-value, $min-width, $max-width, $root-size: $ig-root-size) {
-    @if (unit($min-value) != unit($max-value)) or (unit($min-width) != unit($max-width)) {
+@function ig-fluid-property-calc($min-value, $max-value, $min-width, $max-width) {
+    @if ((unit($min-value) != unit($max-value)) and ($min-value != 0) and ($max-value != 0)) or ((unit($min-width) != unit($max-width)) and ($min-width != 0) and ($max-width != 0)) {
         @error 'Units of $min-value and $max-value, $min-width and $max-width must match.';
     }
 
