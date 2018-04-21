@@ -8,9 +8,10 @@ Its main feature is its **BEM system**, though it also includes some other featu
 - Property trees: A persistent data storage
 - Fluid properties: A generalization of fluid typography
 - Modular scales
-- Utility functions
 
-## BEM
+All features are explained in detail in the [Wiki](/wiki).
+
+## BEM system
 
 Ignis provides a [BEM](https://en.bem.info/) system, i.e. a large variety of mixins you can use to create BEM-compliant stylesheets.
 
@@ -83,8 +84,6 @@ The result is this CSS:
     order: 1;
 }
 ```
-
-(TODO: Prepare more extensive documentation)
 
 ## Smoother background gradients
 
@@ -230,4 +229,34 @@ So instead of the example above, you could also use something like this:
 
 ## Modular scales
 
+Modular scales are collections of values that have a common ratio. They are commonly used to make a design appear more appealing.
 
+Ignis provides mixins to create basic and even multi-stranded modular scales.
+
+Using a basic modular scale:
+
+```scss
+h1 {
+   font-size: ig-harmony-modular-scale(3, 1em, 1.1); // Will be: 1.331em
+}
+h2 {
+   font-size: ig-harmony-modular-scale(2, 1em, 1.1); // Will be: 1.21em
+}
+h3 {
+   font-size: ig-harmony-modular-scale(1, 1em, 1.1); // Will be: 1.1em
+}
+```
+
+Using a multi-stranded modular scale:
+
+```scss
+h1 {
+   font-size: ig-harmony-modular-scale(3, 1em 2em, 1.1); // Will be: 1.128em
+}
+h2 {
+   font-size: ig-harmony-modular-scale(2, 1em 2em, 1.1); // Will be: 1.1em
+}
+h3 {
+   font-size: ig-harmony-modular-scale(1, 1em 2em, 1.1); // Will be: 1.026em
+}
+```
