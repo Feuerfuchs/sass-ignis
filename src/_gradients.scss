@@ -184,15 +184,9 @@ $ig-easing-gradient-precision: 10 !default;
                         $easing-func: get-function('ig-ease-' + $easing);
                     }
 
-                    $transition-stops: ig-easing-gradient-ease-stops($prev-stop, $next-stop, $easing-func);
-
-                    @if (length($generated-stops) != 0) and (nth($generated-stops, length($generated-stops)) == nth($transition-stops, 1)) {
-                        $transition-stops: ig-list-slice($transition-stops, 2);
-                    }
-
                     $generated-stops: join(
                         $generated-stops,
-                        $transition-stops,
+                        ig-easing-gradient-ease-stops($prev-stop, $next-stop, $easing-func),
                         comma
                     );
                 } @else {
@@ -204,7 +198,12 @@ $ig-easing-gradient-precision: 10 !default;
 
             $last-positioned-stop: $i;
         } @else if (type-of($stop) != list) and ($i == 1) {
-            $stops: set-nth($stops, $i, $stop 0);
+            $stop:  $stop 0;
+            $stops: set-nth($stops, $i, $stop);
+        }
+
+        @if $i == 1 {
+            $generated-stops: append($generated-stops, ig-str-implode($stop, ' '));
         }
     }
 
@@ -251,11 +250,16 @@ $ig-easing-gradient-precision: 10 !default;
     @if ((type-of($prev-stop-pos) == number) and (type-of($next-stop-pos) == number) and (unit($prev-stop-pos) == unit($next-stop-pos))) or ($prev-stop-pos == 0) {
         $distance: $next-stop-pos - $prev-stop-pos;
 
-        @for $i from 0 through $ig-easing-gradient-precision {
+        @for $i from 1 through $ig-easing-gradient-precision {
             $perc:  $i / $ig-easing-gradient-precision;
 
-            $color: mix($next-stop-color, $prev-stop-color, call($easing-func, $perc) * 100%);
+            $color: null;
             $pos:   $prev-stop-pos + $perc * $distance;
+            @if $perc == 1 {
+                $color: $next-stop-color;
+            } @else {
+                $color: mix($next-stop-color, $prev-stop-color, call($easing-func, $perc) * 100%);
+            }
 
             $stops: append($stops, $color + ' ' + $pos, comma);
         }
@@ -268,17 +272,17 @@ $ig-easing-gradient-precision: 10 !default;
             $next-stop-pos: str-slice($next-stop-pos, 6, str-length($next-stop-pos) - 1);
         }
 
-        @for $i from 0 through $ig-easing-gradient-precision {
+        @for $i from 1 through $ig-easing-gradient-precision {
             $perc:  $i / $ig-easing-gradient-precision;
 
-            $color: mix($next-stop-color, $prev-stop-color, call($easing-func, $perc) * 100%);
+            $color: null;
             $pos:   null;
-            @if $perc == 0 {
-                $pos: calc(#{$prev-stop-pos});
-            } @else if $perc == 1 {
-                $pos: calc(#{$next-stop-pos});
+            @if $perc == 1 {
+                $color: $next-stop-color;
+                $pos:   calc(#{$next-stop-pos});
             } @else {
-                $pos: calc(#{$prev-stop-pos} + (#{$next-stop-pos} - #{$prev-stop-pos}) * #{$perc});
+                $color: mix($next-stop-color, $prev-stop-color, call($easing-func, $perc) * 100%);
+                $pos:   calc(#{$prev-stop-pos} + (#{$next-stop-pos} - #{$prev-stop-pos}) * #{$perc});
             }
 
             $stops: append($stops, $color + ' ' + $pos, comma);

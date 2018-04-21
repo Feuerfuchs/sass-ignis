@@ -12,7 +12,7 @@
 
         $expected1: linear-gradient(
             to right,
-            mix(transparent, #000, ig-ease-in-quad(0)    * 100%) 0%,
+            #000 0,
             mix(transparent, #000, ig-ease-in-quad(0.25) * 100%) 25%,
             mix(transparent, #000, ig-ease-in-quad(0.5)  * 100%) 50%,
             mix(transparent, #000, ig-ease-in-quad(0.75) * 100%) 75%,
@@ -33,7 +33,7 @@
 
         $expected2: radial-gradient(
             1em 2em at 50% 60%,
-            mix(transparent, #000, ig-ease-out-cubic(0)    * 100%) 0%,
+            #000 0,
             mix(transparent, #000, ig-ease-out-cubic(0.25) * 100%) 25%,
             mix(transparent, #000, ig-ease-out-cubic(0.5)  * 100%) 50%,
             mix(transparent, #000, ig-ease-out-cubic(0.75) * 100%) 75%,
@@ -54,7 +54,7 @@
 
         $expected3: linear-gradient(
             to right,
-            mix(transparent, #000, ig-ease-in-quad(0)    * 100%) 2em,
+            #000 2em,
             mix(transparent, #000, ig-ease-in-quad(0.25) * 100%) 4em,
             mix(transparent, #000, ig-ease-in-quad(0.5)  * 100%) 6em,
             mix(transparent, #000, ig-ease-in-quad(0.75) * 100%) 8em,
@@ -68,14 +68,14 @@
         $gradient4: ig-easing-gradient(
             linear,
             to right,
-            #000        20%,
+            #000 20%,
             in-quad,
             transparent calc(20% + 10em)
         );
 
         $expected4: linear-gradient(
             to right,
-            mix(transparent, #000, ig-ease-in-quad(0)    * 100%) calc(20%),
+            #000 20%,
             mix(transparent, #000, ig-ease-in-quad(0.25) * 100%) calc(20% + (20% + 10em - 20%) * 0.25),
             mix(transparent, #000, ig-ease-in-quad(0.5)  * 100%) calc(20% + (20% + 10em - 20%) * 0.5),
             mix(transparent, #000, ig-ease-in-quad(0.75) * 100%) calc(20% + (20% + 10em - 20%) * 0.75),
@@ -90,19 +90,19 @@
             linear,
             to right,
             #000        2em,
-            in-quad,
             #f00        7em,
+            in-quad,
             transparent 10em
         );
 
         $expected5: linear-gradient(
             to right,
-            mix(#f00, #000, ig-ease-in-quad(0)    * 100%) 2em,
-            mix(#f00, #000, ig-ease-in-quad(0.25) * 100%) 2em + 5em * 0.25,
-            mix(#f00, #000, ig-ease-in-quad(0.5)  * 100%) 2em + 5em * 0.5,
-            mix(#f00, #000, ig-ease-in-quad(0.75) * 100%) 2em + 5em * 0.75,
-            mix(#f00, #000, ig-ease-in-quad(1)    * 100%) 7em,
-            transparent 10em
+            #000 2em,
+            #f00 7em,
+            mix(transparent, #f00, ig-ease-in-quad(0.25) * 100%) 7em + 3em * 0.25,
+            mix(transparent, #f00, ig-ease-in-quad(0.5)  * 100%) 7em + 3em * 0.5,
+            mix(transparent, #f00, ig-ease-in-quad(0.75) * 100%) 7em + 3em * 0.75,
+            mix(transparent, #f00, ig-ease-in-quad(1)    * 100%) 10em
         );
 
         @include assert-equal($gradient5, $expected5, 'Linear gradient with 3 positioned color stops, 1 easing transitions');
@@ -121,11 +121,11 @@
 
         $expected6: linear-gradient(
             to right,
-            mix(#f00,        #000, ig-ease-in-quad(0)    * 100%) 2em,
+            #000 2em,
             mix(#f00,        #000, ig-ease-in-quad(0.25) * 100%) 2em + 5em * 0.25,
             mix(#f00,        #000, ig-ease-in-quad(0.5)  * 100%) 2em + 5em * 0.5,
             mix(#f00,        #000, ig-ease-in-quad(0.75) * 100%) 2em + 5em * 0.75,
-            mix(#f00,        #000, ig-ease-in-quad(1)    * 100%) 7em,
+            #f00 7em,
             mix(transparent, #f00, ig-ease-in-quad(0.25) * 100%) 7em + 3em * 0.25,
             mix(transparent, #f00, ig-ease-in-quad(0.5)  * 100%) 7em + 3em * 0.5,
             mix(transparent, #f00, ig-ease-in-quad(0.75) * 100%) 7em + 3em * 0.75,
@@ -148,11 +148,11 @@
 
         $expected7: linear-gradient(
             to right,
-            mix(#f00,        #000, ig-ease-in-quad(0)    * 100%) 2em,
+            #000 2em,
             mix(#f00,        #000, ig-ease-in-quad(0.25) * 100%) 2em + 4em * 0.25,
             mix(#f00,        #000, ig-ease-in-quad(0.5)  * 100%) 2em + 4em * 0.5,
             mix(#f00,        #000, ig-ease-in-quad(0.75) * 100%) 2em + 4em * 0.75,
-            mix(#f00,        #000, ig-ease-in-quad(1)    * 100%) 6em,
+            #f00 6em,
             mix(transparent, #f00, ig-ease-in-quad(0.25) * 100%) 6em + 4em * 0.25,
             mix(transparent, #f00, ig-ease-in-quad(0.5)  * 100%) 6em + 4em * 0.5,
             mix(transparent, #f00, ig-ease-in-quad(0.75) * 100%) 6em + 4em * 0.75,
@@ -175,11 +175,11 @@
 
         $expected8: linear-gradient(
             to right,
-            mix(#f00,        #000, ig-ease-in-quad(0)    * 100%) 0%,
+            #000 0,
             mix(#f00,        #000, ig-ease-in-quad(0.25) * 100%) 50% * 0.25,
             mix(#f00,        #000, ig-ease-in-quad(0.5)  * 100%) 50% * 0.5,
             mix(#f00,        #000, ig-ease-in-quad(0.75) * 100%) 50% * 0.75,
-            mix(#f00,        #000, ig-ease-in-quad(1)    * 100%) 50%,
+            #f00 50%,
             mix(transparent, #f00, ig-ease-in-quad(0.25) * 100%) 50% + 50% * 0.25,
             mix(transparent, #f00, ig-ease-in-quad(0.5)  * 100%) 50% + 50% * 0.5,
             mix(transparent, #f00, ig-ease-in-quad(0.75) * 100%) 50% + 50% * 0.75,
@@ -202,11 +202,11 @@
 
         $expected9: linear-gradient(
             to right,
-            mix(#f00,        #000, ig-ease-in-quad(0)    * 100%) 0em,
+            #000 0,
             mix(#f00,        #000, ig-ease-in-quad(0.25) * 100%) 10em * 0.25,
             mix(#f00,        #000, ig-ease-in-quad(0.5)  * 100%) 10em * 0.5,
             mix(#f00,        #000, ig-ease-in-quad(0.75) * 100%) 10em * 0.75,
-            mix(#f00,        #000, ig-ease-in-quad(1)    * 100%) 10em,
+            #f00 10em,
             mix(transparent, #f00, ig-ease-in-quad(0.25) * 100%) 10em + 10em * 0.25,
             mix(transparent, #f00, ig-ease-in-quad(0.5)  * 100%) 10em + 10em * 0.5,
             mix(transparent, #f00, ig-ease-in-quad(0.75) * 100%) 10em + 10em * 0.75,
