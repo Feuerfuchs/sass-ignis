@@ -23,7 +23,7 @@
 /// @param {string} $prop      - Property to set
 /// @param {number} $fluid-map - A map with keys = viewports and values = target value
 ///
-/// @example scss - Responsive font size
+/// @example scss - Responsive font size between 2 viewports
 ///   .something {
 ///     @include ig-fluid-property(font-size, ( 320px: 20px, 720px: 30px ));
 ///   }
@@ -33,6 +33,37 @@
 ///   @media (min-width: 320px) and (max-width: 720px) {
 ///     .something {
 ///       font-size: calc(20px + 10 * ((100vw - 20px) / 400));
+///     }
+///   }
+///   
+///   @media (max-width: 320px) {
+///     .something {
+///       font-size: 20px;
+///     }
+///   }
+///   
+///   @media (min-width: 720px) {
+///     .something {
+///       font-size: 30px;
+///     }
+///   }
+///
+/// @example scss - Responsive font size between 3 viewports
+///   .something {
+///     @include ig-fluid-property(font-size, ( 320px: 20px, 720px: 30px, 1280px: 40px ));
+///   }
+///   
+///   // Generates:
+///   
+///   @media (min-width: 320px) and (max-width: 720px) {
+///     .something {
+///       font-size: calc(20px + 10 * ((100vw - 20px) / 400));
+///     }
+///   }
+///   
+///   @media (min-width: 720px) and (max-width: 1280px) {
+///     .something {
+///       font-size: calc(30px + 10 * ((100vw - 30px) / 400));
 ///     }
 ///   }
 ///   
@@ -82,7 +113,7 @@
 }
 
 /// 
-/// Version of ig-fluid-property that uses include-media for media queries.
+/// Version of ig-fluid-property that supports include-media viewports in the $fluid-map.
 ///
 /// @see {mixin} ig-fluid-property
 /// 
