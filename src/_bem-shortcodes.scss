@@ -11,8 +11,8 @@
 ///
 /// @alias ig-bem-block
 ///
-@mixin block($name, $type) {
-    @include ig-bem-block($name, $type) {
+@mixin block($name, $type: null) {
+    @include ig-bem-block($name, $type: null) {
         @content;
     }
 }
@@ -20,8 +20,8 @@
 ///
 /// @alias block
 ///
-@mixin b($name, $type) {
-    @include block($name, $type) {
+@mixin b($name, $type: null) {
+    @include block($name, $type: null) {
         @content;
     }
 }
@@ -56,7 +56,7 @@
 ///
 /// @alias component
 ///
-@mixin cb($name, $type) {
+@mixin cb($name) {
     @include component($name) {
         @content;
     }
@@ -74,7 +74,7 @@
 ///
 /// @alias layout
 ///
-@mixin lb($name, $type) {
+@mixin lb($name) {
     @include layout($name) {
         @content;
     }
@@ -92,7 +92,7 @@
 ///
 /// @alias utility
 ///
-@mixin ub($name, $type) {
+@mixin ub($name) {
     @include utility($name) {
         @content;
     }
@@ -110,7 +110,7 @@
 ///
 /// @alias scope
 ///
-@mixin sb($name, $type) {
+@mixin sb($name) {
     @include scope($name) {
         @content;
     }
@@ -128,7 +128,7 @@
 ///
 /// @alias theme
 ///
-@mixin tb($name, $type) {
+@mixin tb($name) {
     @include theme($name) {
         @content;
     }
@@ -157,6 +157,24 @@
 ///
 @mixin hack($name) {
     @include ig-bem-hack($name) {
+        @content;
+    }
+}
+
+///
+/// @alias ig-bem-composed-of
+///
+@mixin composed-of($block, $blocks...) {
+    @include ig-bem-composed-of($block, $blocks...) {
+        @content;
+    }
+}
+
+///
+/// @alias composed-of
+///
+@mixin co($block, $blocks...) {
+    @include composed-of($block, $blocks...) {
         @content;
     }
 }
@@ -200,8 +218,8 @@
 ///
 /// @alias ig-bem-sibling-element
 ///
-@mixin sibling-element($name) {
-    @include ig-bem-sibling-element($name) {
+@mixin sibling-element($name, $names...) {
+    @include ig-bem-sibling-element($name, $names...) {
         @content;
     }
 }
@@ -209,8 +227,8 @@
 ///
 /// @alias sibling-element
 ///
-@mixin se($name) {
-    @include sibling-element($name) {
+@mixin se($name, $names...) {
+    @include sibling-element($name, $names...) {
         @content;
     }
 }
@@ -218,8 +236,8 @@
 ///
 /// @alias ig-bem-next-element
 ///
-@mixin next-element($name) {
-    @include ig-bem-next-element($name) {
+@mixin next-element($name, $names...) {
+    @include ig-bem-next-element($name, $names...) {
         @content;
     }
 }
@@ -227,8 +245,8 @@
 ///
 /// @alias next-element
 ///
-@mixin ne($name) {
-    @include next-element($name) {
+@mixin ne($name, $names...) {
+    @include next-element($name, $names...) {
         @content;
     }
 }
