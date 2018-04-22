@@ -10,6 +10,10 @@ Its main feature is a **BEM system**, though it also includes some other useful 
 - Modular scales
 
 All features are explained in detail in the Wiki.
+The rest of this document is a quick overview over what Ignis has to offer.
+
+Note that for all mixins and functions, their long form is shown since they are unlikely to clash with other SASS libraries.
+For less clutter, there are shorter versions available.
 
 ## BEM system
 
@@ -213,53 +217,70 @@ This concept can be generalized to work with any property that accepts a numeric
 
 ```scss
 .title {
-    @include ig-fluid-property(font-size, ( 20rem: 2.1rem, 40rem: 2.6rem, 60rem: 3.5rem ));
+    @include ig-fluid-property(padding, ( 20rem: 2.1rem, 40rem: 2.6rem, 60rem: 3.5rem ));
 }
 ```
 
-The font-size will be 2.1rem if the viewport is 20rem wide, 2.6rem if it's 40rem wide, and 3.5rem if it's 60rem wide.
-If the viewport is narrower than 20rem, the font-size will stick with 2.1rem.
-If the viewport is wider than 60rem, the font-size will stick with 3.5rem.
+The padding will be 2.1rem if the viewport is 20rem wide, 2.6rem if it's 40rem wide, and 3.5rem if it's 60rem wide.
+If the viewport is narrower than 20rem, the padding will stick with 2.1rem.
+If the viewport is wider than 60rem, the padding will stick with 3.5rem.
 
 If you use [include-media](https://include-media.com/), there is also another mixin `ig-fluid-property-im` which supports include-media viewports.
 So instead of the example above, you could also use something like this:
 
 ```scss
 .title {
-    @include ig-fluid-property(font-size, ( phone: 2.1rem, tablet: 2.6rem, desktop: 3.5rem ));
+    @include ig-fluid-property-im(padding, ( phone: 2.1rem, tablet: 2.6rem, desktop: 3.5rem ));
 }
 ```
 
 ## Modular scales
 
-Modular scales are collections of values that have a common ratio. They are commonly used to make a design appear more appealing.
+From the description of [modularscale-sass](https://github.com/modularscale/modularscale-sass):
 
-Ignis provides mixins to create basic and even multi-stranded modular scales.
+> A modular scale is a list of values that share the same relationship. These values are often used to size type and create a sense of harmony in a design. Proportions within modular scales are all around us from the spacing of the joints on our fingers to branches on trees. These natural proportions have been used since the time of the ancient Greeks in architecture and design and can be a tremendously helpful tool to leverage for web designers.
 
-Using a basic modular scale:
+Ignis provides a mixin to create basic and multi-stranded modular scales.
+It's a lightweight alternative to modularscale-sass.
+
+Example with a multi-stranded modular scale:
 
 ```scss
+$mod-scale: 1em 2em, 1.1;
+
 h1 {
-   font-size: ig-harmony-modular-scale(3, 1em, 1.1); // Will be: 1.331em
+   font-size: ig-harmony-modular-scale(3, $mod-scale...); // Will be: 1.128em
 }
 h2 {
-   font-size: ig-harmony-modular-scale(2, 1em, 1.1); // Will be: 1.21em
+   font-size: ig-harmony-modular-scale(2, $mod-scale...); // Will be: 1.1em
 }
 h3 {
-   font-size: ig-harmony-modular-scale(1, 1em, 1.1); // Will be: 1.1em
+   font-size: ig-harmony-modular-scale(1, $mod-scale...); // Will be: 1.026em
 }
 ```
 
-Using a multi-stranded modular scale:
+Combined with Ignis' fluid properties:
 
 ```scss
+$mod-scale--phone:  1em 2em, 1.1;
+$mod-scale--tablet: 1em 2em, 1.2;
+
 h1 {
-   font-size: ig-harmony-modular-scale(3, 1em 2em, 1.1); // Will be: 1.128em
+    @include ig-fluid-harmony-modular-scale-im(font-size, 3, (
+       phone:  $mod-scale--phone,
+       tablet: $mod-scale--tablet
+    ));
 }
 h2 {
-   font-size: ig-harmony-modular-scale(2, 1em 2em, 1.1); // Will be: 1.1em
+    @include ig-fluid-harmony-modular-scale-im(font-size, 2, (
+       phone:  $mod-scale--phone,
+       tablet: $mod-scale--tablet
+    ));
 }
 h3 {
-   font-size: ig-harmony-modular-scale(1, 1em 2em, 1.1); // Will be: 1.026em
+    @include ig-fluid-harmony-modular-scale-im(font-size, 1, (
+       phone:  $mod-scale--phone,
+       tablet: $mod-scale--tablet
+    ));
 }
 ```
