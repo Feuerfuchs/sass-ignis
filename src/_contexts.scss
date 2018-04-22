@@ -53,7 +53,7 @@ $ig-context-stacks: ();
 /// 
 /// Clear a context stack.
 ///
-/// @param {string} $stack-id - ID of context stack to use
+/// @param {string} $stack-id - ID of context stack
 ///
 @mixin ig-context-stack-clear($stack-id) {
     $noop: ig-context-stack-clear($stack-id);
@@ -62,7 +62,7 @@ $ig-context-stacks: ();
 /// 
 /// Clear a context stack.
 ///
-/// @param {string} $stack-id - ID of context stack to use
+/// @param {string} $stack-id - ID of context stack
 ///
 @function ig-context-stack-clear($stack-id) {
     @if not map-has-key($ig-context-stacks, $stack-id) {
@@ -76,18 +76,18 @@ $ig-context-stacks: ();
 }
 
 /// 
-/// Clear a context stack.
+/// Delete a context stack.
 ///
-/// @param {string} $stack-id - ID of context stack to use
+/// @param {string} $stack-id - ID of context stack
 ///
 @mixin ig-context-stack-delete($stack-id) {
     $noop: ig-context-stack-delete($stack-id);
 }
 
 /// 
-/// Clear a context stack.
+/// Delete a context stack.
 ///
-/// @param {string} $stack-id - ID of context stack to use
+/// @param {string} $stack-id - ID of context stack
 ///
 @function ig-context-stack-delete($stack-id) {
     @if not map-has-key($ig-context-stacks, $stack-id) {
