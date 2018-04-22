@@ -214,5 +214,26 @@
         );
 
         @include assert-equal($gradient9, $expected9, 'Linear gradient with 1 / 3 positioned color stops, 2 easing transitions');
+
+        // ---------------------------------------------------------------------------
+
+        $gradient10: ig-easing-gradient(
+            linear,
+            to right,
+            #000,
+            cubic-bezier 0.47 0 0.745 0.715,
+            transparent
+        );
+
+        $expected10: linear-gradient(
+            to right,
+            #000 0,
+            mix(transparent, #000, ig-cubic-bezier(0.47, 0, 0.745, 0.715, 0.25) * 100%) 25%,
+            mix(transparent, #000, ig-cubic-bezier(0.47, 0, 0.745, 0.715, 0.5)  * 100%) 50%,
+            mix(transparent, #000, ig-cubic-bezier(0.47, 0, 0.745, 0.715, 0.75) * 100%) 75%,
+            mix(transparent, #000, ig-cubic-bezier(0.47, 0, 0.745, 0.715, 1)    * 100%) 100%
+        );
+
+        @include assert-equal($gradient10, $expected10, 'Simple linear gradient with custom easing');
     }
 }

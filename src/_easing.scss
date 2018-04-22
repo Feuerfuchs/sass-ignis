@@ -8,120 +8,292 @@
 /// @access public
 ////
 
-/// 
-/// Identity function for linear easing.
 ///
-/// @param {number} $t - Current time between 0 and 1 inclusive
+/// A cubic bezier function identical to the CSS cubic-bezier function.
 ///
-/// @return {number} $t
+/// @param {number} $x1 - X of first point
+/// @param {number} $y1 - Y of first point
+/// @param {number} $x2 - X of second point
+/// @param {number} $y2 - Y of second point
+/// @param {number} $t - "Time" between 0 and 1 inclusive
 ///
-@function ig-ease-linear($t) {
-    @return $t;
+/// @return {number}
+///
+@function ig-cubic-bezier($x1, $y1, $x2, $y2, $t) {
+    @return nth(ig-bezier((0 0, $x1 $y1, $x2 $y2, 1 1), $t), 2);
 }
 
 /// 
-/// A normalized quadratic easing function (in direction).
+/// Sinusoidal easing function (in direction).
 ///
 /// @param {number} $t - Current time between 0 and 1 inclusive
 ///
-/// @return {number} Distorted time between 0 and 1 inclusive
+/// @return {number}
 ///
-@function ig-ease-in-quad($t) {
-    @return $t * $t;
+@function ig-ease($t) {
+    @return  ig-cubic-bezier(0.25, 0.1, 0.25, 1, $t);
 }
 
 /// 
-/// A normalized quadratic easing function (out direction).
+/// Sinusoidal easing function (in direction).
 ///
 /// @param {number} $t - Current time between 0 and 1 inclusive
 ///
-/// @return {number} Distorted time between 0 and 1 inclusive
+/// @return {number}
 ///
-@function ig-ease-out-quad($t) {
-    @return 1 - ig-ease-in-quad(1 - $t);
+@function ig-ease-in($t) {
+    @return  ig-cubic-bezier(0.42, 0, 1, 1, $t);
 }
 
 /// 
-/// A normalized quadratic easing function (in-out direction).
+/// Sinusoidal easing function (out direction).
 ///
 /// @param {number} $t - Current time between 0 and 1 inclusive
 ///
-/// @return {number} Distorted time between 0 and 1 inclusive
+/// @return {number}
 ///
-@function ig-ease-in-out-quad($t) {
-    @if $t < 0.5 {
-        @return ig-ease-in-quad($t * 2) / 2;
-    }
-
-    @return 1 - ig-ease-in-quad((1 - $t) * 2) / 2;
+@function ig-ease-out($t) {
+    @return  ig-cubic-bezier(0, 0, 0.58, 1, $t);
 }
 
 /// 
-/// A normalized cubic easing function (in direction).
+/// Sinusoidal easing function (in-out direction).
 ///
 /// @param {number} $t - Current time between 0 and 1 inclusive
 ///
-/// @return {number} Distorted time between 0 and 1 inclusive
+/// @return {number}
 ///
-@function ig-ease-in-cubic($t) {
-    @return $t * $t * $t;
+@function ig-ease-in-out($t) {
+    @return  ig-cubic-bezier(0.42, 0, 0.58, 1, $t);
 }
 
 /// 
-/// A normalized cubic easing function (out direction).
+/// Sinusoidal easing function (in direction).
 ///
 /// @param {number} $t - Current time between 0 and 1 inclusive
 ///
-/// @return {number} Distorted time between 0 and 1 inclusive
-///
-@function ig-ease-out-cubic($t) {
-    @return 1 - ig-ease-in-cubic(1 - $t);
-}
-
-/// 
-/// A normalized cubic easing function (in-out direction).
-///
-/// @param {number} $t - Current time between 0 and 1 inclusive
-///
-/// @return {number} Distorted time between 0 and 1 inclusive
-///
-@function ig-ease-in-out-cubic($t) {
-    @if $t < 0.5 {
-        @return ig-ease-in-cubic($t * 2) / 2;
-    }
-
-    @return 1 - ig-ease-in-cubic((1 - $t) * 2) / 2;
-}
-
-/// 
-/// A normalized sinusoidal easing function (in direction).
-///
-/// @param {number} $t - Current time between 0 and 1 inclusive
-///
-/// @return {number} Distorted time between 0 and 1 inclusive
+/// @return {number}
 ///
 @function ig-ease-in-sine($t) {
-    @return 1 - ig-math-cos($t * (ig-math-pi() / 2));
+    @return  ig-cubic-bezier(0.47, 0, 0.745, 0.715, $t);
 }
 
 /// 
-/// A normalized sinusoidal easing function (out direction).
+/// Sinusoidal easing function (out direction).
 ///
 /// @param {number} $t - Current time between 0 and 1 inclusive
 ///
-/// @return {number} Distorted time between 0 and 1 inclusive
+/// @return {number}
 ///
 @function ig-ease-out-sine($t) {
-    @return ig-math-sin($t * (ig-math-pi() / 2));
+    @return  ig-cubic-bezier(0.39, 0.575, 0.565, 1, $t);
 }
 
 /// 
-/// A normalized sinusoidal easing function (in-out direction).
+/// Sinusoidal easing function (in-out direction).
 ///
 /// @param {number} $t - Current time between 0 and 1 inclusive
 ///
-/// @return {number} Distorted time between 0 and 1 inclusive
+/// @return {number}
 ///
 @function ig-ease-in-out-sine($t) {
-    @return 0.5 * (1 - ig-math-cos(ig-math-pi() * $t));
+    @return  ig-cubic-bezier(0.445, 0.05, 0.55, 0.95, $t);
+}
+
+/// 
+/// Quadratic easing function (in direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-in-quad($t) {
+    @return  ig-cubic-bezier(0.55, 0.085, 0.68, 0.53, $t);
+}
+
+/// 
+/// Quadratic easing function (out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-out-quad($t) {
+    @return  ig-cubic-bezier(0.25, 0.46, 0.45, 0.94, $t);
+}
+
+/// 
+/// Quadratic easing function (in-out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-in-out-quad($t) {
+    @return  ig-cubic-bezier(0.455, 0.03, 0.515, 0.955, $t);
+}
+
+/// 
+/// Cubic easing function (in direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-in-cubic($t) {
+    @return  ig-cubic-bezier(0.55, 0.055, 0.675, 0.19, $t);
+}
+
+/// 
+/// Cubic easing function (out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-out-cubic($t) {
+    @return  ig-cubic-bezier(0.215, 0.61, 0.355, 1, $t);
+}
+
+/// 
+/// Cubic easing function (in-out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-in-out-cubic($t) {
+    @return  ig-cubic-bezier(0.645, 0.045, 0.355, 1, $t);
+}
+
+/// 
+/// Quart easing function (in direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-in-quart($t) {
+    @return  ig-cubic-bezier(0.895, 0.03, 0.685, 0.22, $t);
+}
+
+/// 
+/// Quart easing function (out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-out-quart($t) {
+    @return  ig-cubic-bezier(0.165, 0.84, 0.44, 1, $t);
+}
+
+/// 
+/// Quart easing function (in-out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-in-out-quart($t) {
+    @return  ig-cubic-bezier(0.77, 0, 0.175, 1, $t);
+}
+
+/// 
+/// Quint easing function (in direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-in-quint($t) {
+    @return  ig-cubic-bezier(0.755, 0.05, 0.855, 0.06, $t);
+}
+
+/// 
+/// Quint easing function (out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-out-quint($t) {
+    @return  ig-cubic-bezier(0.23, 1, 0.32, 1, $t);
+}
+
+/// 
+/// Quint easing function (in-out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-in-out-quint($t) {
+    @return  ig-cubic-bezier(0.86, 0, 0.07, 1, $t);
+}
+
+/// 
+/// Exponential easing function (in direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-in-expo($t) {
+    @return  ig-cubic-bezier(0.95, 0.05, 0.795, 0.035, $t);
+}
+
+/// 
+/// Exponential easing function (out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-out-expo($t) {
+    @return  ig-cubic-bezier(0.19, 1, 0.22, 1, $t);
+}
+
+/// 
+/// Exponential easing function (in-out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-in-out-expo($t) {
+    @return  ig-cubic-bezier(1, 0, 0, 1, $t);
+}
+
+/// 
+/// Circular easing function (in direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-in-circ($t) {
+    @return  ig-cubic-bezier(0.6, 0.04, 0.98, 0.335, $t);
+}
+
+/// 
+/// Circular easing function (out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-out-circ($t) {
+    @return  ig-cubic-bezier(0.075, 0.82, 0.165, 1, $t);
+}
+
+/// 
+/// Circular easing function (in-out direction).
+///
+/// @param {number} $t - Current time between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-ease-in-out-circ($t) {
+    @return  ig-cubic-bezier(0.785, 0.135, 0.15, 0.86, $t);
 }

@@ -6,13 +6,6 @@
 /// @access public
 ////
 
-///
-/// Number of iterations used to approximate sine and cosine functions.
-///
-/// @type string
-///
-$ig-math-taylor-iters: 20 !default;
-
 /// 
 /// Perform exponentiation. Only integer exponents are supported.
 ///
@@ -43,118 +36,6 @@ $ig-math-taylor-iters: 20 !default;
     @return $value;
 }
 
-/// 
-/// Calculates the factorial of a given number.
-///
-/// @param {number} $number
-///
-/// @return {number}
-///
-/// @example scss
-///   $result: ig-math-fact(4); // The value of $result is 1 * 2 * 3 * 4 = 24
-///
-@function ig-math-fact($number) {
-    $value: 1;
-
-    @if $number > 0 {
-        @for $i from 1 through $number {
-            $value: $value * $i;
-        }
-    }
-
-    @return $value;
-}
-
-///
-/// Return the mathematical constant π (pi).
-///
-@function ig-math-pi() {
-    @return 3.14159265359;
-}
-
-///
-/// Convert an angle from degrees to radians.
-///
-/// @param {number} $angle
-///
-/// @return {number}
-///
-/// @example scss
-///   $result: ig-math-rad(45deg); // The value of $result is π/4 = 0.785398163...
-///
-@function ig-math-rad($angle) {
-    $unit:  unit($angle);
-    $angle: ig-strip-unit($angle);
-
-    @if $unit == deg {
-        $angle: $angle / 180 * ig-math-pi();
-    }
-
-    @return $angle;
-}
-
-///
-/// Get the sine value for a specific angle.
-///
-/// The sine function is approximated using a Taylor series with $ig-math-taylor-iters iterations:
-///   sum{n from 0 to $ig-math-taylor-iters}[(-1)^n * (θ^(2n+1) / (2n+1)!)] | θ = input angle
-///
-/// @param {number} $angle - Angle in degrees or radians
-///
-/// @return {number}
-///
-/// @example scss
-///   $result: ig-math-sin(90deg); // The value of $result is 1
-///
-@function ig-math-sin($angle) {
-    $sin:   0;
-    $angle: ig-math-rad($angle);
-
-    @for $i from 0 through $ig-math-taylor-iters {
-        $sin: $sin + ig-math-pow(-1, $i) * ig-math-pow($angle, (2 * $i + 1)) / ig-math-fact(2 * $i + 1);
-    }
-
-    @return $sin;
-}
-
-///
-/// Get the cosine value for a specific angle.
-///
-/// The cosine function is approximated using a Taylor series with $ig-math-taylor-iters iterations:
-///   sum{n from 0 to $ig-math-taylor-iters}[(-1)^n * (θ^(2n) / (2n)!)] | θ = input angle
-///
-/// @param {number} $angle - Angle in degrees or radians
-///
-/// @return {number}
-///
-/// @example scss
-///   $result: ig-math-cos(180deg); // The value of $result is -1
-///
-@function ig-math-cos($angle) {
-    $cos:   0;
-    $angle: ig-math-rad($angle);
-
-    @for $i from 0 through $ig-math-taylor-iters {
-        $cos: $cos + ig-math-pow(-1, $i) * ig-math-pow($angle, 2 * $i) / ig-math-fact(2 * $i);
-    }
-
-    @return $cos;
-}
-
-///
-/// Get the tangents value for a specific angle.
-///
-/// @param {number} $angle - Angle in degrees or radians
-///
-/// @return {number}
-///
-/// @example scss
-///   $result: ig-math-tan(45deg); // The value of $result is π/4 = 0.785398163...
-///
-@function ig-math-tan($angle) {
-    @return ig-math-sin($angle) / ig-math-cos($angle);
-}
-
 ///
 /// Clamp a number between a minimum and maximum value.
 ///
@@ -178,4 +59,53 @@ $ig-math-taylor-iters: 20 !default;
         @return $max;
     }
     @return $value;
+}
+
+///
+/// Linear interpolation from value $a to value $b.
+///
+/// @param {number} $a - First value
+/// @param {number} $b - Second value
+/// @param {number} $t - "Time" between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-lerp($a, $b, $t) {
+    @return $a + ($b - $a) * $t;
+}
+
+///
+/// Linear interpolation from point $a to point $b.
+///
+/// @param {list}   $a - First point
+/// @param {list}   $b - Second point
+/// @param {number} $t - "Time" between 0 and 1 inclusive
+///
+/// @return {list}
+///
+@function ig-lerp-2d($a, $b, $t) {
+    @return ig-lerp(nth($a, 1), nth($b, 1), $t), ig-lerp(nth($a, 2), nth($b, 2), $t);
+}
+
+///
+/// A generic bezier function accepting an arbitrary number of points.
+///
+/// @param {list}   $a - First point
+/// @param {list}   $b - Second point
+/// @param {number} $t - "Time" between 0 and 1 inclusive
+///
+/// @return {number}
+///
+@function ig-bezier($points, $t) {
+    @while length($points) > 1 {
+        $new-points: ();
+
+        @for $i from 1 to length($points) {
+            $new-points: append($new-points, ig-lerp-2d(nth($points, $i), nth($points, $i + 1), $t));
+        }
+
+        $points: $new-points;
+    }
+
+    @return nth($points, 1);
 }

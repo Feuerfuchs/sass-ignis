@@ -139,8 +139,8 @@ $ig-easing-gradient-precision: 10 !default;
     @for $i from 1 through length($stops) {
         $stop: nth($stops, $i);
 
-        @if ((type-of($stop) == list) and ($i != 1)) or ($i == length($stops)) {
-            @if (type-of($stop) != list) and ($i == length($stops)) {
+        @if ((type-of($stop) == list) and (type-of(nth($stop, 1)) == color) and ($i != 1)) or ($i == length($stops)) {
+            @if (type-of($stop) == color) and ($i == length($stops)) {
                 $stop:  $stop 100%;
                 $stops: set-nth($stops, $i, $stop);
             }
@@ -169,7 +169,7 @@ $ig-easing-gradient-precision: 10 !default;
                 $prev-stop: nth($stops, $j - 1);
                 $next-stop: nth($stops, $j);
 
-                @if type-of($next-stop) == string {
+                @if not ig-easing-gradient-is-color-stop($next-stop) {
                     $j: $j + 1;
 
                     $easing:    $next-stop;
@@ -178,15 +178,24 @@ $ig-easing-gradient-precision: 10 !default;
 
                 @if $easing != null {
                     $easing-func: null;
-                    @if function-exists($easing) {
-                        $easing-func: get-function($easing);
-                    } @else {
+                    $easing-args: ();
+
+                    @if type-of($easing) == list {
+                        $easing-args: ig-list-slice($easing, 2);
+                        $easing:      nth($easing, 1);
+                    }
+
+                    @if $easing == 'cubic-bezier' {
+                        $easing-func: get-function('ig-cubic-bezier');
+                    } @else if function-exists('ig-ease-' + $easing) {
                         $easing-func: get-function('ig-ease-' + $easing);
+                    } @else {
+                        $easing-func: get-function($easing);
                     }
 
                     $generated-stops: join(
                         $generated-stops,
-                        ig-easing-gradient-ease-stops($prev-stop, $next-stop, $easing-func),
+                        ig-easing-gradient-ease-stops($prev-stop, $next-stop, $easing-func, $easing-args),
                         comma
                     );
                 } @else {
@@ -197,7 +206,7 @@ $ig-easing-gradient-precision: 10 !default;
             }
 
             $last-positioned-stop: $i;
-        } @else if (type-of($stop) != list) and ($i == 1) {
+        } @else if (type-of($stop) == color) and ($i == 1) {
             $stop:  $stop 0;
             $stops: set-nth($stops, $i, $stop);
         }
@@ -239,7 +248,7 @@ $ig-easing-gradient-precision: 10 !default;
 ///
 /// @access private
 ///
-@function ig-easing-gradient-ease-stops($prev-stop, $next-stop, $easing-func) {
+@function ig-easing-gradient-ease-stops($prev-stop, $next-stop, $easing-func, $easing-args: ()) {
     $prev-stop-color: nth($prev-stop, 1);
     $prev-stop-pos:   nth($prev-stop, 2);
     $next-stop-color: nth($next-stop, 1);
@@ -247,7 +256,7 @@ $ig-easing-gradient-precision: 10 !default;
 
     $stops: ();
 
-    @if ((type-of($prev-stop-pos) == number) and (type-of($next-stop-pos) == number) and (unit($prev-stop-pos) == unit($next-stop-pos))) or ($prev-stop-pos == 0) {
+    @if ((type-of($prev-stop-pos) == number) and (type-of($next-stop-pos) == number) and (unit($prev-stop-pos) == unit($next-stop-pos))) or ($prev-stop-pos == 0) or ($next-stop-pos == 0) {
         $distance: $next-stop-pos - $prev-stop-pos;
 
         @for $i from 1 through $ig-easing-gradient-precision {
@@ -258,17 +267,19 @@ $ig-easing-gradient-precision: 10 !default;
             @if $perc == 1 {
                 $color: $next-stop-color;
             } @else {
-                $color: mix($next-stop-color, $prev-stop-color, call($easing-func, $perc) * 100%);
+                $color: mix($next-stop-color, $prev-stop-color, call($easing-func, append($easing-args, $perc)...) * 100%);
             }
 
             $stops: append($stops, $color + ' ' + $pos, comma);
         }
     } @else {
         @if type-of($prev-stop-pos) == string {
+            // assuming calc()
             $prev-stop-pos: str-slice($prev-stop-pos, 6, str-length($prev-stop-pos) - 1);
         }
 
         @if type-of($next-stop-pos) == string {
+            // assuming calc()
             $next-stop-pos: str-slice($next-stop-pos, 6, str-length($next-stop-pos) - 1);
         }
 
@@ -281,7 +292,7 @@ $ig-easing-gradient-precision: 10 !default;
                 $color: $next-stop-color;
                 $pos:   calc(#{$next-stop-pos});
             } @else {
-                $color: mix($next-stop-color, $prev-stop-color, call($easing-func, $perc) * 100%);
+                $color: mix($next-stop-color, $prev-stop-color, call($easing-func, append($easing-args, $perc)...) * 100%);
                 $pos:   calc(#{$prev-stop-pos} + (#{$next-stop-pos} - #{$prev-stop-pos}) * #{$perc});
             }
 
@@ -303,7 +314,8 @@ $ig-easing-gradient-precision: 10 !default;
 
     $stops-num: 0;
     @for $i from 1 through length($stops) {
-        @if type-of(nth($stops, $i)) != string {
+        $stop: nth($stops, $i);
+        @if ig-easing-gradient-is-color-stop($stop) {
             $stops-num: $stops-num + 1;
         }
     }
@@ -311,12 +323,12 @@ $ig-easing-gradient-precision: 10 !default;
     $i: 1;
     $cur-stop-num: 1;
 
-    @if ((type-of($prev-stop-pos) == number) and (type-of($next-stop-pos) == number) and (unit($prev-stop-pos) == unit($next-stop-pos))) or ($prev-stop-pos == 0) {
+    @if ((type-of($prev-stop-pos) == number) and (type-of($next-stop-pos) == number) and (unit($prev-stop-pos) == unit($next-stop-pos))) or ($prev-stop-pos == 0) or ($next-stop-pos == 0) {
         $distance: $next-stop-pos - $prev-stop-pos;
 
         @for $i from 1 through length($stops) {
             $stop: nth($stops, $i);
-            @if type-of($stop) != string {
+            @if ig-easing-gradient-is-color-stop($stop) {
                 $pos:   $prev-stop-pos + $distance / ($stops-num + 1) * $cur-stop-num;
                 $stops: set-nth($stops, $i, $stop $pos);
 
@@ -325,16 +337,18 @@ $ig-easing-gradient-precision: 10 !default;
         }
     } @else {
         @if type-of($prev-stop-pos) == string {
+            // assuming calc()
             $prev-stop-pos: str-slice($prev-stop-pos, 6, str-length($prev-stop-pos) - 1);
         }
 
         @if type-of($next-stop-pos) == string {
+            // assuming calc()
             $next-stop-pos: str-slice($next-stop-pos, 6, str-length($next-stop-pos) - 1);
         }
 
         @for $i from 1 through length($stops) {
             $stop: nth($stops, $i);
-            @if type-of($stop) != string {
+            @if ig-easing-gradient-is-color-stop($stop) {
                 $perc:  $cur-stop-num / ($stops-num + 1);
                 $pos:   calc(#{$prev-stop-pos} + (#{$next-stop-pos} - #{$prev-stop-pos}) * #{$perc});
                 $stops: set-nth($stops, $i, $stop $pos);
@@ -345,4 +359,8 @@ $ig-easing-gradient-precision: 10 !default;
     }
 
     @return $stops;
+}
+
+@function ig-easing-gradient-is-color-stop($input) {
+    @return (type-of($input) == color) or ((type-of($input) == list) and (type-of(nth($input, 1)) == color));
 }
