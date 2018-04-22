@@ -70,7 +70,7 @@
 ///
 /// @return {number}
 ///
-@function ig-lerp($a, $b, $t) {
+@function ig-math-lerp($a, $b, $t) {
     @return $a + ($b - $a) * $t;
 }
 
@@ -83,8 +83,8 @@
 ///
 /// @return {list}
 ///
-@function ig-lerp-2d($a, $b, $t) {
-    @return ig-lerp(nth($a, 1), nth($b, 1), $t), ig-lerp(nth($a, 2), nth($b, 2), $t);
+@function ig-math-lerp-2d($a, $b, $t) {
+    @return ig-math-lerp(nth($a, 1), nth($b, 1), $t), ig-math-lerp(nth($a, 2), nth($b, 2), $t);
 }
 
 ///
@@ -96,12 +96,12 @@
 ///
 /// @return {number}
 ///
-@function ig-bezier($points, $t) {
+@function ig-math-bezier($points, $t) {
     @while length($points) > 1 {
         $new-points: ();
 
         @for $i from 1 to length($points) {
-            $new-points: append($new-points, ig-lerp-2d(nth($points, $i), nth($points, $i + 1), $t));
+            $new-points: append($new-points, ig-math-lerp-2d(nth($points, $i), nth($points, $i + 1), $t));
         }
 
         $points: $new-points;

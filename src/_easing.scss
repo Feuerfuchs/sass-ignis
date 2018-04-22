@@ -48,7 +48,7 @@
 /// @return {number}
 ///
 @function ig-cubic-bezier($x1, $y1, $x2, $y2, $t) {
-    @return nth(ig-bezier((0 0, $x1 $y1, $x2 $y2, 1 1), $t), 2);
+    @return nth(ig-math-bezier((0 0, $x1 $y1, $x2 $y2, 1 1), $t), 2);
 }
 
 /// 
