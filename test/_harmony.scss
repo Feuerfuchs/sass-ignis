@@ -16,4 +16,146 @@
         @include assert-equal(_limit-decimals(ig-harmony-modular-scale(-1, 1em 1.5em, 1.2)), 0.868em, '-1 iteration, 1em 2em base, 1.1 scale');
         @include assert-equal(_limit-decimals(ig-harmony-modular-scale(-2, 1em 1.5em, 1.2)), 0.833em, '-2 iterations, 1em 2em base, 1.1 scale');
     }
+
+    @include it('ig-fluid-modular-scale') {
+        @include assert('Single-stranded') {
+            $ms: (
+                320px: (1rem, 1.1),
+                640px: (1rem, 1.2)
+            );
+
+            $rem320px:  ig-px-to-rem(320px);
+            $rem640px:  ig-px-to-rem(640px);
+            $diff320px: ig-strip-unit($rem640px - $rem320px);
+
+            @include output {
+                h3 {
+                    @include ig-fluid-modular-scale(font-size, 0, $ms);
+                }
+
+                h2 {
+                    @include ig-fluid-modular-scale(font-size, 1, $ms);
+                }
+
+                h1 {
+                    @include ig-fluid-modular-scale(font-size, 2, $ms);
+                }
+            }
+
+            @include expect {
+                h3 {
+                    @media (min-width: 320px) and (max-width: 640px) {
+                        font-size: calc(1rem + 0 * ((100vw - #{$rem320px}) / #{$diff320px}));
+                    }
+
+                    @media (max-width: 320px) {
+                        font-size: 1rem;
+                    }
+
+                    @media (min-width: 640px) {
+                        font-size: 1rem;
+                    }
+                }
+
+                h2 {
+                    @media (min-width: 320px) and (max-width: 640px) {
+                        font-size: calc(1.1rem + 0.1 * ((100vw - #{$rem320px}) / #{$diff320px}));
+                    }
+
+                    @media (max-width: 320px) {
+                        font-size: 1.1rem;
+                    }
+
+                    @media (min-width: 640px) {
+                        font-size: 1.2rem;
+                    }
+                }
+
+                h1 {
+                    @media (min-width: 320px) and (max-width: 640px) {
+                        font-size: calc(1.21rem + 0.23 * ((100vw - #{$rem320px}) / #{$diff320px}));
+                    }
+
+                    @media (max-width: 320px) {
+                        font-size: 1.21rem;
+                    }
+
+                    @media (min-width: 640px) {
+                        font-size: 1.44rem;
+                    }
+                }
+            }
+        }
+    }
+
+    @include it('ig-fluid-modular-scale') {
+        @include assert('Double-stranded') {
+            $ms: (
+                320px: (1rem 2rem, 1.1),
+                640px: (1rem 2rem, 1.2)
+            );
+
+            $rem320px:  ig-px-to-rem(320px);
+            $rem640px:  ig-px-to-rem(640px);
+            $diff320px: ig-strip-unit($rem640px - $rem320px);
+
+            @include output {
+                h3 {
+                    @include ig-fluid-modular-scale(font-size, 0, $ms);
+                }
+
+                h2 {
+                    @include ig-fluid-modular-scale(font-size, 1, $ms);
+                }
+
+                h1 {
+                    @include ig-fluid-modular-scale(font-size, 2, $ms);
+                }
+            }
+
+            @include expect {
+                h3 {
+                    @media (min-width: 320px) and (max-width: 640px) {
+                        font-size: calc(1rem + 0 * ((100vw - #{$rem320px}) / #{$diff320px}));
+                    }
+
+                    @media (max-width: 320px) {
+                        font-size: 1rem;
+                    }
+
+                    @media (min-width: 640px) {
+                        font-size: 1rem;
+                    }
+                }
+
+                h2 {
+                    @media (min-width: 320px) and (max-width: 640px) {
+                        font-size: calc(1.02632rem + 0.13109 * ((100vw - #{$rem320px}) / #{$diff320px}));
+                    }
+
+                    @media (max-width: 320px) {
+                        font-size: 1.02632rem;
+                    }
+
+                    @media (min-width: 640px) {
+                        font-size: 1.15741rem;
+                    }
+                }
+
+                h1 {
+                    @media (min-width: 320px) and (max-width: 640px) {
+                        font-size: calc(1.1rem + 0.1 * ((100vw - #{$rem320px}) / #{$diff320px}));
+                    }
+
+                    @media (max-width: 320px) {
+                        font-size: 1.1rem;
+                    }
+
+                    @media (min-width: 640px) {
+                        font-size: 1.2rem;
+                    }
+                }
+            }
+        }
+    }
 }

@@ -11,7 +11,7 @@
 /// 
 /// Adjust a value to a modular scale.
 ///
-/// For a more sophisticated solution, check out modularscale-sass: https://github.com/modularscale/modularscale-sass
+/// For a more sophisticated solution, check out [modularscale-sass](https://github.com/modularscale/modularscale-sass).
 ///
 /// @link http://alistapart.com/article/more-meaningful-typography An article about modular scales by Tim Brown
 ///
@@ -62,6 +62,24 @@
 ///
 /// @see {function} ig-harmony-modular-scale
 ///
+/// @example scss - Responsive font sizes between 2 viewports based on modular scales
+///   $ms: (
+///     320px: (1rem 2rem, 1.1),
+///     640px: (1rem 2rem, 1.2)
+///   );
+///
+///   h1 {
+///     @include ig-fluid-modular-scale(font-size, 3, $ms);
+///   }
+///
+///   h2 {
+///     @include ig-fluid-modular-scale(font-size, 2, $ms);
+///   }
+///
+///   h3 {
+///     @include ig-fluid-modular-scale(font-size, 1, $ms);
+///   }
+///
 @mixin ig-fluid-modular-scale($prop, $times, $fluid-map) {
     $new-map: ();
 
@@ -75,7 +93,7 @@
 }
 
 /// 
-/// Version of ig-fluid-modular-scale that supports include-media viewports in the $fluid-map.
+/// Version of ig-fluid-modular-scale that supports [include-media](https://include-media.com/) viewports in the $fluid-map.
 ///
 /// @see {mixin} ig-fluid-modular-scale
 /// 
