@@ -1686,6 +1686,7 @@ $ig-bem-context-id: 'bem' !default;
 
         @if $selector == null {
             $selector: join(selector-parse($sel), selector-parse('[class*=\' t-\'] ' + $sel), comma);
+            $selector: join($selector, selector-parse('[class^=\'t-\'] ' + $sel), comma);
         } @else {
             $selector: selector-nest($selector, $sel);
             $selector: ig-selector-nest-fix($selector);

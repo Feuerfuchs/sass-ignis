@@ -18,7 +18,8 @@
 
         @include expect(false) {
             .t-theme .something,
-            [class*=' t-'] .t-theme .something {
+            [class*=' t-'] .t-theme .something,
+            [class^='t-'] .t-theme .something {
                 font-size: 2em;
             }
         }
@@ -39,12 +40,14 @@
 
         @include expect(false) {
             .t-theme .something,
-            [class*=' t-'] .t-theme .something {
+            [class*=' t-'] .t-theme .something,
+            [class^='t-'] .t-theme .something {
                 font-size: 2em;
             }
 
             .t-theme .t-subtheme .something,
-            [class*=' t-'] .t-theme .t-subtheme .something {
+            [class*=' t-'] .t-theme .t-subtheme .something,
+            [class^='t-'] .t-theme .t-subtheme .something {
                 font-size: 3em;
             }
         }

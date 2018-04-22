@@ -196,7 +196,8 @@
 
         @include expect(false) {
             .t-dark .something__child,
-            [class*=' t-'] .t-dark .something__child {
+            [class*=' t-'] .t-dark .something__child,
+            [class^='t-'] .t-dark .something__child {
                 font-size: 2em;
             }
         }
@@ -408,8 +409,10 @@
         @include expect(false) {
             .t-dark .something__child1,
             [class*=' t-'] .t-dark .something__child1,
+            [class^='t-'] .t-dark .something__child1,
             .t-dark .something__child2,
-            [class*=' t-'] .t-dark .something__child2 {
+            [class*=' t-'] .t-dark .something__child2,
+            [class^='t-'] .t-dark .something__child2 {
                 font-size: 2em;
             }
         }

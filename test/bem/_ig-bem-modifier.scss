@@ -61,12 +61,14 @@
 
         @include expect(false) {
             .t-dark .something--mod,
-            [class*=' t-'] .t-dark .something--mod {
+            [class*=' t-'] .t-dark .something--mod,
+            [class^='t-'] .t-dark .something--mod {
                 font-size: 1.5em;
             }
 
             .t-dark .something--mod.something--submod,
-            [class*=' t-'] .t-dark .something--mod.something--submod {
+            [class*=' t-'] .t-dark .something--mod.something--submod,
+            [class^='t-'] .t-dark .something--mod.something--submod {
                 font-size: 1.75em;
             }
         }
@@ -372,12 +374,14 @@
 
         @include expect(false) {
             .t-dark .something__child--mod,
-            [class*=' t-'] .t-dark .something__child--mod {
+            [class*=' t-'] .t-dark .something__child--mod,
+            [class^='t-'] .t-dark .something__child--mod {
                 font-size: 2.5em;
             }
 
             .t-dark .something__child--mod.something__child--submod,
-            [class*=' t-'] .t-dark .something__child--mod.something__child--submod {
+            [class*=' t-'] .t-dark .something__child--mod.something__child--submod,
+            [class^='t-'] .t-dark .something__child--mod.something__child--submod {
                 font-size: 2.75em;
             }
         }
