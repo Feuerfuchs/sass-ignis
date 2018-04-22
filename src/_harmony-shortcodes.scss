@@ -1,0 +1,21 @@
+////
+/// Shorter version of the harmony-related functions. Useful to reduce clutter.
+///
+/// @group Harmony shortcodes
+///
+/// @access public
+////
+
+///
+/// @alias ig-harmony-modular-scale
+///
+@function modular-scale($times, $base, $ratio) {
+    @include ig-harmony-modular-scale($times, $base, $ratio);
+}
+
+///
+/// @alias modular-scale
+///
+@function ms($times, $base, $ratio) {
+    @include modular-scale($times, $base, $ratio);
+}
