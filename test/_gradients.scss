@@ -6,7 +6,7 @@
             linear,
             to right,
             #000,
-            in-quad,
+            ease-in-quad,
             transparent
         );
 
@@ -27,7 +27,7 @@
             radial,
             1em 2em at 50% 60%,
             #000,
-            out-cubic,
+            ease-out-cubic,
             transparent
         );
 
@@ -48,7 +48,7 @@
             linear,
             to right,
             #000        2em,
-            in-quad,
+            ease-in-quad,
             transparent 10em
         );
 
@@ -69,7 +69,7 @@
             linear,
             to right,
             #000 20%,
-            in-quad,
+            ease-in-quad,
             transparent calc(20% + 10em)
         );
 
@@ -91,7 +91,7 @@
             to right,
             #000        2em,
             #f00        7em,
-            in-quad,
+            ease-in-quad,
             transparent 10em
         );
 
@@ -113,9 +113,9 @@
             linear,
             to right,
             #000        2em,
-            in-quad,
+            ease-in-quad,
             #f00        7em,
-            in-quad,
+            ease-in-quad,
             transparent 10em
         );
 
@@ -140,9 +140,9 @@
             linear,
             to right,
             #000        2em,
-            in-quad,
+            ease-in-quad,
             #f00,
-            in-quad,
+            ease-in-quad,
             transparent 10em
         );
 
@@ -167,9 +167,9 @@
             linear,
             to right,
             #000,
-            in-quad,
+            ease-in-quad,
             #f00,
-            in-quad,
+            ease-in-quad,
             transparent
         );
 
@@ -194,9 +194,9 @@
             linear,
             to right,
             #000,
-            in-quad,
+            ease-in-quad,
             #f00,
-            in-quad,
+            ease-in-quad,
             transparent 20em
         );
 

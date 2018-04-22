@@ -185,9 +185,7 @@ $ig-easing-gradient-precision: 10 !default;
                         $easing:      nth($easing, 1);
                     }
 
-                    @if function-exists('ig-ease-' + $easing) {
-                        $easing-func: get-function('ig-ease-' + $easing);
-                    } @else if function-exists('ig-' + $easing) {
+                    @if function-exists('ig-' + $easing) {
                         $easing-func: get-function('ig-' + $easing);
                     } @else {
                         $easing-func: get-function($easing);
