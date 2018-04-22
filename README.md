@@ -12,7 +12,7 @@ Its main feature is a **BEM system**, though it also includes some other useful 
 All features are explained in detail in the Wiki.
 The rest of this document is a quick overview over what Ignis has to offer.
 
-Note that for all mixins and functions, their long form is shown since they are unlikely to clash with other SASS libraries.
+Note that for all mixins and functions, their long forms are shown since they are unlikely to clash with other SASS libraries.
 For less clutter, there are shorter versions available.
 
 ## BEM system
@@ -262,25 +262,18 @@ h3 {
 Combined with Ignis' fluid properties:
 
 ```scss
-$mod-scale--phone:  1em 2em, 1.1;
-$mod-scale--tablet: 1em 2em, 1.2;
+$fluid-mod-scale: (
+    320px: (1rem 2rem, 1.1),
+    640px: (1rem 2rem, 1.2)
+);
 
 h1 {
-    @include ig-fluid-modular-scale-im(font-size, 3, (
-       phone:  $mod-scale--phone,
-       tablet: $mod-scale--tablet
-    ));
+    @include ig-fluid-modular-scale(font-size, 3, $fluid-mod-scale);
 }
 h2 {
-    @include ig-fluid-modular-scale-im(font-size, 2, (
-       phone:  $mod-scale--phone,
-       tablet: $mod-scale--tablet
-    ));
+    @include ig-fluid-modular-scale(font-size, 2, $fluid-mod-scale);
 }
 h3 {
-    @include ig-fluid-modular-scale-im(font-size, 1, (
-       phone:  $mod-scale--phone,
-       tablet: $mod-scale--tablet
-    ));
+    @include ig-fluid-modular-scale(font-size, 1, $fluid-mod-scale);
 }
 ```
