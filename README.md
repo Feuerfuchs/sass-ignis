@@ -17,11 +17,14 @@ For less clutter, there are shorter versions available.
 
 ## BEM system
 
-Ignis provides a [BEM](https://en.bem.info/) system, i.e. a large variety of mixins you can use to create BEM-compliant stylesheets.
+Ignis' main feature is its BEM system. It was developed over the course of three years and was being actively used in real-world projects. Features include:
 
-These mixins basically have two functions:
-1. Check if they are used correctly. For example, if nested elements are disallowed, the element mixin will throw an error if you try to create a nested element.
-2. Generate an optimal selector.
+- Full BEM and BEMIT support, i.e. namespaced blocks, suffixes, states, and so on.
+- Safety: All mixins perform checks if they are used correctly.
+- Performance: All mixins generate optimal selectors with a minimal degree of specificity.
+- Flexibility: You are not at all limited to the provided BEM mixins.
+
+To expand on the last point: Sometimes it is necessary to write your own selectors in a BEM context. Simple cases are the ::before and ::after pseudo elements, but there are more situations where BEM mixins and manual selectors have to be mixed, especially when :hover and other states get involved. The BEM system keeps track of the selectors it generates and so it can adapt to such situations.
 
 Below is a basic example of the BEM system can be used:
 
