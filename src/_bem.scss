@@ -1582,16 +1582,16 @@ $ig-bem-context-id: 'bem' !default;
 ///
 /// NOTE: This mixin does not generate perfectly optimized selectors in order to keep track of contexts.
 ///
-/// @param {string | list} $first  - First selector. Either a string for a manual selector, or a list with the first items standing for a BEM selector function and other items being passed as argument to said function.
-/// @param {string | list} $others - Other selectors. Either a string for a manual selector, or a list with the first items standing for a BEM selector function and other items being passed as argument to said function.
+/// @param {string | list} $first  - First selector. Either a string for a manual selector, or a list with the first items standing for a BEM selector function (optionally suffixed by a colon) and other items being passed as arguments to said function.
+/// @param {string | list} $others - Other selectors. Either a string for a manual selector, or a list with the first items standing for a BEM selector function (optionally suffixed by a colon) and other items being passed as arguments to said function.
 ///
 /// @content
 ///
-/// @example scss - Creating multiple elements and a modifier
+/// @example scss - Creating multiple elements, a modifier and an anchor
 ///   @include ig-bem-object('buttonstrip') {
 ///     display: none;
 ///     
-///     @include ig-bem-multi('modifier' 'mod', 'element' 'button' 'separator') {
+///     @include ig-bem-multi('modifier' 'mod', 'element' 'button' 'separator', '> a') {
 ///       display: block;
 ///     }
 ///   }
@@ -1610,9 +1610,42 @@ $ig-bem-context-id: 'bem' !default;
 ///   .o-buttonstrip__separator {
 ///     display: block;
 ///   }
+///   
+///   .o-buttonstrip > a {
+///     display: block;
+///   }
+///
+/// @example scss - Creating multiple elements, a modifier and an anchor - optional colons included
+///   @include ig-bem-object('buttonstrip') {
+///     display: none;
+///     
+///     @include ig-bem-multi('modifier:' 'mod', 'element:' 'button' 'separator', '> a') {
+///       display: block;
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .o-buttonstrip {
+///     display: none;
+///   }
+///   
+///   .o-buttonstrip--mod {
+///     display: block;
+///   }
+///   
+///   .o-buttonstrip__button, {
+///   .o-buttonstrip__separator {
+///     display: block;
+///   }
+///   
+///   .o-buttonstrip > a {
+///     display: block;
+///   }
 ///
 @mixin ig-bem-multi($first, $others...) {
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
+    @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'multi');
 
     @each $entity in ig-list-prepend($others, $first) {
         $is-manual-selector: false;
@@ -1643,10 +1676,6 @@ $ig-bem-context-id: 'bem' !default;
                 $entity-func-id: str-slice($entity-func-id, 1, str-length($entity-func-id) - 1);
             }
 
-            @if $entity-func-id == 'multi' {
-                @error 'ig-bem-multi cannot call itself.';
-            }
-
             $sel-func: null;
 
             @if function-exists('ig-bem-' + $entity-func-id) {
@@ -1659,6 +1688,8 @@ $ig-bem-context-id: 'bem' !default;
                 @error 'Function "#{inspect($entity-func-id)}" was not found.';
             }
 
+            @include ig-context-push($ig-bem-context-id, 'multi', null);
+
             $entity-data: call($sel-func, $entity...);
 
             @at-root #{nth($entity-data, 1)} {
@@ -1668,6 +1699,8 @@ $ig-bem-context-id: 'bem' !default;
             @if nth($entity-data, 2) {
                 @include ig-context-pop($ig-bem-context-id);
             }
+
+            @include ig-context-pop($ig-bem-context-id);
         }
     }
 }
