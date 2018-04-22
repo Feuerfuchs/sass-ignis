@@ -9,7 +9,8 @@ Its main feature is a **BEM system**, though it also includes some other useful 
 - Fluid properties: A generalization of fluid typography
 - Modular scales
 
-All features are explained in detail in the Wiki.
+All features are explained in detail in the SassDoc documentation.
+For a quick reference, check the Wiki of this repository.
 The rest of this document is a quick overview over what Ignis has to offer.
 
 Note that for all mixins and functions, their long forms are shown since they are unlikely to clash with other SASS libraries.
