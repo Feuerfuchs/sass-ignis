@@ -126,7 +126,8 @@ From then on, this context is publicly accessible.
 In order to remove it, you pop the stack.
 
 This feature becomes extremely useful when paired with mixins and their `@content` directive.
-The BEM system, for example, uses a context stack as a call stack and thus can attach metadata to the generated selectors.
+The BEM system, for example, uses a context stack as a call stack.
+THis way, it can attach metadata to the selectors it generates and these information can be used to generate optimal selectors without too much parsing.
 
 Below is an example of how context stacks can be used:
 
