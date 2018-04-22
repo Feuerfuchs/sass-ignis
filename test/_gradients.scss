@@ -234,6 +234,27 @@
             mix(transparent, #000, ig-cubic-bezier(0.47, 0, 0.745, 0.715, 1)    * 100%) 100%
         );
 
-        @include assert-equal($gradient10, $expected10, 'Simple linear gradient with custom easing');
+        @include assert-equal($gradient10, $expected10, 'Simple linear gradient with custom cubic-bezier easing');
+
+        // ---------------------------------------------------------------------------
+
+        $gradient11: ig-easing-gradient(
+            linear,
+            to right,
+            #000,
+            steps 4 jump-start,
+            transparent
+        );
+
+        $expected11: linear-gradient(
+            to right,
+            #000 0,
+            mix(transparent, #000, 0.25 * 100%) 25%,
+            mix(transparent, #000, 0.5  * 100%) 50%,
+            mix(transparent, #000, 0.75 * 100%) 75%,
+            mix(transparent, #000, 1    * 100%) 100%
+        );
+
+        @include assert-equal($gradient11, $expected11, 'Simple linear gradient with custom steps easing');
     }
 }

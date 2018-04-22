@@ -185,10 +185,10 @@ $ig-easing-gradient-precision: 10 !default;
                         $easing:      nth($easing, 1);
                     }
 
-                    @if $easing == 'cubic-bezier' {
-                        $easing-func: get-function('ig-cubic-bezier');
-                    } @else if function-exists('ig-ease-' + $easing) {
+                    @if function-exists('ig-ease-' + $easing) {
                         $easing-func: get-function('ig-ease-' + $easing);
+                    } @else if function-exists('ig-' + $easing) {
+                        $easing-func: get-function('ig-' + $easing);
                     } @else {
                         $easing-func: get-function($easing);
                     }

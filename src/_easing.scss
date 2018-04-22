@@ -9,6 +9,34 @@
 ////
 
 ///
+/// A steps function identical to the CSS steps function.
+///
+/// @param {number} $n        - Number of steps
+/// @param {string} $behavior - One of these: jump-none, jump-both, jump-start, jump-end
+///
+/// @return {number}
+///
+@function ig-steps($n, $behavior, $t) {
+    @if $behavior == jump-start {
+        $s: 1 / $n;
+        @return if($t == 0, $s, ceil($t / $s) * $s);
+    } @else if $behavior == jump-end {
+        $s: 1 / $n;
+        @return if($t == 1, 1 - $s, floor($t / $s) * $s);
+    } @else if $behavior == jump-both {
+        $sx: 1 / $n;
+        $sy: 1 / ($n + 1);
+        @return if($t == 0, $sy, ceil($t / $sx) * $sy);
+    } @else if $behavior == jump-none {
+        $sx: 1 / $n;
+        $sy: 1 / ($n - 1);
+        @return if($t == 1, 1, floor($t / $sx) * $sy);
+    } @else {
+        @error 'Invalid $behavior: #{inspect($behavior)}';
+    }
+}
+
+///
 /// A cubic bezier function identical to the CSS cubic-bezier function.
 ///
 /// @param {number} $x1 - X of first point
