@@ -102,7 +102,9 @@ And second, I wanted to freely position the color stops and not be locked to 0% 
 
 The easing gradients provided by Ignis address the above problems.
 Moreover, they have one more major feature: You can use multiple color stops with varying easing functions.
-The syntax is similar to the [new CSS proposal](https://github.com/w3c/csswg-drafts/issues/1332).
+
+The syntax is kept as close to the [new CSSWG proposal](https://github.com/w3c/csswg-drafts/issues/1332) as possible to make the transition to the native easing gradients easier later on.  
+**However:** Note that mid-point shifts are not supported (yet) and the usage of `cubic-bezier()` and `steps()` is entirely different.
 
 Example usage:
 
@@ -112,7 +114,7 @@ Example usage:
         to right,
         #000 2em,
         #f00,
-        in-out-sine,
+        ease-in-out-sine,
         transparent 10em
     );
 }
