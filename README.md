@@ -17,7 +17,7 @@ For less clutter, there are shorter versions available.
 
 ## BEM system
 
-Ignis' main feature is its BEM system. It was developed over the course of three years and was being actively used in real-world projects. Features include:
+Ignis' main feature is its BEM system, which was developed over the course of three years. Features include:
 
 - Full BEM and BEMIT support, i.e. namespaced blocks, suffixes, states, and so on.
 - Safety: All mixins perform checks if they are used correctly.
