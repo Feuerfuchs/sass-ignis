@@ -266,19 +266,19 @@ $mod-scale--phone:  1em 2em, 1.1;
 $mod-scale--tablet: 1em 2em, 1.2;
 
 h1 {
-    @include ig-fluid-harmony-modular-scale-im(font-size, 3, (
+    @include ig-fluid-modular-scale-im(font-size, 3, (
        phone:  $mod-scale--phone,
        tablet: $mod-scale--tablet
     ));
 }
 h2 {
-    @include ig-fluid-harmony-modular-scale-im(font-size, 2, (
+    @include ig-fluid-modular-scale-im(font-size, 2, (
        phone:  $mod-scale--phone,
        tablet: $mod-scale--tablet
     ));
 }
 h3 {
-    @include ig-fluid-harmony-modular-scale-im(font-size, 1, (
+    @include ig-fluid-modular-scale-im(font-size, 1, (
        phone:  $mod-scale--phone,
        tablet: $mod-scale--tablet
     ));

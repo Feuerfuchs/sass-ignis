@@ -19,31 +19,3 @@
 @mixin fluid-im($prop, $fluid-map) {
     @include ig-fluid-property-im($prop, $fluid-map);
 }
-
-///
-/// @alias ig-fluid-harmony-modular-scale
-///
-@mixin fluid-modular-scale($prop, $times, $fluid-map) {
-    @include ig-fluid-harmony-modular-scale($prop, $times, $fluid-map);
-}
-
-///
-/// @alias fluid-modular-scale
-///
-@mixin fluid-ms($prop, $times, $fluid-map) {
-    @include fluid-modular-scale($prop, $times, $fluid-map);
-}
-
-///
-/// @alias ig-fluid-harmony-modular-scale-im
-///
-@mixin fluid-modular-scale-im($prop, $times, $fluid-map) {
-    @include ig-fluid-harmony-modular-scale-im($prop, $times, $fluid-map);
-}
-
-///
-/// @alias fluid-modular-scale-im
-///
-@mixin fluid-ms-im($prop, $times, $fluid-map) {
-    @include fluid-modular-scale-im($prop, $times, $fluid-map);
-}
