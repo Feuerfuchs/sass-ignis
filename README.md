@@ -121,13 +121,13 @@ After that, the gradient remains transparent.
 ## Context stacks
 
 Context stacks are a temporary data storage and, as the name suggests, are used like a conventional stack data structure.
-This means: Whenever you want to store a context -- which can be any kind of data, such as a map, a list, a string, etc... -- you push it to the stack.
+This means: Whenever you want to store a context -- which is an identifier and any kind of data, such as a map, a list, a string, etc... -- you push it to the stack.
 From then on, this context is publicly accessible.
 In order to remove it, you pop the stack.
 
-This feature becomes extremely useful when paired with mixins and their `@content` directive.
-The BEM system, for example, uses a context stack as a call stack.
-THis way, it can attach metadata to the selectors it generates and these information can be used to generate optimal selectors without too much parsing.
+This feature becomes extremely useful when paired with mixins and their `@content` directive: Pushing a context to the stack before `@content` and popping the stack afterwards gives it the role of a call stack.
+Thats how the BEM system, for example, attaches metadata to the selectors it generates.
+These information are used to generate optimal selectors without much parsing.
 
 Below is an example of how context stacks can be used:
 
