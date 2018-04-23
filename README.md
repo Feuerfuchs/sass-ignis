@@ -20,12 +20,13 @@ For less clutter, there are shorter versions available.
 
 Ignis' main feature is its BEM system which was developed over the course of three years. Features include:
 
-- Full BEM and BEMIT support, i.e. namespaced blocks, suffixes, states, and so on.
+- Full [BEM](https://en.bem.info/) and [BEMIT](https://csswizardry.com/2015/08/bemit-taking-the-bem-naming-convention-a-step-further/) support, i.e. namespaced blocks, suffixes, states, and so on.
 - Safety: All mixins perform checks if they are used correctly.
 - Performance: All mixins generate optimal selectors with a minimal degree of specificity.
 - Flexibility: You are not at all limited to the provided BEM mixins.
+- Robustness: Most selector-related operations are done using SASS' native selector functions.
 
-To expand on the last point: Sometimes it is necessary to write your own selectors in a BEM context. Simple cases are the ::before and ::after pseudo elements, but there are more situations where BEM mixins and manual selectors have to be mixed, especially when :hover and other states get involved. The BEM system keeps track of the selectors it generates and so it can adapt to such situations.
+To expand on the last point: Sometimes it is necessary to write your own selectors in a BEM context. Simple cases are the `::before` and `::after` pseudo elements, but there are more situations where BEM mixins and manual selectors have to be mixed, especially when `:hover` and other states are involved. The BEM system keeps track of the selectors it generates and so it can adapt to such situations.
 
 Below is a basic example showing how the BEM system can be used:
 
