@@ -1,4 +1,4 @@
-@include describe('Responsive') {
+@include describe('Fluid') {
     @include it('ig-fluid-property-calc') {
         $rem600px: ig-px-to-rem(600px);
         $rem800px: ig-px-to-rem(800px);

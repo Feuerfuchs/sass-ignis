@@ -16,6 +16,19 @@ The rest of this document is a quick overview over what Ignis has to offer.
 Note that for all mixins and functions, their long forms are shown since they are unlikely to clash with other SASS libraries.
 For less clutter, there are shorter versions available.
 
+## Getting started
+
+Ignis hasn't been published on a package manager like npm yet, so to get started you need to download this repository.
+
+Run `npm install` or `yarn` to install all development dependencies.
+
+The following npm scripts are available:
+
+- `lint`: Lint the source code with sass-lint.
+- `livelint`: Re-lint whenever the code changes. Useful in combination with the VSCode task `livelint`.
+- `doc`: Generate the SassDoc documentation.
+- `test`: Run unit tests.
+
 ## BEM system
 
 Ignis' main feature is its BEM system which was developed over the course of two years. Features include:
