@@ -140,12 +140,36 @@ $ig-easing-gradient-precision: 10 !default;
         $stop: nth($stops, $i);
 
         @if ((type-of($stop) == list) and (type-of(nth($stop, 1)) == color) and ($i != 1)) or ($i == length($stops)) {
+            @if not ig-easing-gradient-is-color-stop($stop) {
+                @error 'The last color stop argument must be a color stop.';
+            }
+
+            //
+            // Either the current stops list item is a positioned color stop, or the end of
+            // the stops list has been reached.
+            //
+
             @if (type-of($stop) == color) and ($i == length($stops)) {
+                //
+                // The current stop is an unpositioned color stop, which means this is the end
+                // of the stops list. The default position for the last color stop is 100%, which
+                // is explicitly added for easier calculations.
+                //
+
                 $stop:  $stop 100%;
                 $stops: set-nth($stops, $i, $stop);
             }
 
+            //
+            // Now the current color stop is guaranteed to be a positioned color stop.
+            //
+
             @if $i > $last-positioned-stop + 1 {
+                //
+                // There is at least one unpositioned color stop item between the last positioned
+                // color stop and the current current stops list item. Interpolate their positions.
+                //
+
                 $interpolated-stops: ig-easing-gradient-interpolate-stop-positions(
                     nth($stops, $last-positioned-stop),
                     ig-list-slice($stops, $last-positioned-stop + 1, $i - 1),
@@ -162,6 +186,14 @@ $ig-easing-gradient-precision: 10 !default;
                 );
                 $stops: $new-stops;
             }
+
+            //
+            // Now all color stops between this one and the last positioned one have
+            // interpolated positions.
+            // Next task is to perform an easing transition between all color stops that
+            // have an easing function specified. The rest can be left alone since the
+            // browser will automatically apply a linear transition between them.
+            //
 
             $j: $last-positioned-stop + 1;
             @while $j <= $i {
@@ -204,9 +236,20 @@ $ig-easing-gradient-precision: 10 !default;
             }
 
             $last-positioned-stop: $i;
-        } @else if (type-of($stop) == color) and ($i == 1) {
-            $stop:  $stop 0;
-            $stops: set-nth($stops, $i, $stop);
+        } @else if ($i == 1) {
+            @if not ig-easing-gradient-is-color-stop($stop) {
+                @error 'The first color stop argument must be a color stop.';
+            }
+
+            @if type-of($stop) == color {
+                //
+                // The first color stop is unpositioned. The default position for the first
+                // color stop is 0, which is explicitly added for easier calculations.
+                //
+
+                $stop:  $stop 0;
+                $stops: set-nth($stops, $i, $stop);
+            }
         }
 
         @if $i == 1 {
@@ -255,6 +298,10 @@ $ig-easing-gradient-precision: 10 !default;
     $stops: ();
 
     @if ((type-of($prev-stop-pos) == number) and (type-of($next-stop-pos) == number) and (unit($prev-stop-pos) == unit($next-stop-pos))) or ($prev-stop-pos == 0) or ($next-stop-pos == 0) {
+        //
+        // The transition color stop positions can be statically calculated.
+        //
+
         $distance: $next-stop-pos - $prev-stop-pos;
 
         @for $i from 1 through $ig-easing-gradient-precision {
@@ -271,6 +318,10 @@ $ig-easing-gradient-precision: 10 !default;
             $stops: append($stops, $color + ' ' + $pos, comma);
         }
     } @else {
+        //
+        // The transition color stop positions have to be dynamically calculated with the calc() function.
+        //
+
         @if type-of($prev-stop-pos) == string {
             // assuming calc()
             $prev-stop-pos: str-slice($prev-stop-pos, 6, str-length($prev-stop-pos) - 1);
@@ -322,6 +373,10 @@ $ig-easing-gradient-precision: 10 !default;
     $cur-stop-num: 1;
 
     @if ((type-of($prev-stop-pos) == number) and (type-of($next-stop-pos) == number) and (unit($prev-stop-pos) == unit($next-stop-pos))) or ($prev-stop-pos == 0) or ($next-stop-pos == 0) {
+        //
+        // The color stop positions can be statically calculated.
+        //
+
         $distance: $next-stop-pos - $prev-stop-pos;
 
         @for $i from 1 through length($stops) {
@@ -334,6 +389,10 @@ $ig-easing-gradient-precision: 10 !default;
             }
         }
     } @else {
+        //
+        // The color stop positions have to be dynamically calculated with the calc() function.
+        //
+
         @if type-of($prev-stop-pos) == string {
             // assuming calc()
             $prev-stop-pos: str-slice($prev-stop-pos, 6, str-length($prev-stop-pos) - 1);
@@ -359,6 +418,11 @@ $ig-easing-gradient-precision: 10 !default;
     @return $stops;
 }
 
+///
+/// Check if the input is a valid color stop.
+///
+/// @access private
+///
 @function ig-easing-gradient-is-color-stop($input) {
     @return (type-of($input) == color) or ((type-of($input) == list) and (type-of(nth($input, 1)) == color));
 }
