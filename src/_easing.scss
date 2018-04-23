@@ -2,11 +2,42 @@
 /// Easing.
 ///
 /// A collection of easing functions which are commonly used for animations.
+/// The code is based on https://github.com/gre/bezier-easing.
 ///
 /// @group Easing
 ///
 /// @access public
 ////
+
+///
+/// @access private
+///
+$ig-cubic-bezier-sample-pool: ();
+
+///
+/// Sample pool size for cubic bezier calculations.
+///
+$ig-cubic-bezier-sample-pool-size: 10 !default;
+
+///
+/// Minimum slope required to use the Newton-Raphson method for cubic bezier calculations.
+///
+$ig-cubic-bezier-newton-min-slope: 0.001 !default;
+
+///
+/// Number of iterations of the Newton-Raphson method.
+///
+$ig-cubic-bezier-newton-iters: 4 !default;
+
+///
+/// Precision of the subdivision method for cubic bezier calculations.
+///
+$ig-cubic-bezier-subdiv-precision: 0.0000001 !default;
+
+///
+/// Maximum iterations of the subdivision method for cubic bezier calculations.
+///
+$ig-cubic-bezier-subdiv-max-iters: 10 !default;
 
 ///
 /// A steps function identical to the CSS steps function.
@@ -43,12 +74,165 @@
 /// @param {number} $y1 - Y of first point
 /// @param {number} $x2 - X of second point
 /// @param {number} $y2 - Y of second point
-/// @param {number} $t - "Time" between 0 and 1 inclusive
+/// @param {number} $x  - Progress between 0 and 1 inclusive
 ///
 /// @return {number}
 ///
-@function ig-cubic-bezier($x1, $y1, $x2, $y2, $t) {
-    @return nth(ig-math-bezier((0 0, $x1 $y1, $x2 $y2, 1 1), $t), 2);
+@function ig-cubic-bezier($x1, $y1, $x2, $y2, $x) {
+    //
+    // Cover simple cases
+    //
+
+    @if ($x1 == $y1) and ($x2 == $y2) {
+        @return $x;
+    }
+    @if $x == 0 {
+        @return 0;
+    }
+    @if $x == 1 {
+        @return 1;
+    }
+
+    //
+    // Generate samples
+    //
+
+    $sample-pool-key: $x1 + '_' + $x2;
+
+    @if not map-has-key($ig-cubic-bezier-sample-pool, $sample-pool-key) {
+        $samples: ();
+
+        @for $i from 0 through $ig-cubic-bezier-sample-pool-size {
+            $samples: append($samples, ig-cubic-bezier-func($x1, $x2, $i / $ig-cubic-bezier-sample-pool-size));
+        }
+
+        $ig-cubic-bezier-sample-pool: map-merge($ig-cubic-bezier-sample-pool, ($sample-pool-key: $samples)) !global;
+    }
+
+    //
+    // Calculate cubic bezier
+    //
+
+    @return ig-cubic-bezier-func($y1, $y2, ig-cubic-bezier-t-for-x($x1, $x2, $x));
+}
+
+///
+/// @access private
+///
+@function ig-cubic-bezier-func-a($p1, $p2) {
+    @return 1 - 3 * $p2 +  3 * $p1;
+}
+
+///
+/// @access private
+///
+@function ig-cubic-bezier-func-b($p1, $p2) {
+    @return 3 * $p2 - 6 * $p1;
+}
+
+///
+/// @access private
+///
+@function ig-cubic-bezier-func-c($p1) {
+    @return 3 * $p1;
+}
+
+///
+/// One-dimensional cubic bezier function.
+///
+/// @access private
+///
+@function ig-cubic-bezier-func($p1, $p2, $t) {
+    @return ((ig-cubic-bezier-func-a($p1, $p2) * $t + ig-cubic-bezier-func-b($p1, $p2)) * $t + ig-cubic-bezier-func-c($p1)) * $t;
+}
+
+///
+/// Derivative of the one-dimensional cubic bezier function.
+///
+/// @access private
+///
+@function ig-cubic-bezier-func-slope($p1, $p2, $t) {
+    @return 3 * ig-cubic-bezier-func-a($p1, $p2) * $t * $t + 2 * ig-cubic-bezier-func-b($p1, $p2) * $t + ig-cubic-bezier-func-c($p1);
+}
+
+///
+/// Newton-Raphson method to calculate the t parameter for a given x parameter.
+///
+/// @access private
+///
+@function ig-cubic-bezier-newton-raphson($x1, $x2, $x, $t) {
+    @for $i from 1 through $ig-cubic-bezier-newton-iters {
+        $cur-slope: ig-cubic-bezier-func-slope($x1, $x2, $t);
+
+        @if $cur-slope == 0 {
+            @return $t;
+        }
+
+        $cur-x: ig-cubic-bezier-func($x1, $x2, $t) - $x;
+        $t:     $t - $cur-x / $cur-slope;
+    }
+
+    @return $t;
+}
+
+///
+/// Subdivision method to calculate the t parameter for a given x parameter.
+///
+/// @access private
+///
+@function ig-cubic-bezier-binary-subdivide($x1, $x2, $x, $a, $b) {
+    $cur-x: 0;
+    $cur-t: 0;
+    $i:     0;
+
+    @while $i < $ig-cubic-bezier-subdiv-max-iters {
+        $cur-t: $a + ($b - $a) / 2;
+        $cur-x: ig-cubic-bezier-func($x1, $x2, $cur-t) - $x;
+
+        @if $cur-x > 0 {
+            $b: $cur-t;
+        } @else {
+            $a: $cur-t;
+        }
+
+        @if abs($cur-x) < $ig-cubic-bezier-subdiv-precision {
+            @return $cur-t;
+        }
+    }
+
+    @return $cur-t;
+}
+
+///
+/// Calculate the t parameter for a given x parameter.
+///
+/// @access private
+///
+@function ig-cubic-bezier-t-for-x($x1, $x2, $x) {
+    $sample-pool-key: $x1 + '_' + $x2;
+    $samples:         map-get($ig-cubic-bezier-sample-pool, $sample-pool-key);
+
+    $intv-start:  0;
+    $cur-sample:  1;
+    $last-sample: $ig-cubic-bezier-sample-pool-size;
+
+    @while ($cur-sample != $last-sample) and (nth($samples, $cur-sample) <= $x) {
+        $intv-start: $intv-start + (1 / $ig-cubic-bezier-sample-pool-size);
+        $cur-sample: $cur-sample + 1;
+    }
+    $cur-sample: $cur-sample - 1;
+
+    $dist:    ($x - nth($samples, $cur-sample)) / (nth($samples, $cur-sample + 1) - nth($samples, $cur-sample));
+    $guess-t: $intv-start + $dist / $ig-cubic-bezier-sample-pool-size;
+
+    $init-slope: ig-cubic-bezier-func-slope($x1, $x2, $guess-t);
+    @if $init-slope >= $ig-cubic-bezier-newton-min-slope {
+        @return ig-cubic-bezier-newton-raphson($x1, $x2, $x, $guess-t);
+    } @else if $init-slope == 0 {
+        @return $guess-t;
+    } @else {
+        @return ig-cubic-bezier-binary-subdivide($x1, $x2, $x, $intv-start, $intv-start + 1 / $ig-cubic-bezier-sample-pool-size);
+    }
 }
 
 /// 
@@ -59,7 +243,7 @@
 /// @return {number}
 ///
 @function ig-ease($t) {
-    @return  ig-cubic-bezier(0.25, 0.1, 0.25, 1, $t);
+    @return ig-cubic-bezier(0.25, 0.1, 0.25, 1, $t);
 }
 
 /// 
