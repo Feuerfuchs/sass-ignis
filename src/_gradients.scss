@@ -166,8 +166,9 @@ $ig-easing-gradient-precision: 10 !default;
 
             @if $i > $last-positioned-stop + 1 {
                 //
-                // There is at least one unpositioned color stop item between the last positioned
-                // color stop and the current current stops list item. Interpolate their positions.
+                // There is at least one color stop item (unpositioned color stop or easing function)
+                // between the last positioned color stop and the current stops list item. Interpolate
+                // the positions of all stops list items that are color stops.
                 //
 
                 $interpolated-stops: ig-easing-gradient-interpolate-stop-positions(
