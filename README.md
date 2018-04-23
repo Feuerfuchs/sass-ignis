@@ -18,7 +18,7 @@ For less clutter, there are shorter versions available.
 
 ## BEM system
 
-Ignis' main feature is its BEM system which was developed over the course of three years. Features include:
+Ignis' main feature is its BEM system which was developed over the course of two years. Features include:
 
 - Full [BEM](https://en.bem.info/) and [BEMIT](https://csswizardry.com/2015/08/bemit-taking-the-bem-naming-convention-a-step-further/) support, i.e. namespaced blocks, suffixes, states, and so on.
 - Robustness: Most selector-related operations use SASS' native selector functions instead of manual parsing and assembling.
