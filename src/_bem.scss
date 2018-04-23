@@ -1645,7 +1645,6 @@ $ig-bem-context-id: 'bem' !default;
 ///
 @mixin ig-bem-multi($first, $others...) {
     @include ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
-    @include ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'multi');
 
     @each $entity in ig-list-prepend($others, $first) {
         $is-manual-selector: false;
@@ -1688,8 +1687,6 @@ $ig-bem-context-id: 'bem' !default;
                 @error 'Function "#{inspect($entity-func-id)}" was not found.';
             }
 
-            @include ig-context-push($ig-bem-context-id, 'multi', null);
-
             $entity-data: call($sel-func, $entity...);
 
             @at-root #{nth($entity-data, 1)} {
@@ -1699,8 +1696,6 @@ $ig-bem-context-id: 'bem' !default;
             @if nth($entity-data, 2) {
                 @include ig-context-pop($ig-bem-context-id);
             }
-
-            @include ig-context-pop($ig-bem-context-id);
         }
     }
 }

@@ -158,7 +158,7 @@ $ig-context-stacks: ();
     $context-stack: map-get($ig-context-stacks, $stack-id);
 
     @if length($context-stack) == 0 {
-        @error 'Context stack is already empty.';
+        @error 'Context stack "#{inspect($stack-id)}" is already empty.';
     }
 
     $popped-context: nth($context-stack, -1);
