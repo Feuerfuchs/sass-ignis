@@ -172,8 +172,9 @@ $context-id: 'some-context-stack';
 
 ## Property trees
 
-Property trees are essentially globally accessible maps which can be saved and read from using certain functions.
-I use this feature for my website to manage various color schemes.
+Property trees are basically global maps that are immutable as long as you just use the intended functions.
+
+It's a very simple feature, but it makes managing large sets of structured data much easier.
 
 Example usage:
 
@@ -218,7 +219,7 @@ a {
 
 ## Fluid properties
 
-[Fluid typography](https://www.smashingmagazine.com/2016/05/fluid-typography/) is a technique where font sizes dynamically respond to the viewport size, thanks to viewport units like `vw`, `vh` and so on.
+[Fluid typography](https://www.smashingmagazine.com/2016/05/fluid-typography/) is a technique where font sizes dynamically respond to the viewport size using viewport units like `vw`, `vh` and so on.
 This concept can be generalized to work with any property that accepts a numeric input.
 
 ```scss
