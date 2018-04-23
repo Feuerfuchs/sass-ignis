@@ -1,0 +1,543 @@
+////
+/// @group BEM
+///
+/// @access public
+////
+
+/// 
+/// Generate a new BEM element.
+///
+/// The element will be generated according to the BEM naming convention.
+/// If the parent selector doesn't match the block selector, the element will be
+/// nested inside the parent selector. This means, you may nest elements inside
+/// other elements, modifiers or any kind of selector such as &:hover.
+///
+/// @param {string} $name  - First element name
+/// @param {string} $names - More element names
+///
+/// @content
+///
+/// @throw If the element is not preceded by a block, element, modifier or suffix.
+///
+/// @example scss - Element for a block
+///   @include ig-bem-component('block') {
+///     /* some block definitions */
+///     
+///     @include ig-bem-element('elem') {
+///       /* some element definitions */
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block {
+///     /* some block definitions */
+///   }
+///   
+///   .c-block__elem {
+///     /* some element definitions */
+///   }
+///
+/// @example scss - Element that is affected by the user hovering the block
+///   @include ig-bem-component('block') {
+///     /* some block definitions */
+///     
+///     @include ig-bem-element('elem') {
+///       background-color: #eee;
+///     }
+///     
+///     &:hover {
+///       @include ig-bem-element('elem') {
+///         background-color: #000;
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block {
+///     /* some block definitions */
+///   }
+///   
+///   .c-block__elem {
+///     background-color: #eee;
+///   }
+///   
+///   .c-block:hover .c-block__elem {
+///     background-color: #000;
+///   }
+///
+/// @example scss - Multiple elements
+///   @include ig-bem-component('block') {
+///     /* some block definitions */
+///     
+///     @include ig-bem-element('elem1', 'elem2') {
+///       /* some element definitions */
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block {
+///     /* some block definitions */
+///   }
+///   
+///   .c-block__elem1, .c-block__elem2 {
+///     /* some element definitions */
+///   }
+///
+@mixin ig-bem-element($name, $names...) {
+    $selector: nth(ig-bem-element($name, $names...), 1);
+
+    @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+///
+/// Generate a new BEM element. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-element
+///
+@function ig-bem-element($name, $names...) {
+    $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
+    $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
+
+    $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'at-theme');
+
+    $selector:   ();
+    $parts-data: ();
+
+    @if nth($parent-context, 1) == 'element' {
+        @if $ig-bem-element-nesting-policy == 'disallow' {
+            @error 'Element nesting is forbidden.';
+        }
+
+        $element-selector: map-get(nth($parent-context, 2), 'selector');
+
+        @if $ig-bem-element-nesting-policy == 'append' {
+            @if not is-superselector(&, $element-selector) {
+                @error 'A nested element must be an immediate children of the parent element.';
+            }
+
+            //
+            // Possible outcomes:
+            //   - {e}__element
+            //
+
+            @each $name in join($name, $names) {
+                $sel:        selector-append(&, $ig-bem-element-separator + $name);
+                $selector:   join($selector, $sel, comma);
+                $parts-data: append($parts-data, (
+                        'name':     $name,
+                        'selector': $sel
+                ));
+            }
+        }
+
+        $parent-context: ig-context-get($ig-bem-context-id, 'block' 'at-theme');
+    }
+
+    @if length($selector) == 0 {
+        $parent-selector: map-get(nth($parent-context, 2), 'selector');
+
+        @if is-superselector(&, $parent-selector) {
+            //
+            // Possible outcomes:
+            //   - {b}__element
+            //
+
+            @each $name in join($name, $names) {
+                $sel:        selector-append(&, $ig-bem-element-separator + $name);
+                $selector:   join($selector, $sel, comma);
+                $parts-data: append($parts-data, (
+                        'name':     $name,
+                        'selector': $sel
+                ));
+            }
+        } @else {
+            //
+            // Possible outcomes:
+            //   - {b} [manual selector] {b}__element
+            //   - {e,m,s} ([manual selector]) {b}__element
+            //
+
+            @if nth($parent-context, 1) != 'block' {
+                $parent-context: ig-context-get($ig-bem-context-id, 'block');
+            }
+
+            $block-base-selector: map-get(nth($parent-context, 2), 'base-selector');
+
+            @each $name in join($name, $names) {
+                $sel:        selector-nest(&, selector-append($block-base-selector, $ig-bem-element-separator + $name));
+                $sel:        ig-selector-nest-fix($sel);
+                $selector:   join($selector, $sel, comma);
+                $parts-data: append($parts-data, (
+                        'name':     $name,
+                        'selector': $sel
+                ));
+            }
+        }
+    }
+
+    $noop: ig-context-push($ig-bem-context-id, 'element', (
+            'parts':    $parts-data,
+            'selector': $selector
+    ));
+
+    @return $selector true;
+}
+
+/// 
+/// Generate a BEM element that is related to the current element.
+///
+/// The generated element selector is appended to the current element selector. The $sign
+/// determines the relationship.
+///
+/// @param {string} $sign  - Relationshop sign, either '+' or '~'
+/// @param {string} $name  - First element name
+/// @param {string} $names - More element names
+///
+/// @content
+///
+/// @throw If the element is not preceded by an element.
+///
+/// @example scss - A sibling element to a single element
+///   @include ig-bem-component('block') {
+///     @include ig-bem-element('elem') {
+///       /* some element definitions */
+///       
+///       @include ig-bem-related-element('~', 'sibling') {
+///         /* some sibling element definitions */
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block__elem {
+///     /* some element definitions */
+///   }
+///   
+///   .c-block__elem ~ .c-block__sibling {
+///     /* some sibling element definitions */
+///   }
+///
+/// @example scss - A successor element to a single element
+///   @include ig-bem-component('block') {
+///     @include ig-bem-element('elem') {
+///       /* some element definitions */
+///       
+///       @include ig-bem-related-element('+', 'successor') {
+///         /* some successor element definitions */
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block__elem {
+///     /* some element definitions */
+///   }
+///   
+///   .c-block__elem + .c-block__successor {
+///     /* some successor element definitions */
+///   }
+///
+/// @example scss - A successor element to multiple elements
+///   @include ig-bem-component('block') {
+///     @include ig-bem-element('elem1', 'elem2') {
+///       /* some element definitions */
+///       
+///       @include ig-bem-related-element('+', 'successor') {
+///         /* some successor element definitions */
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block__elem1, .c-block__elem2 {
+///     /* some element definitions */
+///   }
+///   
+///   .c-block__elem1 + .c-block__successor, .c-block__elem2 + .c-block__successor {
+///     /* some successor element definitions */
+///   }
+///
+@mixin ig-bem-related-element($sign, $name, $names...) {
+    $selector: nth(ig-bem-related-element($sign, $name, $names...), 1);
+
+    @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+///
+/// Generate a new BEM element that is related to the current element.
+/// Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-related-element
+///
+@function ig-bem-related-element($sign, $name, $names...) {
+    //
+    // Generating this selector is simple: Take the latest block context, use it
+    // to generate the element part, and insert it at the end of the current selector.
+    // Possible outcomes:
+    //   - {e} ({m,s}) ([manual selector]) + {e}
+    //   - {e} ({m,s}) ([manual selector]) ~ {e}
+    //
+
+    $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
+    $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'element');
+
+    @if $sign != '+' and $sign != '~' {
+        @error 'Invalid relationship sign #{inspect($sign)}.';
+    }
+
+    $block-context:       ig-context-get($ig-bem-context-id, 'block');
+    $block-base-selector: map-get(nth($block-context, 2), 'base-selector');
+
+    $selector:   ();
+    $parts-data: ();
+
+    @each $name in join($name, $names) {
+        $sel:        selector-nest(&, $sign, selector-append($block-base-selector, $ig-bem-element-separator + $name));
+        $sel:        ig-selector-nest-fix($sel);
+        $selector:   join($selector, $sel, comma);
+        $parts-data: append($parts-data, (
+                'name':     $name,
+                'selector': $sel
+        ));
+    }
+
+    $noop: ig-context-push($ig-bem-context-id, 'element', (
+            'parts':    $parts-data,
+            'selector': $selector
+    ));
+
+    @return $selector true;
+}
+
+/// 
+/// Generate a BEM element that is a sibling of the current element.
+///
+/// It's a shorthand for ig-bem-related-element('~', $name).
+///
+/// @param {string} $name  - First element name
+/// @param {list}   $names - List of more element names
+///
+/// @content
+///
+@mixin ig-bem-sibling-element($name, $names...) {
+    @include ig-bem-related-element('~', $name, $names...) {
+        @content;
+    }
+}
+
+///
+/// Generate a new BEM element that is a sibling of the current element.
+/// Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-sibling-element
+///
+@function ig-bem-sibling-element($name, $names...) {
+    @return ig-bem-related-element('~', $name, $names...);
+}
+
+/// 
+/// Generate a BEM element that is the successor of the current element.
+///
+/// It's a shorthand for ig-bem-related-element('+', $name).
+///
+/// @param {string} $name  - First element name
+/// @param {string} $names - More element names
+///
+/// @content
+///
+@mixin ig-bem-next-element($name, $names...) {
+    @include ig-bem-related-element('+', $name, $names...) {
+        @content;
+    }
+}
+
+///
+/// Generate a new BEM element that is the successor of the current element.
+/// Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-next-element
+///
+@function ig-bem-next-element($name, $names...) {
+    @return ig-bem-related-element('+', $name, $names...);
+}
+
+/// 
+/// Generate the current BEM element as a successor of itself.
+///
+/// If this is applied to a single element, it behaves exactly the same as
+/// ig-bem-related-element('+', name);
+/// However, if it is applied to multiple elements, each twin element only will influence
+/// their other twin, which is not replicable with ig-bem-related-element.
+///
+/// @content
+///
+/// @example scss - Two twin elements
+///   @include ig-bem-component('block') {
+///     @include ig-bem-element('elem') {
+///       /* some element definitions */
+///       
+///       @include ig-bem-next-twin-element {
+///         /* some twin element definitions */
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block__elem {
+///     /* some element definitions */
+///   }
+///   
+///   .c-block__elem + .c-block__elem {
+///     /* some twin element definitions */
+///   }
+///
+/// @example scss - Multiple twin elements
+///   @include ig-bem-component('block') {
+///     @include ig-bem-element('elem1', 'elem2') {
+///       /* some element definitions */
+///       
+///       @include ig-bem-next-twin-element {
+///         /* some twin element definitions */
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block__elem1, .c-block__elem2 {
+///     /* some element definitions */
+///   }
+///   
+///   .c-block__elem1 + .c-block__elem1, .c-block__elem2 + .c-block__elem2 {
+///     /* some twin element definitions */
+///   }
+///
+@mixin ig-bem-next-twin-element {
+    $selector: nth(ig-bem-next-twin-element(), 1);
+
+    @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+///
+/// Generate the current BEM element as a successor of itself.
+/// Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-next-twin-element
+///
+@function ig-bem-next-twin-element() {
+    $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
+    $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'element');
+
+    $element-context:  ig-context-get($ig-bem-context-id, 'element');
+    $element-selector: map-get(nth($element-context, 2), 'selector');
+
+    $block-context:       ig-context-get($ig-bem-context-id, 'block');
+    $block-base-selector: map-get(nth($block-context, 2), 'base-selector');
+
+    $selector:   ();
+    $parts-data: ();
+
+    //
+    // To determine the twin for each element, iterate the sub-selectors from the current selector
+    // and check if it contains the currently inspected element. This has to be done with string
+    // comparison since none of SASS selector functions is of use here.
+    // Finally, the current twin will be appended to the extracted sub-selector as a successor
+    // element.
+    //
+    @each $part-data in map-get(nth($element-context, 2), 'parts') {
+        $part-selector: map-get($part-data, 'selector');
+        $part-name:     map-get($part-data, 'name');
+
+        $sel: ();
+        @if is-superselector(&, $element-selector) {
+            //
+            // This mixin is included in the selector the last element mixin created.
+            // Possible outcomes:
+            //   - {e} + {e}
+            //
+
+            @each $s in & {
+                @each $ps in $part-selector {
+                    @if $s == $ps {
+                        $sel-ent: selector-nest($s, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
+                        $sel-ent: ig-selector-nest-fix($sel-ent);
+                        $sel:     append($sel, $sel-ent, comma);
+                    }
+                }
+            }
+        } @else {
+            //
+            // This mixin is NOT included in the selector the last element mixin created.
+            // Possible outcomes:
+            //   - {e} {m,s} + {e}
+            //   - {e} [manual selector] + {e}
+            //   - {e} {m,s} [manual selector] + {e}
+            //
+
+            @each $s in & {
+                @each $ps in $part-selector {
+                    @if str-index(inspect($s), inspect($ps)) == 1 {
+                        $char-index: str-length(inspect($ps)) + 1;
+                        $match:      index(' ' ':' ',', str-slice(inspect($s), $char-index, $char-index)) != null;
+
+                        @if not $match {
+                            @each $separator in $ig-bem-element-separator $ig-bem-modifier-separator $ig-bem-suffix-separator {
+                                @if str-slice(inspect($s), $char-index, $char-index + str-length($separator) - 1) == $separator {
+                                    $match: true;
+                                }
+                            }
+                        }
+
+                        @if $match {
+                            $sel-ent: selector-nest($s, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
+                            $sel-ent: ig-selector-nest-fix($sel-ent);
+                            $sel:     append($sel, $sel-ent, comma);
+                        }
+                    }
+                }
+            }
+        }
+        @if length($sel) != length($part-selector) {
+            @error 'Could not generate twin element selector.';
+        }
+
+        $selector:   join($selector, $sel, comma);
+        $parts-data: append($parts-data, (
+                'name':     $part-name,
+                'selector': $sel
+        ));
+    }
+
+    $noop: ig-context-push($ig-bem-context-id, 'element', (
+            'parts':    $parts-data,
+            'selector': $selector
+    ));
+
+    @return $selector true;
+}

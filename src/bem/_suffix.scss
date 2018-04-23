@@ -1,0 +1,108 @@
+////
+/// @group BEM
+///
+/// @access public
+////
+
+/// 
+/// Generate a new suffix.
+///
+/// @param {string} $name - Suffix name
+///
+/// @content
+///
+/// @throw If the element is not preceded by a block or modifier.
+///
+/// @example scss - Using a suffix
+///   @include ig-bem-utility('hidden') {
+///     display: none;
+///     
+///     @media (max-width: 320px) {
+///       @include ig-bem-suffix('phone') {
+///         display: none;
+///       }
+///     }
+///     
+///     @media (max-width: 768px) {
+///       @include ig-bem-suffix('tablet') {
+///         display: none;
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .u-hidden {
+///     display: none;
+///   }
+///   
+///   @media (max-width: 320px) {
+///     .u-hidden@phone {
+///       display: none;
+///     }
+///   }
+///   
+///   @media (max-width: 768px) {
+///     .u-hidden@tablet {
+///       display: none;
+///     }
+///   }
+///
+@mixin ig-bem-suffix($name) {
+    $selector: nth(ig-bem-suffix($name), 1);
+
+    @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+///
+/// Generate a new suffix. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-suffix
+///
+@function ig-bem-suffix($name) {
+    //
+    // Suffixes can be used on block, element and modifier.
+    //
+
+    $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
+    $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
+    $noop: ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'suffix');
+
+    $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'at-theme');
+    $parent-selector: map-get(nth($parent-context, 2), 'selector');
+
+    @if not is-superselector(&, $parent-selector) {
+        //
+        // The current selector doesn't match the parent selector.
+        // The user manually added a selector between parent context and this suffix call.
+        // This case is forbidden because any outcome semantically wouldn't make sense:
+        //   - {b,e,m} [manual selector] {b,e,m}@suffix
+        //   - {b,e,m}@suffix [manual selector]
+        // The first case would make the modifier behave like an element.
+        // The second case is unintuitive, the code would be more clear by nesting the manual
+        // selector in the suffix instead.
+        //
+
+        @error 'A suffix must be an immediate child of the parent context';
+    }
+
+    //
+    // The suffix part can simply be appended.
+    // Possible outcomes:
+    //   - {b,e,m}@suffix
+    //
+
+    $selector: selector-append(&, $ig-bem-suffix-separator + $name);
+
+    $noop: ig-context-push($ig-bem-context-id, 'suffix', (
+            'name':     $name,
+            'selector': $selector
+    ));
+
+    @return $selector true;
+}

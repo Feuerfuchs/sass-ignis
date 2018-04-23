@@ -1,0 +1,236 @@
+////
+/// @group BEM
+///
+/// @access public
+////
+
+/// 
+/// Generate a new BEM modifier.
+/// 
+/// If the parent context is block or element, the modifier will modify said block or element according
+/// to the BEM naming convention.
+///
+/// If the parent context is a modifier or suffix, then the modifier will depend on said modifier or suffix.
+/// Depending on $extend, the meaning of this dependency (and the resulting selector) varies:
+/// If it's false (default), you signalize that the modifier also exists by itself, but it changes its
+/// behavior when the parent modifier or suffix is set.
+/// If it's true, you signalize that the modifier extends the parent modifier or suffix and can only be
+/// used in conjunction with it.
+///
+/// @param {string | list} $name  - First element name or list with two items: 1. first element name, 2. bool indicating if the modifier is extending
+/// @param {string | list} $names - More element names or lists with two items: 1. element name, 2. bool indicating if the modifier is extending
+///
+/// @content
+///
+/// @throw If the element is not preceded by a block, element, modifier or suffix.
+///
+/// @example scss - Modifier that modifies a block or element
+///   @include ig-bem-component('block') {
+///     @include ig-bem-modifier('mod') {
+///       background-color: #eee;
+///     }
+///     
+///     @include ig-bem-element('elem') {
+///       @include ig-bem-modifier('mod') {
+///         background-color: #222;
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block--mod {
+///     background-color: #eee;
+///   }
+///   
+///   .c-block__elem--mod {
+///     background-color: #222;
+///   }
+///
+/// @example scss - Modifier nested in another modifier, not extending
+///   @include ig-bem-component('block') {
+///     @include ig-bem-modifier('mod') {
+///       background-color: #eee;
+///     }
+///     
+///     @include ig-bem-modifier('dark') {
+///       /* some definitions */
+///       
+///       @include ig-bem-modifier('mod') {
+///         background-color: #222;
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block--mod {
+///     background-color: #eee;
+///   }
+///   
+///   .c-block--dark {
+///     /* some definitions */
+///   }
+///   
+///   .c-block--dark.c-block--mod {
+///     background-color: #222;
+///   }
+///
+/// @example scss - Modifier nested in another modifier, extending
+///   @include ig-bem-component('block') {
+///     @include ig-bem-modifier('mod') {
+///       background-color: #eee;
+///     }
+///     
+///     @include ig-bem-modifier('dark') {
+///       /* some definitions */
+///       
+///       @include ig-bem-modifier('mod' true) {
+///         background-color: #222;
+///       }
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .c-block--mod {
+///     background-color: #eee;
+///   }
+///   
+///   .c-block--dark {
+///     /* some definitions */
+///   }
+///   
+///   .c-block--dark--mod {
+///     background-color: #222;
+///   }
+///
+@mixin ig-bem-modifier($name, $names...) {
+    $selector: nth(ig-bem-modifier($name, $names...), 1);
+
+    @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+///
+/// Generate a new BEM modifier. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-modifier
+///
+@function ig-bem-modifier($name, $names...) {
+    $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
+    $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
+
+    $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'at-theme');
+    $parent-selector: map-get(nth($parent-context, 2), 'selector');
+    $selector:        ();
+    $parts-data:      ();
+
+    @if not is-superselector(&, $parent-selector) {
+        //
+        // The current selector doesn't match the parent selector.
+        // The user manually added a selector between parent context and this modifier call.
+        // This case is forbidden because any outcome semantically wouldn't make sense:
+        //   - {b,e,m,s} [manual selector] {b,e,m,s}--modifier
+        //   - {b,e,m,s}--modifier [manual selector]
+        // The first case would make the modifier behave like an element.
+        // The second case is unintuitive, the code would be more clear by nesting the manual
+        // selector in the modifier instead.
+        //
+
+        @error 'A modifier must be an immediate child of the parent context';
+    }
+
+    @each $name in ig-list-prepend($names, $name) {
+        $extend: false;
+        @if type-of($name) == list {
+            $extend: nth($name, 2);
+            $name:   nth($name, 1);
+        }
+
+        @if index('block' 'element' 'at-theme', nth($parent-context, 1)) or $extend == true {
+            //
+            // Either the parent context is block or element, or a modifier or suffix
+            // is to be extended. The modifier part can simply be appended.
+            // Possible outcomes:
+            //   - {b,e,m,s}--modifier
+            //
+
+            $sel:        selector-append(&, $ig-bem-modifier-separator + $name);
+            $selector:   join($selector, $sel, comma);
+            $parts-data: append($parts-data, (
+                    'name':     $name,
+                    'selector': $sel
+            ));
+        } @else {
+            //
+            // Parent context is modifier or suffix and $extend is false. Get latest element or block.
+            //
+
+            $be-context: ig-context-get($ig-bem-context-id, 'block' 'element');
+
+            @if nth($be-context, 1) == 'element' {
+                //
+                // Latest context is element. Since element contexts can consist of multiple single
+                // elements, inspect all elements and append its selector with the suffix "--$name".
+                // This has to be done with string comparison since none of SASS selector functions
+                // is of use here. 
+                // Possible outcomes:
+                //   - {m,s}.{e}--modifier
+                //
+
+                $nsel: ();
+
+                @each $elem-part-data in map-get(nth($be-context, 2), 'parts') {
+                    $elem-part-selector: map-get($elem-part-data, 'selector');
+
+                    $sel: ();
+                    @each $s in & {
+                        @each $ps in $elem-part-selector {
+                            @if (str-index(inspect($s), inspect($ps) + $ig-bem-modifier-separator) == 1) or (str-index(inspect($s), inspect($ps) + $ig-bem-suffix-separator) == 1) {
+                                $sel: append($sel, selector-unify($s, selector-append($ps, $ig-bem-modifier-separator + $name)), comma);
+                            }
+                        }
+                    }
+                    @if length($sel) == 0 {
+                        @error 'Could not generate modifier selector.';
+                    }
+
+                    $nsel: join($nsel, $sel, comma);
+                }
+
+                $selector:   join($selector, $nsel, comma);
+                $parts-data: append($parts-data, (
+                        'name':     $name,
+                        'selector': $nsel
+                ));
+            } @else {
+                //
+                // Latest context is block. Just append the modifier part.
+                // Possible outcomes:
+                //   - {m,s}.{b}--modifier
+                //
+
+                $block-base-selector: map-get(nth($be-context, 2), 'base-selector');
+
+                $sel:        selector-append(&, $block-base-selector, $ig-bem-modifier-separator + $name);
+                $selector:   join($selector, $sel, comma);
+                $parts-data: append($parts-data, (
+                        'name':     $name,
+                        'selector': $sel
+                ));
+            }
+        }
+    }
+
+    $noop: ig-context-push($ig-bem-context-id, 'modifier', (
+            'parts':    $parts-data,
+            'selector': $selector
+    ));
+
+    @return $selector true;
+}

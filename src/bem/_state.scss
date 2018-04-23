@@ -1,0 +1,155 @@
+////
+/// @group BEM
+///
+/// @access public
+////
+
+/// 
+/// Create a new is-state modifier.
+///
+/// @param {string} $state  - First state name
+/// @param {list}   $states - List of more state names
+///
+/// @content
+///
+/// @example scss - Using single is-state
+///   @include ig-bem-object('menu') {
+///     display: none;
+///     
+///     @include ig-bem-is('open') {
+///       display: block;
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .o-menu {
+///     display: none;
+///   }
+///   
+///   .o-menu.is-open {
+///     display: block;
+///   }
+///
+/// @example scss - Using multiple is-states
+///   @include ig-bem-object('menu') {
+///     display: none;
+///     
+///     @include ig-bem-is('open', 'visible') {
+///       display: block;
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .o-menu {
+///     display: none;
+///   }
+///   
+///   .o-menu.is-open,
+///   .o-menu.is-visible {
+///     display: block;
+///   }
+///
+@mixin ig-bem-is($state, $states...) {
+    $selector: nth(ig-bem-is($state, $states...), 1);
+
+    @at-root #{$selector} {
+        @content;
+    }
+}
+
+///
+/// Generate a new is-state modifier. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-is
+///
+@function ig-bem-is($state, $states...) {
+    $selector: ();
+
+    @each $state in join($state, $states) {
+        $sel:      '&.is-#{$state}';
+        $sel:      if(&, selector-nest(&, $sel), selector-parse($sel));
+        $sel:      ig-selector-nest-fix($sel);
+        $selector: join($selector, $sel, comma);
+    }
+
+    @return $selector false;
+}
+
+/// 
+/// Create a new has-state modifier.
+///
+/// @param {string} $state  - First state name
+/// @param {list}   $states - List of more state names
+///
+/// @content
+///
+/// @example scss - Using single has-state
+///   @include ig-bem-object('buttonstrip') {
+///     display: none;
+///     
+///     @include ig-bem-has('buttons') {
+///       display: block;
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .o-buttonstrip {
+///     display: none;
+///   }
+///   
+///   .o-buttonstrip.has-buttons {
+///     display: block;
+///   }
+///
+/// @example scss - Using multiple has-states
+///   @include ig-bem-object('buttonstrip') {
+///     display: none;
+///     
+///     @include ig-bem-has('buttons', 'textfields') {
+///       display: block;
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   .o-buttonstrip {
+///     display: none;
+///   }
+///   
+///   .o-buttonstrip.has-buttons,
+///   .o-buttonstrip.has-textfields {
+///     display: block;
+///   }
+///
+@mixin ig-bem-has($state, $states...) {
+    $selector: nth(ig-bem-has($state, $states...), 1);
+
+    @at-root #{$selector} {
+        @content;
+    }
+}
+
+///
+/// Generate a new has-state modifier. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-has
+///
+@function ig-bem-has($state, $states...) {
+    $selector: ();
+
+    @each $state in join($state, $states) {
+        $sel:      '&.has-#{$state}';
+        $sel:      if(&, selector-nest(&, $sel), selector-parse($sel));
+        $sel:      ig-selector-nest-fix($sel);
+        $selector: join($selector, $sel, comma);
+    }
+
+    @return $selector false;
+}

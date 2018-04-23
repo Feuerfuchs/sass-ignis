@@ -1,0 +1,88 @@
+////
+/// @group BEM
+///
+/// @access public
+////
+
+///
+/// Separating character sequence for elements.
+///
+/// @type string
+///
+$ig-bem-element-separator: '__' !default;
+
+///
+/// Separating character sequence for modifiers.
+///
+/// @type string
+///
+$ig-bem-modifier-separator: '--' !default;
+
+///
+/// Separating character sequence for BEMIT suffixes.
+///
+/// @type string
+///
+$ig-bem-suffix-separator: '\\@' !default;
+
+///
+/// Prefixes for all BEMIT namespaces.
+///
+/// @prop {string} utility   ['u']  - Utility namespace
+/// @prop {string} object    ['o']  - Object namespace
+/// @prop {string} component ['c']  - Component namespace
+/// @prop {string} layout    ['l']  - Layout namespace
+/// @prop {string} scope     ['s']  - Scope namespace
+/// @prop {string} theme     ['t']  - Theme namespace
+/// @prop {string} js        ['js'] - JS namespace
+/// @prop {string} qa        ['qa'] - QA namespace
+/// @prop {string} hack      ['_']  - Hack namespace
+///
+/// @type map
+///
+$ig-bem-namespaces: (
+    utility:   'u',
+    object:    'o',
+    component: 'c',
+    layout:    'l',
+    scope:     's',
+    theme:     't',
+    js:        'js',
+    qa:        'qa',
+    hack:      '_'
+) !default;
+
+///
+/// A list of all generated blocks. 
+///
+/// @type list
+///
+/// @access private
+///
+$ig-bem-blocks: ();
+
+///
+/// Maximum nesting depth of BEM mixins. The large default value means there is no effective limit.
+/// 
+/// @type number
+///
+$ig-bem-max-depth: 99 !default;
+
+///
+/// Indicates how nested elements should be handled.
+///
+/// 'allow' means elements will be nested, i.e. the result will be {e} {b}__element.
+/// 'disallow' means an error will be emitted.
+/// 'append' means the element name will be appended to the parent element, i.e. the result will be {e}__element.
+/// Any other value is treated as 'allow'.
+/// 
+/// @type string
+///
+$ig-bem-element-nesting-policy: 'allow' !default;
+
+///
+/// Context ID used for all BEM-related mixins.
+///
+/// @type string
+///
+$ig-bem-context-id: 'bem' !default;

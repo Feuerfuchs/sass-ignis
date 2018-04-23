@@ -1,0 +1,52 @@
+////
+/// @group BEM
+///
+/// @access public
+////
+
+/// 
+/// Declare new rules for the current block for when this theme is active.
+///
+/// @param {string} $name  - First theme block name
+/// @param {string} $names - More theme block names
+///
+/// @content
+///
+@mixin ig-bem-at-theme($name, $names...) {
+    $selector: nth(ig-bem-at-theme($name, $names...), 1);
+
+    @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+///
+/// Declare new rules for the current block for when this theme is active.
+/// Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-at-theme
+///
+@function ig-bem-at-theme($name, $names...) {
+    $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
+
+    $parent-context:  ig-context-get($ig-bem-context-id, 'block');
+    $parent-selector: map-get(nth($parent-context, 2), 'selector');
+
+    @if not is-superselector(&, $parent-selector) {
+        @error 'An at-theme rule must be an immediate child of a block or another at-theme rule';
+    }
+
+    $selector: ig-bem-theme-selector($name, $names...);
+    $selector: selector-nest($selector, &);
+    $selector: ig-selector-nest-fix($selector);
+
+    $noop: ig-context-push($ig-bem-context-id, 'at-theme', (
+            'name':     join($name, $names),
+            'selector': $selector
+    ));
+
+    @return $selector true;
+}

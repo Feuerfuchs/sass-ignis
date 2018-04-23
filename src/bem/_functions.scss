@@ -1,0 +1,27 @@
+////
+/// @group BEM
+///
+/// @access public
+////
+
+//
+// @access private
+//
+@function ig-bem-theme-selector($name, $names...) {
+    $namespace: map-get($ig-bem-namespaces, 'theme');
+    $selector:  null;
+
+    @each $name in join($name, $names) {
+        $sel: '.' + $namespace + '-' + $name;
+
+        @if $selector == null {
+            $selector: join(selector-parse($sel), selector-parse('[class*=\' t-\'] ' + $sel), comma);
+            $selector: join($selector, selector-parse('[class^=\'t-\'] ' + $sel), comma);
+        } @else {
+            $selector: selector-nest($selector, $sel);
+            $selector: ig-selector-nest-fix($selector);
+        }
+    }
+
+    @return $selector;
+}

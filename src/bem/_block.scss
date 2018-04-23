@@ -1,0 +1,383 @@
+////
+/// @group BEM
+///
+/// @access public
+////
+
+/// 
+/// Generate a new block.
+///
+/// This mixin simply creates a new block with the name {namespace}_{name},
+/// where {namespace} is the prefix assigned to $type and {name} is the
+/// block's name.
+///
+/// @param {string} $name        - Block name
+/// @param {string} $type [null] - BEMIT namespace of the block
+///
+/// @content
+///
+/// @throw If $type is invalid
+/// @throw If the block is preceded by another block, element, modifier or suffix
+///
+/// @example scss - Creating a new block
+///   @include ig-bem-block('something', 'component') {
+///     /* some definitions */
+///   }
+///   
+///   // Generates:
+///   
+///   .c-something {
+///     /* some definitions */
+///   }
+///
+@mixin ig-bem-block($name, $type: null) {
+    $selector: nth(ig-bem-block($name, $type), 1);
+
+    @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+///
+/// Generate a new block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-block
+///
+@function ig-bem-block($name, $type: null) {
+    //
+    // Possible outcomes:
+    //   - ({b,e,m,s}) block
+    //
+
+    $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
+
+    $selector:      null;
+    $base-selector: null;
+
+    @if $type != null {
+        $namespace: map-get($ig-bem-namespaces, $type);
+
+        @if not $namespace {
+            @error '"#{$type}" is not a valid type.';
+        }
+
+        $base-selector: selector-parse('.' + $namespace + '-' + $name);
+
+        @if $type != 'theme' or & {
+            $selector: $base-selector;
+        } @else if not & {
+            $selector: ig-bem-theme-selector($name);
+        }
+    } @else {
+        $base-selector: selector-parse('.' + $name);
+        $selector:      $base-selector;
+    }
+
+    @if & {
+        $selector: selector-nest(&, $selector);
+        $selector: ig-selector-nest-fix($selector);
+    }
+
+    @if $type != null {
+        $ig-bem-blocks: append($ig-bem-blocks, $name + '_' + $type) !global;
+    } @else {
+        $ig-bem-blocks: append($ig-bem-blocks, $name) !global;
+    }
+
+    $noop: ig-context-push($ig-bem-context-id, 'block', (
+            'name':          $name,
+            'type':          $type,
+            'selector':      $selector,
+            'base-selector': $base-selector
+    ));
+
+    @return $selector true;
+}
+
+/// 
+/// Generate a new object block. It's a shorthand for ig-bem-block($name, 'object').
+///
+/// @param {string} $name - Object block name
+///
+/// @content
+///
+@mixin ig-bem-object($name) {
+    @include ig-bem-block($name, 'object') {
+        @content;
+    }
+}
+
+///
+/// Generate a new object block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-object
+///
+@function ig-bem-object($name) {
+    @return ig-bem-block($name, 'object');
+}
+
+/// 
+/// Generate a new component block. It's a shorthand for ig-bem-block($name, 'component').
+///
+/// @param {string} $name - Component block name
+///
+/// @content
+///
+@mixin ig-bem-component($name) {
+    @include ig-bem-block($name, 'component') {
+        @content;
+    }
+}
+
+///
+/// Generate a new component block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-component
+///
+@function ig-bem-component($name) {
+    @return ig-bem-block($name, 'component');
+}
+
+/// 
+/// Generate a new layout block. It's a shorthand for ig-bem-block($name, 'layout').
+///
+/// @param {string} $name - Layout block name
+///
+/// @content
+///
+@mixin ig-bem-layout($name) {
+    @include ig-bem-block($name, 'layout') {
+        @content;
+    }
+}
+
+///
+/// Generate a new layout block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-layout
+///
+@function ig-bem-layout($name) {
+    @return ig-bem-block($name, 'layout');
+}
+
+/// 
+/// Generate a new utility block. It's a shorthand for ig-bem-block($name, 'utility').
+///
+/// @param {string} $name - Utility block name
+///
+/// @content
+///
+@mixin ig-bem-utility($name) {
+    @include ig-bem-block($name, 'utility') {
+        @content;
+    }
+}
+
+///
+/// Generate a new utility block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-utility
+///
+@function ig-bem-utility($name) {
+    @return ig-bem-block($name, 'utility');
+}
+
+/// 
+/// Generate a new scope block. It's a shorthand for ig-bem-block($name, 'scope').
+///
+/// @param {string} $name - Scope block name
+///
+/// @content
+///
+@mixin ig-bem-scope($name) {
+    @include ig-bem-block($name, 'scope') {
+        @content;
+    }
+}
+
+///
+/// Generate a new scope block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-scope
+///
+@function ig-bem-scope($name) {
+    @return ig-bem-block($name, 'scope');
+}
+
+/// 
+/// Generate a new theme block. It's a shorthand for ig-bem-block($name, 'theme').
+///
+/// @param {string} $name - Theme block name
+///
+/// @content
+///
+@mixin ig-bem-theme($name) {
+    @include ig-bem-block($name, 'theme') {
+        @content;
+    }
+}
+
+///
+/// Generate a new theme block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-theme
+///
+@function ig-bem-theme($name) {
+    @return ig-bem-block($name, 'theme');
+}
+
+/// 
+/// Generate a new JS block. It's a shorthand for ig-bem-block($name, 'js').
+///
+/// @param {string} $name - JS block name
+///
+/// @content
+///
+@mixin ig-bem-js($name) {
+    @include ig-bem-block($name, 'js') {
+        @content;
+    }
+}
+
+///
+/// Generate a new JS block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-js
+///
+@function ig-bem-js($name) {
+    @return ig-bem-block($name, 'js');
+}
+
+/// 
+/// Generate a new QA block. It's a shorthand for ig-bem-block($name, 'qa').
+///
+/// @param {string} $name - QA block name
+///
+/// @content
+///
+@mixin ig-bem-qa($name) {
+    @include ig-bem-block($name, 'qa') {
+        @content;
+    }
+}
+
+///
+/// Generate a new QA block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-qa
+///
+@function ig-bem-qa($name) {
+    @return ig-bem-block($name, 'qa');
+}
+
+/// 
+/// Generate a new hack block. It's a shorthand for ig-bem-block($name, 'hack').
+///
+/// @param {string} $name - Hack block name
+///
+/// @content
+///
+@mixin ig-bem-hack($name) {
+    @include ig-bem-block($name, 'hack') {
+        @content;
+    }
+}
+
+///
+/// Generate a new hack block. Check the respective mixin documentation for more information.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+///
+/// @see {mixin} ig-bem-hack
+///
+@function ig-bem-hack($name) {
+    @return ig-bem-block($name, 'hack');
+}
+
+/// 
+/// Assert that a block or element is composed of another block. In BEM, such a relationship is referred to
+/// as a "mix": https://en.bem.info/methodology/key-concepts/#mix
+///
+/// Compilation will fail if the foreign block doesn't exist. This way, you can ensure that blocks are
+/// defined in the right order so that composed blocks/elements will actually override the foreign
+/// declarations without having to artificially increase the specificity.
+///
+/// @param {string | list} $block  - Either first block name, or list with two items: 1. block name, 2. block type
+/// @param {string | list} $blocks - Either other block names, or list with two items: 1. block name, 2. block type
+///
+/// @throw If a block type is invalid 
+/// @throw If a block doesn't exist
+///
+/// @example scss - Successful assertion
+///   @include ig-bem-component('someBlock') {
+///     /* some definitions */
+///   }
+///   
+///   @include ig-bem-component('anotherBlock') {
+///     /* some definitions */
+///     
+///     @include ig-bem-element('elem') {
+///       @include ig-bem-composed-of('someBlock' 'component');
+///       
+///       /* some definitions */
+///     }
+///   }
+///
+///   // Intended use: <div class="c-anotherBlock__elem c-someBlock">...</div>
+///
+/// @example scss - Failing assertion
+///   @include ig-bem-component('anotherBlock') {
+///     /* some definitions */
+///     
+///     @include ig-bem-element('elem') {
+///       @include ig-bem-composed-of('someBlock' 'component');
+///       
+///       /* some definitions */
+///     }
+///   }
+///   
+///   @include ig-bem-component('someBlock') {
+///     /* some definitions */
+///   }
+///   
+///   // Compilation will fail because c-someBlock is defined after c-anotherBlock__elem
+///
+@mixin ig-bem-composed-of($block, $blocks...) {
+    @each $block in ig-list-prepend($blocks, $block) {
+        @if type-of($block) == string {
+            @if not index($ig-bem-blocks, $block) {
+                @error 'Block "#{$block}" does not exist.';
+            }
+        } @else {
+            $name: nth($block, 1);
+            $type: nth($block, 2);
+
+            @if not map-get($ig-bem-namespaces, $type) {
+                @error '"#{$type}" is not a valid type.';
+            }
+
+            @if not index($ig-bem-blocks, $name + '_' + $type) {
+                @error 'Block "#{$name}" does not exist.';
+            }
+        }
+    }
+}
