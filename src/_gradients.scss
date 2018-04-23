@@ -226,8 +226,7 @@ $ig-easing-gradient-precision: 10 !default;
 
                     $generated-stops: join(
                         $generated-stops,
-                        ig-easing-gradient-ease-stops($prev-stop, $next-stop, $easing-func, $easing-args),
-                        comma
+                        ig-easing-gradient-ease-stops($prev-stop, $next-stop, $easing-func, $easing-args)
                     );
                 } @else {
                     $generated-stops: append($generated-stops, ig-str-implode($next-stop, ' '));
@@ -316,7 +315,7 @@ $ig-easing-gradient-precision: 10 !default;
                 $color: mix($next-stop-color, $prev-stop-color, call($easing-func, append($easing-args, $perc)...) * 100%);
             }
 
-            $stops: append($stops, $color + ' ' + $pos, comma);
+            $stops: append($stops, $color + ' ' + $pos);
         }
     } @else {
         //
@@ -346,7 +345,7 @@ $ig-easing-gradient-precision: 10 !default;
                 $pos:   calc(#{$prev-stop-pos} + (#{$next-stop-pos} - #{$prev-stop-pos}) * #{$perc});
             }
 
-            $stops: append($stops, $color + ' ' + $pos, comma);
+            $stops: append($stops, $color + ' ' + $pos);
         }
     }
 
