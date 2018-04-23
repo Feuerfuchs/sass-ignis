@@ -20,10 +20,10 @@
 /// 
 /// Scale a property uniformly between a specific set of target viewports / values.
 ///
-/// @param {string} $prop      - Property to set
-/// @param {number} $fluid-map - A map with keys = viewports and values = target value
+/// @param {string | list} $props     - Property or list of properties to set
+/// @param {number}        $fluid-map - A map with keys = viewports and values = target value
 ///
-/// @example scss - Responsive font size between 2 viewports
+/// @example scss - Responsive font-size between 2 viewports
 ///   .something {
 ///     @include ig-fluid-property(font-size, ( 320px: 20px, 720px: 30px ));
 ///   }
@@ -48,7 +48,7 @@
 ///     }
 ///   }
 ///
-/// @example scss - Responsive font size between 3 viewports
+/// @example scss - Responsive font-size between 3 viewports
 ///   .something {
 ///     @include ig-fluid-property(font-size, ( 320px: 20px, 720px: 30px, 1280px: 40px ));
 ///   }
@@ -79,11 +79,17 @@
 ///     }
 ///   }
 ///
-@mixin ig-fluid-property($prop, $fluid-map) {
+@mixin ig-fluid-property($props, $fluid-map) {
     $keys: ig-quicksort(map-keys($fluid-map));
 
     @if length($keys) <= 1 {
         @error '$fluid-map must contain at least two viewports.';
+    }
+
+    @each $key in $keys {
+        @if (type-of($key) != number) or unitless($key) {
+            @error '$fluid-map contains invalid viewports.';
+        }
     }
 
     @for $i from 1 to length($keys) {
@@ -96,7 +102,13 @@
         $calc: ig-fluid-property-calc($prev-value, $next-value, $prev-key, $next-key);
 
         @media (min-width: $prev-key) and (max-width: $next-key) {
-            #{$prop}: $calc;
+            @if type-of($props) == list {
+                @each $prop in $props {
+                    #{$prop}: $calc;
+                }
+            } @else {
+                #{$props}: $calc;
+            }
         }
     }
 
@@ -104,11 +116,27 @@
     $last-key:  nth($keys, length($keys));
 
     @media (max-width: $first-key) {
-        #{$prop}: map-get($fluid-map, $first-key);
+        $val: map-get($fluid-map, $first-key);
+
+        @if type-of($props) == list {
+            @each $prop in $props {
+                #{$prop}: $val;
+            }
+        } @else {
+            #{$props}: $val;
+        }
     }
 
     @media (min-width: $last-key) {
-        #{$prop}: map-get($fluid-map, $last-key);
+        $val: map-get($fluid-map, $last-key);
+
+        @if type-of($props) == list {
+            @each $prop in $props {
+                #{$prop}: $val;
+            }
+        } @else {
+            #{$props}: $val;
+        }
     }
 }
 
