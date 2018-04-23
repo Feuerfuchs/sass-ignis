@@ -7,6 +7,13 @@
 ////
 
 /// 
+/// 
+///
+@function ig-math-sign($n) {
+    @return if($n < 0, -1, 1);
+}
+
+/// 
 /// Perform exponentiation. Only integer exponents are supported.
 ///
 /// @param {number} $base
@@ -59,53 +66,4 @@
         @return $max;
     }
     @return $value;
-}
-
-///
-/// Linear interpolation from value $a to value $b.
-///
-/// @param {number} $a - First value
-/// @param {number} $b - Second value
-/// @param {number} $t - "Time" between 0 and 1 inclusive
-///
-/// @return {number}
-///
-@function ig-math-lerp($a, $b, $t) {
-    @return $a + ($b - $a) * $t;
-}
-
-///
-/// Linear interpolation from point $a to point $b.
-///
-/// @param {list}   $a - First point
-/// @param {list}   $b - Second point
-/// @param {number} $t - "Time" between 0 and 1 inclusive
-///
-/// @return {list}
-///
-@function ig-math-lerp-2d($a, $b, $t) {
-    @return ig-math-lerp(nth($a, 1), nth($b, 1), $t), ig-math-lerp(nth($a, 2), nth($b, 2), $t);
-}
-
-///
-/// A generic bezier function accepting an arbitrary number of points.
-///
-/// @param {list}   $a - First point
-/// @param {list}   $b - Second point
-/// @param {number} $t - "Time" between 0 and 1 inclusive
-///
-/// @return {number}
-///
-@function ig-math-bezier($points, $t) {
-    @while length($points) > 1 {
-        $new-points: ();
-
-        @for $i from 1 to length($points) {
-            $new-points: append($new-points, ig-math-lerp-2d(nth($points, $i), nth($points, $i + 1), $t));
-        }
-
-        $points: $new-points;
-    }
-
-    @return nth($points, 1);
 }
