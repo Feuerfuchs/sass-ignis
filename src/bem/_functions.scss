@@ -12,7 +12,10 @@
 /// 2. Arguments passed to the mixin (list)
 /// 3. The generated selector (selector)
 /// 4. The generated context (list, may be null)
-/// The function must return a list with two items: 1. true if the usage is valid, otherwise false, 2. a string with a rejection reason (empty if the usage is valid).
+/// The function must return a list with two items: 1. true if the mixin usage is valid, otherwise false, 2. a string with a rejection reason (empty if the usage is valid).
+///
+/// @param {string} $func-name  - First function name.
+/// @param {string} $func-names - Other function names.
 ///
 @mixin ig-bem-add-validator($func-name, $func-names...) {
     $noop: ig-bem-add-validator($func-name, $func-names...);
@@ -32,6 +35,9 @@
 
 ///
 /// Unregister one or multiple validator functions.
+///
+/// @param {string} $func-name  - First function name.
+/// @param {string} $func-names - Other function names.
 ///
 @mixin ig-bem-remove-validator($func-name, $func-names...) {
     $noop: ig-bem-remove-validator($func-name, $func-names...);
