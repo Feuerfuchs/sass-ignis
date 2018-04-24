@@ -16,12 +16,12 @@
 ////
 
 ///
-/// Number of easing steps. The lower the value, the more fine-grained are the steps and the better is
-/// the quality. However, a value of 0.1 is perfectly sufficient and I wouldn't recommend changing it.
+/// Number of intermediate color stops generated to achieve easing.
+/// A higher value results in better quality, but also much more code.
 ///
 /// @type number
 ///
-$ig-easing-gradient-precision: 10 !default;
+$ig-easing-gradient-steps: 10 !default;
 
 /// 
 /// Generate a new easing background gradient.
@@ -207,9 +207,17 @@ $ig-easing-gradient-precision: 10 !default;
 
                     $easing:    $next-stop;
                     $next-stop: nth($stops, $j);
+
+                    @if not ig-easing-gradient-is-color-stop($next-stop) {
+                        @error 'There can be at most one interpolation hint between to color stops.';
+                    }
                 }
 
                 @if $easing != null {
+                    @if type-of($easing) == number {
+                        @error 'Midpoint shifts are not supported.';
+                    }
+
                     $easing-func: null;
                     $easing-args: ();
 
@@ -304,8 +312,8 @@ $ig-easing-gradient-precision: 10 !default;
 
         $distance: $next-stop-pos - $prev-stop-pos;
 
-        @for $i from 1 through $ig-easing-gradient-precision {
-            $perc:  $i / $ig-easing-gradient-precision;
+        @for $i from 1 through $ig-easing-gradient-steps {
+            $perc:  $i / $ig-easing-gradient-steps;
 
             $color: null;
             $pos:   $prev-stop-pos + $perc * $distance;
@@ -332,8 +340,8 @@ $ig-easing-gradient-precision: 10 !default;
             $next-stop-pos: str-slice($next-stop-pos, 6, str-length($next-stop-pos) - 1);
         }
 
-        @for $i from 1 through $ig-easing-gradient-precision {
-            $perc:  $i / $ig-easing-gradient-precision;
+        @for $i from 1 through $ig-easing-gradient-steps {
+            $perc:  $i / $ig-easing-gradient-steps;
 
             $color: null;
             $pos:   null;
