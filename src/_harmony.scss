@@ -91,20 +91,3 @@
 
     @include ig-fluid-property($props, $new-map);
 }
-
-/// 
-/// Version of ig-fluid-modular-scale that supports [include-media](https://include-media.com/) viewports in the $fluid-map.
-///
-/// @see {mixin} ig-fluid-modular-scale
-/// 
-@mixin ig-fluid-modular-scale-im($props, $times, $fluid-map) {
-    $new-map: ();
-
-    @each $key, $value in $fluid-map {
-        $new-map: map-merge($new-map, (
-                $key: ig-harmony-modular-scale($times, $value...)
-        ));
-    }
-
-    @include ig-fluid-property-im($props, $new-map);
-}

@@ -33,17 +33,3 @@
 @mixin fluid-ms($prop, $times, $fluid-map) {
     @include fluid-modular-scale($prop, $times, $fluid-map);
 }
-
-///
-/// @alias ig-fluid-modular-scale-im
-///
-@mixin fluid-modular-scale-im($prop, $times, $fluid-map) {
-    @include ig-fluid-modular-scale-im($prop, $times, $fluid-map);
-}
-
-///
-/// @alias fluid-modular-scale-im
-///
-@mixin fluid-ms-im($prop, $times, $fluid-map) {
-    @include fluid-modular-scale-im($prop, $times, $fluid-map);
-}

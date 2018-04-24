@@ -17,6 +17,14 @@
 /// @access public
 ////
 
+///
+/// If true, named viewports will be supported if a compatible $breakpoints map exists.
+/// This is the case for [include-media](https://include-media.com/), for example.
+///
+/// @type bool
+///
+$ig-fluid-support-named-viewports: true !default;
+
 /// 
 /// Scale a property uniformly between a specific set of target viewports / values.
 ///
@@ -80,17 +88,28 @@
 ///   }
 ///
 @mixin ig-fluid-property($props, $fluid-map) {
-    $keys: ig-quicksort(map-keys($fluid-map));
-
-    @if length($keys) <= 1 {
+    @if length($fluid-map) <= 1 {
         @error '$fluid-map must contain at least two viewports.';
     }
 
-    @each $key in $keys {
+    $new-fluid-map: ();
+
+    @each $key, $value in $fluid-map {
+        @if $ig-fluid-support-named-viewports and global-variable-exists(breakpoints) {
+            @if map-has-key($breakpoints, $key) {
+                $key: map-get($breakpoints, $key);
+            }
+        }
+
         @if (type-of($key) != number) or unitless($key) {
             @error '$fluid-map contains invalid viewports.';
         }
+
+        $new-fluid-map: map-merge($new-fluid-map, ($key: $value));
     }
+
+    $fluid-map: $new-fluid-map;
+    $keys:      ig-quicksort(map-keys($fluid-map));
 
     @for $i from 1 to length($keys) {
         $prev-key: nth($keys, $i);
@@ -138,25 +157,6 @@
             #{$props}: $val;
         }
     }
-}
-
-/// 
-/// Version of ig-fluid-property that supports [include-media](https://include-media.com/) viewports in the $fluid-map.
-///
-/// @see {mixin} ig-fluid-property
-/// 
-@mixin ig-fluid-property-im($prop, $fluid-map) {
-    $new-map: ();
-
-    @each $key, $value in $fluid-map {
-        @if map-has-key($breakpoints, $key) {
-            $key: map-get($breakpoints, $key);
-        }
-
-        $new-map: map-merge($new-map, ($key: $value));
-    }
-
-    @include ig-fluid-property($prop, $new-map);
 }
 
 /// 

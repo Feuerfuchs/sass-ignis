@@ -231,7 +231,7 @@ a {
 ## Fluid properties
 
 [Fluid typography](https://www.smashingmagazine.com/2016/05/fluid-typography/) is a technique where font sizes dynamically respond to the viewport size using viewport units like `vw`, `vh` and so on.
-This concept can be generalized to work with any property that accepts a numeric input.
+Ignis provides mixins that can apply this concept to any property that accepts a numeric input.
 
 ```scss
 .title {
@@ -243,12 +243,12 @@ The padding will be 2.1rem if the viewport is 20rem wide, 2.6rem if it's 40rem w
 If the viewport is narrower than 20rem, the padding will stick with 2.1rem.
 If the viewport is wider than 60rem, the padding will stick with 3.5rem.
 
-If you use [include-media](https://include-media.com/), there is also another mixin `ig-fluid-property-im` which supports include-media viewports.
+If you use [include-media](https://include-media.com/), this mixin also supports named viewports.
 So instead of the example above, you could also use something like this:
 
 ```scss
 .title {
-    @include ig-fluid-property-im(padding, ( phone: 2.1rem, tablet: 2.6rem, desktop: 3.5rem ));
+    @include ig-fluid-property(padding, ( phone: 2.1rem, tablet: 2.6rem, desktop: 3.5rem ));
 }
 ```
 

@@ -12,10 +12,3 @@
 @mixin fluid($props, $fluid-map) {
     @include ig-fluid-property($props, $fluid-map);
 }
-
-///
-/// @alias ig-fluid-property-im
-///
-@mixin fluid-im($props, $fluid-map) {
-    @include ig-fluid-property-im($props, $fluid-map);
-}
