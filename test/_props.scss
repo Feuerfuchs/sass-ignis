@@ -1,7 +1,7 @@
 // sass-lint:disable empty-args
 
 @include describe('Property trees') {
-    @include it('Set') {
+    @include it('Save / Delete') {
         $map: (
             --background: #fff,
             --text:       #000,
@@ -17,7 +17,8 @@
             )
         );
 
-        @include assert-equal(ig-props-set($map), null, 'Set default tree');
+        @include assert-equal(ig-props-save($map),    null, 'Save default tree');
+        @include assert-equal(ig-props-delete(), null, 'Delete default tree');
     }
 
     @include it('Read') {
@@ -51,8 +52,8 @@
             )
         );
 
-        @include assert-equal(ig-props-set($map1),         null,  'Set default tree');
-        @include assert-equal(ig-props-set($map2, 'test'), null,  'Set "test" tree');
+        @include assert-equal(ig-props-save($map1),         null,  'Save default tree');
+        @include assert-equal(ig-props-save($map2, 'test'), null,  'Save "test" tree');
 
         @include assert-equal(ig-props-get(--background),                     #fff,  'Get --background in default');
         @include assert-equal(ig-props-get(--buttons --primary --background), #f00,  'Get --buttons --primary --background in default');
@@ -64,8 +65,8 @@
         @include assert-equal(ig-props-get(--buttons --default --text, 'test'),       #fff,  'Get --buttons --default --text in "test"');
         @include assert-equal(ig-props-get(--box, 'test', $default: false),           false, 'Get nonexistent in "test"');
 
-        @include assert-equal(ig-props-unset(),       null, 'Unset default tree');
-        @include assert-equal(ig-props-unset('test'), null, 'Unset "test" tree');
+        @include assert-equal(ig-props-delete(),       null, 'Delete default tree');
+        @include assert-equal(ig-props-delete('test'), null, 'Delete "test" tree');
     }
 
     @include it('Overwrite') {
@@ -93,20 +94,20 @@
             )
         );
 
-        @include assert-equal(ig-props-set($map1), null, 'Set default tree');
+        @include assert-equal(ig-props-save($map1), null, 'Save default tree');
 
         @include assert-equal(ig-props-get(--background),                                #fff,  'Before update, get --background');
         @include assert-equal(ig-props-get(--text),                                      #000,  'Before update, get --text');
         @include assert-equal(ig-props-get(--buttons --primary --background),            #f00,  'Before update, get --buttons --primary --background');
         @include assert-equal(ig-props-get(--buttons --default --text, $default: false), false, 'Before update, get --buttons --default --text');
 
-        @include assert-equal(ig-props-set($map2), null, 'Overwrite default tree');
+        @include assert-equal(ig-props-save($map2, $merge: true), null, 'Overwrite default tree');
 
         @include assert-equal(ig-props-get(--background),                     #eee, 'After update, get --background');
         @include assert-equal(ig-props-get(--text),                           #000, 'After update, get --text');
         @include assert-equal(ig-props-get(--buttons --primary --background), #00f, 'After update, get --buttons --primary --background');
         @include assert-equal(ig-props-get(--buttons --default --text),       #fff, 'After update, get --buttons --default --text');
 
-        @include assert-equal(ig-props-unset(), null, 'Unset default tree');
+        @include assert-equal(ig-props-delete(), null, 'Delete default tree');
     }
 }

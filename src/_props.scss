@@ -3,7 +3,7 @@
 ///
 /// Property trees allow you to organize properties in a tree structure (internally nested maps).
 /// The intended use is to store all your properties at the beginning and for the rest of the
-/// stylesheet you just get them. There is no way to remove properties.
+/// stylesheet you just get them.
 ///
 /// @group Property trees
 ///
@@ -27,36 +27,34 @@ $ig-props-default-tree: 'default' !default;
 $ig-props-trees: ();
 
 /// 
-/// Save a new property tree.
+/// Save a property tree. If a tree with the sane name already exists, the trees
+/// will be merged.
 ///
-/// @param {map}    $map                           - Map containing properties
-/// @param {string} $tree [$ig-props-default-tree] - ID the map is saved as
+/// @param {map}    $map                            - Map containing properties
+/// @param {string} $tree  [$ig-props-default-tree] - ID the map is saved as
+/// @param {bool}   $merge [false]                  - If a tree named $tree already exists and this value is set to true, they will be merged. Otherwise an error will be emitted.
 ///
-/// @throw If a property name doesn't start with '--'
-///
-@mixin ig-props-set($map, $tree: $ig-props-default-tree) {
-    $noop: ig-props-set($map, $tree);
+@mixin ig-props-save($map, $tree: $ig-props-default-tree, $merge: false) {
+    $noop: ig-props-save($map, $tree, $merge);
 }
 
 /// 
-/// Save a new property tree.
+/// Save a property tree. If a tree with the sane name already exists, the trees
+/// will be merged.
 ///
-/// @param {map}    $map                           - Map containing properties
-/// @param {string} $tree [$ig-props-default-tree] - ID the map is saved as
+/// @param {map}    $map                            - Map containing properties
+/// @param {string} $tree  [$ig-props-default-tree] - ID the map is saved as
+/// @param {bool}   $merge [false]                  - If a tree named $tree already exists and this value is set to true, they will be merged. Otherwise an error will be emitted.
 ///
-/// @throw If a property name doesn't start with '--'
-///
-@function ig-props-set($map, $tree: $ig-props-default-tree) {
-    @each $key, $value in $map {
-        @if str-slice($key, 1, 2) != '--' {
-            @error 'Property names must start with "--".';
-        }
-    }
-
+@function ig-props-save($map, $tree: $ig-props-default-tree, $merge: false) {
     $prop-map: null;
 
     @if map-has-key($ig-props-trees, $tree) {
-        $map: ig-map-merge-recursive(map-get($ig-props-trees, $tree), $map);
+        @if $merge {
+            $map: ig-map-merge-recursive(map-get($ig-props-trees, $tree), $map);
+        } @else {
+            @error 'Property tree #{inspect($tree)} does already exist.';
+        }
     }
 
     $ig-props-trees: map-merge($ig-props-trees, ($tree: $map)) !global;
@@ -65,12 +63,12 @@ $ig-props-trees: ();
 }
 
 /// 
-/// Unset a property tree.
+/// Delete a property tree.
 ///
 /// @param {string} $tree [$ig-props-default-tree] - ID of the tree to be deleted
 ///
-@mixin ig-props-unset($tree: $ig-props-default-tree) {
-    $noop: ig-props-set($tree);
+@mixin ig-props-delete($tree: $ig-props-default-tree) {
+    $noop: ig-props-delete($tree);
 }
 
 /// 
@@ -80,7 +78,7 @@ $ig-props-trees: ();
 ///
 /// @throw If the property tree does not exist
 ///
-@function ig-props-unset($tree: $ig-props-default-tree) {
+@function ig-props-delete($tree: $ig-props-default-tree) {
     @if not map-has-key($ig-props-trees, $tree) {
         @error 'Property tree "#{inspect($tree)}" does not exist.';
     }
@@ -99,7 +97,7 @@ $ig-props-trees: ();
 ///
 /// @throw If there is no tree with the given ID
 ///
-@function ig-props-get-tree($tree: $ig-props-default-tree) {
+@function ig-props-get-all($tree: $ig-props-default-tree) {
     @if not map-has-key($ig-props-trees, $tree) {
         @error 'Unknown tree "#{$tree}".';
     }
@@ -119,7 +117,7 @@ $ig-props-trees: ();
 /// @throw If there was no match for $key and $default is null
 ///
 @function ig-props-get($key, $tree: $ig-props-default-tree, $default: null) {
-    $prop-map:   ig-props-get-tree($tree);
+    $prop-map:   ig-props-get-all($tree);
     $prop-value: ig-map-get-deep($prop-map, $key, $default);
 
     @if $prop-value == null {

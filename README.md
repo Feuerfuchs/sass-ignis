@@ -190,7 +190,7 @@ It's a very simple feature, but it makes managing large sets of structured data 
 Example usage:
 
 ```scss
-@include ig-props-set((
+@include ig-props-save((
     --accent:      #f00,
     --accent-text: #fff,
 
