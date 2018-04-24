@@ -106,8 +106,11 @@
 ///   }
 ///
 @mixin ig-bem-modifier($name, $names...) {
-    $selector: nth(ig-bem-modifier($name, $names...), 1);
+    $result:   ig-bem-modifier($name, $names...);
+    $selector: nth($result, 1);
+    $context:  nth($result, 2);
 
+    @include ig-context-push($ig-bem-context-id, $context...);
     @at-root #{$selector} {
         @content;
     }
@@ -227,10 +230,10 @@
         }
     }
 
-    $noop: ig-context-push($ig-bem-context-id, 'modifier', (
-            'parts':    $parts-data,
-            'selector': $selector
-    ));
+    $context: 'modifier', (
+        'parts':    $parts-data,
+        'selector': $selector
+    );
 
-    @return $selector true;
+    @return $selector $context;
 }

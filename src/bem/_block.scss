@@ -31,8 +31,11 @@
 ///   }
 ///
 @mixin ig-bem-block($name, $type: null) {
-    $selector: nth(ig-bem-block($name, $type), 1);
+    $result:   ig-bem-block($name, $type);
+    $selector: nth($result, 1);
+    $context:  nth($result, 2);
 
+    @include ig-context-push($ig-bem-context-id, $context...);
     @at-root #{$selector} {
         @content;
     }
@@ -87,14 +90,14 @@
         $ig-bem-blocks: append($ig-bem-blocks, $name) !global;
     }
 
-    $noop: ig-context-push($ig-bem-context-id, 'block', (
-            'name':          $name,
-            'type':          $type,
-            'selector':      $selector,
-            'base-selector': $base-selector
-    ));
+    $context: 'block', (
+        'name':          $name,
+        'type':          $type,
+        'selector':      $selector,
+        'base-selector': $base-selector
+    );
 
-    @return $selector true;
+    @return $selector $context;
 }
 
 /// 

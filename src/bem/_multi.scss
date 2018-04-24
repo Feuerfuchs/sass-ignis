@@ -114,13 +114,17 @@
                 @error 'Function "#{inspect($entity-func-id)}" was not found.';
             }
 
-            $entity-data: call($sel-func, $entity...);
+            $entity-result:          call($sel-func, $entity...);
+            $entity-result-selector: nth($entity-result, 1);
+            $entity-result-context:  nth($entity-result, 2);
 
-            @at-root #{nth($entity-data, 1)} {
+            @if $entity-result-context != null {
+                @include ig-context-push($ig-bem-context-id, $entity-result-context...);
+            }
+            @at-root #{$entity-result-selector} {
                 @content;
             }
-
-            @if nth($entity-data, 2) {
+            @if $entity-result-context != null {
                 @include ig-context-pop($ig-bem-context-id);
             }
         }

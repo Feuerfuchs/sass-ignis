@@ -13,8 +13,11 @@
 /// @content
 ///
 @mixin ig-bem-at-theme($name, $names...) {
-    $selector: nth(ig-bem-at-theme($name, $names...), 1);
+    $result:   ig-bem-at-theme($name, $names...);
+    $selector: nth($result, 1);
+    $context:  nth($result, 2);
 
+    @include ig-context-push($ig-bem-context-id, $context...);
     @at-root #{$selector} {
         @content;
     }
@@ -43,10 +46,10 @@
     $selector: selector-nest($selector, &);
     $selector: ig-selector-nest-fix($selector);
 
-    $noop: ig-context-push($ig-bem-context-id, 'at-theme', (
-            'name':     join($name, $names),
-            'selector': $selector
-    ));
+    $context: 'at-theme', (
+        'name':     join($name, $names),
+        'selector': $selector
+    );
 
-    @return $selector true;
+    @return $selector $context;
 }

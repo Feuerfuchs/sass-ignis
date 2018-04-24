@@ -49,8 +49,11 @@
 ///   }
 ///
 @mixin ig-bem-suffix($name) {
-    $selector: nth(ig-bem-suffix($name), 1);
+    $result:   ig-bem-suffix($name);
+    $selector: nth($result, 1);
+    $context:  nth($result, 2);
 
+    @include ig-context-push($ig-bem-context-id, $context...);
     @at-root #{$selector} {
         @content;
     }
@@ -99,10 +102,10 @@
 
     $selector: selector-append(&, $ig-bem-suffix-separator + $name);
 
-    $noop: ig-context-push($ig-bem-context-id, 'suffix', (
-            'name':     $name,
-            'selector': $selector
-    ));
+    $context: 'suffix', (
+        'name':     $name,
+        'selector': $selector
+    );
 
-    @return $selector true;
+    @return $selector $context;
 }

@@ -76,7 +76,7 @@
         $selector: join($selector, $sel, comma);
     }
 
-    @return $selector false;
+    @return $selector null;
 }
 
 /// 
@@ -151,5 +151,5 @@
         $selector: join($selector, $sel, comma);
     }
 
-    @return $selector false;
+    @return $selector null;
 }
