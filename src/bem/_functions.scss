@@ -5,7 +5,7 @@
 ////
 
 ///
-/// Register a new validator function.
+/// Register one or multiple validator functions.
 ///
 /// A validator function is a function that accepts 4 arguments:
 /// 1. BEM entity type (string)
@@ -14,34 +14,36 @@
 /// 4. The generated context (list, may be null)
 /// The function must return a list with two items: 1. true if the usage is valid, otherwise false, 2. a string with a rejection reason (empty if the usage is valid).
 ///
-@mixin ig-bem-add-validator($func-name) {
-    $noop: ig-bem-add-validator($func-name);
+@mixin ig-bem-add-validator($func-name, $func-names...) {
+    $noop: ig-bem-add-validator($func-name, $func-names...);
 }
 
 ///
-/// Register a new validator function. Check the respective mixin documentation for more information.
+/// Register one or multiple validator functions. Check the respective mixin documentation for more information.
 /// 
 /// @see {mixin} ig-bem-add-validator
 ///
-@function ig-bem-add-validator($func-name) {
-    $ig-bem-validators: map-merge($ig-bem-validators, ($func-name: get-function($func-name)));
+@function ig-bem-add-validator($func-name, $func-names...) {
+    @each $fn in join($func-name, $func-names) {
+        $ig-bem-validators: map-merge($ig-bem-validators, ($fn: get-function($fn)));
+    }
     @return null;
 }
 
 ///
-/// Unregister a validator function. Check the respective mixin documentation for more information.
-/// 
-/// @see {mixin} ig-bem-remove-validator
+/// Unregister one or multiple validator functions.
 ///
-@mixin ig-bem-remove-validator($func-name) {
-    $noop: ig-bem-remove-validator($func-name);
+@mixin ig-bem-remove-validator($func-name, $func-names...) {
+    $noop: ig-bem-remove-validator($func-name, $func-names...);
 }
 
 ///
-/// Unregister a validator function.
+/// Unregister one or multiple validator functions. Check the respective mixin documentation for more information.
+/// 
+/// @see {mixin} ig-bem-remove-validator
 ///
-@function ig-bem-remove-validator($func-name) {
-    $ig-bem-validators: map-remove($ig-bem-validators, $func-name);
+@function ig-bem-remove-validator($func-name, $func-names...) {
+    $ig-bem-validators: map-remove($ig-bem-validators, $func-name, $func-names...);
     @return null;
 }
 
