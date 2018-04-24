@@ -110,6 +110,13 @@
     $selector: nth($result, 1);
     $context:  nth($result, 2);
 
+    @include ig-bem-validate(
+        'modifier',
+        $name $names,
+        $selector,
+        $context
+    );
+
     @include ig-context-push($ig-bem-context-id, $context...);
     @at-root #{$selector} {
         @content;

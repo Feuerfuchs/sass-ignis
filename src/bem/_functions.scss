@@ -4,9 +4,63 @@
 /// @access public
 ////
 
-//
-// @access private
-//
+///
+/// Register a new validator function.
+///
+/// A validator function is a function that accepts 4 arguments:
+/// 1. BEM entity type (string)
+/// 2. Arguments passed to the mixin (list)
+/// 3. The generated selector (selector)
+/// 4. The generated context (list, may be null)
+/// The function must return a list with two items: 1. true if the usage is valid, otherwise false, 2. a string with a rejection reason (empty if the usage is valid).
+///
+@mixin ig-bem-add-validator($func-name) {
+    $noop: ig-bem-add-validator($func-name);
+}
+
+///
+/// Register a new validator function. Check the respective mixin documentation for more information.
+/// 
+/// @see {mixin} ig-bem-add-validator
+///
+@function ig-bem-add-validator($func-name) {
+    $ig-bem-validators: map-merge($ig-bem-validators, ($func-name: get-function($func-name)));
+    @return null;
+}
+
+///
+/// Unregister a validator function. Check the respective mixin documentation for more information.
+/// 
+/// @see {mixin} ig-bem-remove-validator
+///
+@mixin ig-bem-remove-validator($func-name) {
+    $noop: ig-bem-remove-validator($func-name);
+}
+
+///
+/// Unregister a validator function.
+///
+@function ig-bem-remove-validator($func-name) {
+    $ig-bem-validators: map-remove($ig-bem-validators, $func-name);
+    @return null;
+}
+
+///
+/// @access private
+///
+@mixin ig-bem-validate($type, $args, $selector, $context) {
+    @each $id, $fn in $ig-bem-validators {
+        $result: call($fn, $args, $selector, $context);
+        @if not nth($result, 1) {
+            @error 'A BEM validator rejected this mixin usage due to the following reason: #{nth($result, 2)}';
+        }
+    }
+}
+
+
+///
+/// @access private
+///
 @function ig-bem-theme-selector($name, $names...) {
     $namespace: map-get($ig-bem-namespaces, 'theme');
     $selector:  null;

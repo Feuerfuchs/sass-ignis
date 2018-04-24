@@ -38,6 +38,7 @@ Ignis' main feature is its BEM system which was developed over the course of two
 - Quality: All mixins generate optimal selectors with a minimal degree of specificity.
 - Safety: All mixins perform checks if they are used correctly.
 - Flexibility: Mix BEM selectors and other selectors however you like — the BEM system will adapt.
+- Rules: The BEM system allows you to set rules that control how the BEM mixins may or may not be used.
 
 Below is a basic example showing how the BEM system can be used:
 

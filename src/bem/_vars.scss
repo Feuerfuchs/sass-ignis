@@ -86,3 +86,12 @@ $ig-bem-element-nesting-policy: 'allow' !default;
 /// @type string
 ///
 $ig-bem-context-id: 'bem' !default;
+
+///
+/// A list of validator functions.
+///
+/// @type list
+///
+/// @access private
+///
+$ig-bem-validators: ();

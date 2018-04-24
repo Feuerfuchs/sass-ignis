@@ -54,6 +54,13 @@
 @mixin ig-bem-is($state, $states...) {
     $selector: nth(ig-bem-is($state, $states...), 1);
 
+    @include ig-bem-validate(
+        'state-is',
+        $state $states,
+        $selector,
+        null
+    );
+
     @at-root #{$selector} {
         @content;
     }
@@ -128,6 +135,13 @@
 ///
 @mixin ig-bem-has($state, $states...) {
     $selector: nth(ig-bem-has($state, $states...), 1);
+
+    @include ig-bem-validate(
+        'state-has',
+        $state $states,
+        $selector,
+        null
+    );
 
     @at-root #{$selector} {
         @content;
