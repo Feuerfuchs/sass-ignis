@@ -120,23 +120,33 @@ $ig-bem-validators: ();
         $ig-bem-generated-selectors: () !global;
     }
 
-    $block-selector: null;
+    $block-name: null;
+    $block-type: null;
+    $block-id:   null;
 
     @if $type == 'block' {
-        $block-selector: inspect($selector);
+        $block-name: map-get($args, 'name');
+        $block-type: map-get($args, 'type');
     } @else {
-        $block-context:  ig-context-get($ig-bem-context-id, 'block');
-        $block-selector: inspect(map-get(nth($block-context, 2), 'selector'));
+        $block-context: ig-context-get($ig-bem-context-id, 'block');
+        $block-name:    map-get(nth($block-context, 2), 'name');
+        $block-type:    map-get(nth($block-context, 2), 'type');
+    }
+
+    @if $block-type != null {
+        $block-id: $block-name + '_' + $block-type;
+    } @else {
+        $block-id: $block-name;
     }
 
     @if $type == 'block' {
-        @if map-has-key($ig-bem-generated-selectors, $block-selector) {
+        @if map-has-key($ig-bem-generated-selectors, $block-id) {
             @return false 'Entity "#{$type}" with arguments [ #{ig-map-print($args)} ] was already defined.';
         }
 
-        $ig-bem-generated-selectors: map-merge($ig-bem-generated-selectors, ($block-selector: ())) !global;
+        $ig-bem-generated-selectors: map-merge($ig-bem-generated-selectors, ($block-id: ())) !global;
     } @else {
-        $selectors: map-get($ig-bem-generated-selectors, $block-selector);
+        $selectors: map-get($ig-bem-generated-selectors, $block-id);
 
         @if index($selectors, $selector) {
             @return false 'Entity "#{$type}" with arguments [ #{ig-map-print($args)} ] was already defined.';
@@ -144,7 +154,7 @@ $ig-bem-validators: ();
 
         $selectors: append($selectors, $selector);
 
-        $ig-bem-generated-selectors: map-merge($ig-bem-generated-selectors, ($block-selector: $selectors)) !global;
+        $ig-bem-generated-selectors: map-merge($ig-bem-generated-selectors, ($block-id: $selectors)) !global;
     }
 
     @return true '';
