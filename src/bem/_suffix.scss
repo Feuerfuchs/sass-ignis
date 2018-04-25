@@ -55,7 +55,7 @@
 
     @include ig-bem-validate(
         'suffix',
-        $name,
+        (name: $name),
         $selector,
         $context
     );

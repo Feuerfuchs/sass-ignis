@@ -1,0 +1,151 @@
+////
+/// @group BEM
+///
+/// @access public
+////
+
+///
+/// A list of validator functions.
+///
+/// @type list
+///
+/// @access private
+///
+$ig-bem-validators: ();
+
+///
+/// Register one or multiple validator functions.
+///
+/// A validator function is a function that accepts 4 arguments:
+/// 1. BEM entity type (string)
+/// 2. Arguments passed to the mixin (map)
+/// 3. The generated selector (selector)
+/// 4. The generated context (list, may be null)
+/// The function must return a list with two items: 1. true if the mixin usage is valid, otherwise false, 2. a string with a rejection reason (empty if the usage is valid).
+///
+/// @param {string} $func-name  - First function name.
+/// @param {string} $func-names - Other function names.
+///
+@mixin ig-bem-add-validator($func-name, $func-names...) {
+    $noop: ig-bem-add-validator($func-name, $func-names...);
+}
+
+///
+/// Register one or multiple validator functions. Check the respective mixin documentation for more information.
+/// 
+/// @see {mixin} ig-bem-add-validator
+///
+@function ig-bem-add-validator($func-name, $func-names...) {
+    @each $fn-name in join($func-name, $func-names) {
+        $fn: get-function($fn-name);
+        $ig-bem-validators: map-merge($ig-bem-validators, ($fn-name: $fn)) !global;
+    }
+    @return null;
+}
+
+///
+/// Unregister one or multiple validator functions.
+///
+/// @param {string} $func-name  - First function name.
+/// @param {string} $func-names - Other function names.
+///
+@mixin ig-bem-remove-validator($func-name, $func-names...) {
+    $noop: ig-bem-remove-validator($func-name, $func-names...);
+}
+
+///
+/// Unregister one or multiple validator functions. Check the respective mixin documentation for more information.
+/// 
+/// @see {mixin} ig-bem-remove-validator
+///
+@function ig-bem-remove-validator($func-name, $func-names...) {
+    $ig-bem-validators: map-remove($ig-bem-validators, $func-name, $func-names...) !global;
+    @return null;
+}
+
+///
+/// @access private
+///
+@mixin ig-bem-validate($type, $args, $selector, $context) {
+    @each $id, $fn in $ig-bem-validators {
+        $result: call($fn, $type, $args, $selector, $context);
+        @if not nth($result, 1) {
+            @error 'A BEM validator rejected this mixin usage due to the following reason: #{nth($result, 2)}';
+        }
+    }
+}
+
+//
+// ---------------------------------------------------------------------------------------------------------
+//  Built-in validators
+// ---------------------------------------------------------------------------------------------------------
+//
+
+///
+/// A validator that makes sure blocks are declared in the right order, determined by the
+/// namespace used.
+///
+@function ig-bem-validator--enforce-namespace-order($type, $args, $selector, $context) {
+    @if not global-variable-exists(ig-bem-namespace-order) {
+        $ig-bem-namespace-order: map-keys($ig-bem-namespaces) !global;
+    }
+    @if not global-variable-exists(ig-bem-cur-namespace-index) {
+        $ig-bem-cur-namespace-index: 1 !global;
+    }
+
+    @if $type == 'block' {
+        $block-type: map-get($args, 'type');
+
+        @if $block-type != null {
+            $ns-index: index($ig-bem-namespace-order, $block-type);
+
+            @if $ns-index != null {
+                @if $ns-index < $ig-bem-cur-namespace-index {
+                    @return false 'Namespace "#{$block-type}" comes before current namespace #{nth($ig-bem-namespace-order, $ig-bem-cur-namespace-index)}';
+                }
+
+                $ig-bem-cur-namespace-index: $ns-index !global;
+            }
+        }
+    }
+
+    @return true '';
+}
+
+///
+/// A validator that makes all BEM entities immutable.
+///
+@function ig-bem-validator--immutable-entities($type, $args, $selector, $context) {
+    @if not global-variable-exists(ig-bem-generated-selectors) {
+        $ig-bem-generated-selectors: () !global;
+    }
+
+    $block-selector: null;
+
+    @if $type == 'block' {
+        $block-selector: inspect($selector);
+    } @else {
+        $block-context:  ig-context-get($ig-bem-context-id, 'block');
+        $block-selector: inspect(map-get(nth($block-context, 2), 'selector'));
+    }
+
+    @if $type == 'block' {
+        @if map-has-key($ig-bem-generated-selectors, $block-selector) {
+            @return false 'Entity "#{$type}" with arguments [ #{ig-map-print($args)} ] was already defined.';
+        }
+
+        $ig-bem-generated-selectors: map-merge($ig-bem-generated-selectors, ($block-selector: ())) !global;
+    } @else {
+        $selectors: map-get($ig-bem-generated-selectors, $block-selector);
+
+        @if index($selectors, $selector) {
+            @return false 'Entity "#{$type}" with arguments [ #{ig-map-print($args)} ] was already defined.';
+        }
+
+        $selectors: append($selectors, $selector);
+
+        $ig-bem-generated-selectors: map-merge($ig-bem-generated-selectors, ($block-selector: $selectors)) !global;
+    }
+
+    @return true '';
+}

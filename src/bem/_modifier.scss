@@ -112,7 +112,7 @@
 
     @include ig-bem-validate(
         'modifier',
-        $name $names,
+        (name: $name, names: $names),
         $selector,
         $context
     );

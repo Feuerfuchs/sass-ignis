@@ -37,10 +37,16 @@
 
     @include ig-bem-validate(
         'block',
-        $name $type,
+        (name: $name, type: $type),
         $selector,
         $context
     );
+
+    @if $type != null {
+        $ig-bem-blocks: append($ig-bem-blocks, $name + '_' + $type) !global;
+    } @else {
+        $ig-bem-blocks: append($ig-bem-blocks, $name) !global;
+    }
 
     @include ig-context-push($ig-bem-context-id, $context...);
     @at-root #{$selector} {
@@ -89,12 +95,6 @@
     @if & {
         $selector: selector-nest(&, $selector);
         $selector: ig-selector-nest-fix($selector);
-    }
-
-    @if $type != null {
-        $ig-bem-blocks: append($ig-bem-blocks, $name + '_' + $type) !global;
-    } @else {
-        $ig-bem-blocks: append($ig-bem-blocks, $name) !global;
     }
 
     $context: 'block', (

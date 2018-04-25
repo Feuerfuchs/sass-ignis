@@ -223,6 +223,39 @@
 }
 
 /// 
+/// Get the contents of a map as a user-friendly string representation.
+///
+/// @param {map} $map
+///
+/// @return {string}
+///
+@function ig-map-print($map) {
+    $output: '';
+
+    @each $key, $value in $map {
+        $value-str: '';
+
+        @if type-of($value) == map {
+            $value-str: '[ ' + ig-map-print($value) + ' ]';
+        } @else if type-of($value) == list {
+            $value-str: '[ ' + ig-str-implode($value, ', ') + ' ]';
+        } @else if type-of($value) == string {
+            $value-str: '\'' + $value + '\'';
+        } @else {
+            $value-str: $value;
+        }
+
+        @if $output == '' {
+            $output: $key + ': ' + $value-str;
+        } @else {
+            $output: $output + ', ' + $key + ': ' + $value-str;
+        }
+    }
+
+    @return $output;
+}
+
+/// 
 /// A bugfix for the built-in selector-nest function.
 ///
 /// For some reason, SASS will duplicate parts of the selector which will result in

@@ -93,7 +93,7 @@
 
     @include ig-bem-validate(
         'element',
-        $name $names,
+        (name: $name, names: $names),
         $selector,
         $context
     );
@@ -285,7 +285,7 @@
 
     @include ig-bem-validate(
         'related-element',
-        $sign $name $names,
+        (sign: $sign, name: $name, names: $names),
         $selector,
         $context
     );

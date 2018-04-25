@@ -5,68 +5,6 @@
 ////
 
 ///
-/// Register one or multiple validator functions.
-///
-/// A validator function is a function that accepts 4 arguments:
-/// 1. BEM entity type (string)
-/// 2. Arguments passed to the mixin (list)
-/// 3. The generated selector (selector)
-/// 4. The generated context (list, may be null)
-/// The function must return a list with two items: 1. true if the mixin usage is valid, otherwise false, 2. a string with a rejection reason (empty if the usage is valid).
-///
-/// @param {string} $func-name  - First function name.
-/// @param {string} $func-names - Other function names.
-///
-@mixin ig-bem-add-validator($func-name, $func-names...) {
-    $noop: ig-bem-add-validator($func-name, $func-names...);
-}
-
-///
-/// Register one or multiple validator functions. Check the respective mixin documentation for more information.
-/// 
-/// @see {mixin} ig-bem-add-validator
-///
-@function ig-bem-add-validator($func-name, $func-names...) {
-    @each $fn in join($func-name, $func-names) {
-        $ig-bem-validators: map-merge($ig-bem-validators, ($fn: get-function($fn)));
-    }
-    @return null;
-}
-
-///
-/// Unregister one or multiple validator functions.
-///
-/// @param {string} $func-name  - First function name.
-/// @param {string} $func-names - Other function names.
-///
-@mixin ig-bem-remove-validator($func-name, $func-names...) {
-    $noop: ig-bem-remove-validator($func-name, $func-names...);
-}
-
-///
-/// Unregister one or multiple validator functions. Check the respective mixin documentation for more information.
-/// 
-/// @see {mixin} ig-bem-remove-validator
-///
-@function ig-bem-remove-validator($func-name, $func-names...) {
-    $ig-bem-validators: map-remove($ig-bem-validators, $func-name, $func-names...);
-    @return null;
-}
-
-///
-/// @access private
-///
-@mixin ig-bem-validate($type, $args, $selector, $context) {
-    @each $id, $fn in $ig-bem-validators {
-        $result: call($fn, $args, $selector, $context);
-        @if not nth($result, 1) {
-            @error 'A BEM validator rejected this mixin usage due to the following reason: #{nth($result, 2)}';
-        }
-    }
-}
-
-
-///
 /// @access private
 ///
 @function ig-bem-theme-selector($name, $names...) {

@@ -19,7 +19,7 @@
 
     @include ig-bem-validate(
         'at-theme',
-        $name $names,
+        (name: $name, names: $names),
         $selector,
         $context
     );

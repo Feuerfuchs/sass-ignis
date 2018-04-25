@@ -41,12 +41,12 @@ $ig-bem-suffix-separator: '\\@' !default;
 /// @type map
 ///
 $ig-bem-namespaces: (
-    utility:   'u',
     object:    'o',
     component: 'c',
     layout:    'l',
     scope:     's',
     theme:     't',
+    utility:   'u',
     js:        'js',
     qa:        'qa',
     hack:      '_'
@@ -86,12 +86,3 @@ $ig-bem-element-nesting-policy: 'allow' !default;
 /// @type string
 ///
 $ig-bem-context-id: 'bem' !default;
-
-///
-/// A list of validator functions.
-///
-/// @type list
-///
-/// @access private
-///
-$ig-bem-validators: ();
