@@ -211,7 +211,7 @@ $ig-context-stacks: ();
 /// @param {list}   $context-ids             - Context IDs
 /// @param {bool}   $check-head-only [false] - If false, all items will be checked. If true, only the head will be checked.
 ///
-/// @return {bool} true if the context stack contains one of the context IDs, otherwise false
+/// @return {bool} `true` if the context stack contains one of the context IDs, otherwise `false`
 ///
 @function ig-context-stack-contains($stack-id, $context-ids, $check-head-only: false) {
     @if not map-has-key($ig-context-stacks, $stack-id) {

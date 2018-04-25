@@ -69,7 +69,7 @@
 ///
 /// Generate a new is-state modifier. Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-is
 ///
@@ -151,7 +151,7 @@
 ///
 /// Generate a new has-state modifier. Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-has
 ///

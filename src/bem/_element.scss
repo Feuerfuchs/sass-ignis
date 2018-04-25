@@ -108,7 +108,7 @@
 ///
 /// Generate a new BEM element. Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-element
 ///
@@ -301,7 +301,7 @@
 /// Generate a new BEM element that is related to the current element.
 /// Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-related-element
 ///
@@ -365,7 +365,7 @@
 /// Generate a new BEM element that is a sibling of the current element.
 /// Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-sibling-element
 ///
@@ -393,7 +393,7 @@
 /// Generate a new BEM element that is the successor of the current element.
 /// Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-next-element
 ///
@@ -476,7 +476,7 @@
 /// Generate the current BEM element as a successor of itself.
 /// Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-next-twin-element
 ///

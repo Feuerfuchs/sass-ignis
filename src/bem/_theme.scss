@@ -35,7 +35,7 @@
 /// Declare new rules for the current block for when this theme is active.
 /// Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-at-theme
 ///

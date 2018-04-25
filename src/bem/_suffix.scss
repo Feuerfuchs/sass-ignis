@@ -70,7 +70,7 @@
 ///
 /// Generate a new suffix. Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-suffix
 ///

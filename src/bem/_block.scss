@@ -58,7 +58,7 @@
 ///
 /// Generate a new block. Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-block
 ///
@@ -123,7 +123,7 @@
 ///
 /// Generate a new object block. Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-object
 ///
@@ -147,7 +147,7 @@
 ///
 /// Generate a new component block. Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-component
 ///
@@ -171,7 +171,7 @@
 ///
 /// Generate a new layout block. Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-layout
 ///
@@ -195,7 +195,7 @@
 ///
 /// Generate a new utility block. Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-utility
 ///
@@ -219,7 +219,7 @@
 ///
 /// Generate a new scope block. Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-scope
 ///
@@ -243,7 +243,7 @@
 ///
 /// Generate a new theme block. Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-theme
 ///
@@ -267,7 +267,7 @@
 ///
 /// Generate a new JS block. Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-js
 ///
@@ -291,7 +291,7 @@
 ///
 /// Generate a new QA block. Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-qa
 ///
@@ -315,7 +315,7 @@
 ///
 /// Generate a new hack block. Check the respective mixin documentation for more information.
 /// 
-/// @return {list} A list with two items: 1. selector, 2. true if context was created, otherwise false
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
 ///
 /// @see {mixin} ig-bem-hack
 ///

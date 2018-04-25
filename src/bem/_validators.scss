@@ -1,4 +1,16 @@
 ////
+/// Validators are custom functions that will be called before a BEM entity is created.
+/// They check if the current mixin usage is valid or not and thus they are a flexible way to
+/// let you implement your own rules.
+/// 
+/// Validator functions receive the following information:
+/// - BEM entity type
+/// - Arguments passed to the mixin
+/// - The generated selector
+/// - The generated context, if any
+/// 
+/// Additionally, the context stack used by the BEM system can be examined.
+///
 /// @group BEM
 ///
 /// @access public
@@ -21,7 +33,10 @@ $ig-bem-validators: ();
 /// 2. Arguments passed to the mixin (map)
 /// 3. The generated selector (selector)
 /// 4. The generated context (list, may be null)
-/// The function must return a list with two items: 1. true if the mixin usage is valid, otherwise false, 2. a string with a rejection reason (empty if the usage is valid).
+/// 
+/// The function must return a list with two items:
+/// 1. `true` if the mixin usage is valid, otherwise `false`,
+/// 2. a string with a rejection reason (empty if the usage is valid).
 ///
 /// @param {string} $func-name  - First function name.
 /// @param {string} $func-names - Other function names.
