@@ -16,7 +16,7 @@
             mix(transparent, #000, ig-ease-in-quad(0.25) * 100%) 25%,
             mix(transparent, #000, ig-ease-in-quad(0.5)  * 100%) 50%,
             mix(transparent, #000, ig-ease-in-quad(0.75) * 100%) 75%,
-            mix(transparent, #000, ig-ease-in-quad(1)    * 100%) 100%
+            transparent 100%
         );
 
         @include assert-equal($gradient1, $expected1, 'Simple linear gradient');
@@ -37,7 +37,7 @@
             mix(transparent, #000, ig-ease-out-cubic(0.25) * 100%) 25%,
             mix(transparent, #000, ig-ease-out-cubic(0.5)  * 100%) 50%,
             mix(transparent, #000, ig-ease-out-cubic(0.75) * 100%) 75%,
-            mix(transparent, #000, ig-ease-out-cubic(1)    * 100%) 100%
+            transparent 100%
         );
 
         @include assert-equal($gradient2, $expected2, 'Simple radial gradient');
@@ -58,7 +58,7 @@
             mix(transparent, #000, ig-ease-in-quad(0.25) * 100%) 4em,
             mix(transparent, #000, ig-ease-in-quad(0.5)  * 100%) 6em,
             mix(transparent, #000, ig-ease-in-quad(0.75) * 100%) 8em,
-            mix(transparent, #000, ig-ease-in-quad(1)    * 100%) 10em
+            transparent 10em
         );
 
         @include assert-equal($gradient3, $expected3, 'Linear gradient with positioned color stops');
@@ -79,7 +79,7 @@
             mix(transparent, #000, ig-ease-in-quad(0.25) * 100%) calc(20% + (20% + 10em - 20%) * 0.25),
             mix(transparent, #000, ig-ease-in-quad(0.5)  * 100%) calc(20% + (20% + 10em - 20%) * 0.5),
             mix(transparent, #000, ig-ease-in-quad(0.75) * 100%) calc(20% + (20% + 10em - 20%) * 0.75),
-            mix(transparent, #000, ig-ease-in-quad(1)    * 100%) calc(20% + 10em)
+            transparent calc(20% + 10em)
         );
 
         @include assert-equal($gradient4, $expected4, 'More advanced linear gradient with positioned color stops');
@@ -102,7 +102,7 @@
             mix(transparent, #f00, ig-ease-in-quad(0.25) * 100%) 7em + 3em * 0.25,
             mix(transparent, #f00, ig-ease-in-quad(0.5)  * 100%) 7em + 3em * 0.5,
             mix(transparent, #f00, ig-ease-in-quad(0.75) * 100%) 7em + 3em * 0.75,
-            mix(transparent, #f00, ig-ease-in-quad(1)    * 100%) 10em
+            transparent 10em
         );
 
         @include assert-equal($gradient5, $expected5, 'Linear gradient with 3 positioned color stops, 1 easing transitions');
@@ -129,7 +129,7 @@
             mix(transparent, #f00, ig-ease-in-quad(0.25) * 100%) 7em + 3em * 0.25,
             mix(transparent, #f00, ig-ease-in-quad(0.5)  * 100%) 7em + 3em * 0.5,
             mix(transparent, #f00, ig-ease-in-quad(0.75) * 100%) 7em + 3em * 0.75,
-            mix(transparent, #f00, ig-ease-in-quad(1)    * 100%) 10em
+            transparent 10em
         );
 
         @include assert-equal($gradient6, $expected6, 'Linear gradient with 3 positioned color stops, 2 easing transitions');
@@ -156,7 +156,7 @@
             mix(transparent, #f00, ig-ease-in-quad(0.25) * 100%) 6em + 4em * 0.25,
             mix(transparent, #f00, ig-ease-in-quad(0.5)  * 100%) 6em + 4em * 0.5,
             mix(transparent, #f00, ig-ease-in-quad(0.75) * 100%) 6em + 4em * 0.75,
-            mix(transparent, #f00, ig-ease-in-quad(1)    * 100%) 10em
+            transparent 10em
         );
 
         @include assert-equal($gradient7, $expected7, 'Linear gradient with 2 / 3 positioned color stops, 2 easing transitions');
@@ -183,7 +183,7 @@
             mix(transparent, #f00, ig-ease-in-quad(0.25) * 100%) 50% + 50% * 0.25,
             mix(transparent, #f00, ig-ease-in-quad(0.5)  * 100%) 50% + 50% * 0.5,
             mix(transparent, #f00, ig-ease-in-quad(0.75) * 100%) 50% + 50% * 0.75,
-            mix(transparent, #f00, ig-ease-in-quad(1)    * 100%) 100%
+            transparent 100%
         );
 
         @include assert-equal($gradient8, $expected8, 'Linear gradient with 0 / 3 positioned color stops, 2 easing transitions');
@@ -210,7 +210,7 @@
             mix(transparent, #f00, ig-ease-in-quad(0.25) * 100%) 10em + 10em * 0.25,
             mix(transparent, #f00, ig-ease-in-quad(0.5)  * 100%) 10em + 10em * 0.5,
             mix(transparent, #f00, ig-ease-in-quad(0.75) * 100%) 10em + 10em * 0.75,
-            mix(transparent, #f00, ig-ease-in-quad(1)    * 100%) 20em
+            transparent 20em
         );
 
         @include assert-equal($gradient9, $expected9, 'Linear gradient with 1 / 3 positioned color stops, 2 easing transitions');
@@ -231,7 +231,7 @@
             mix(transparent, #000, ig-cubic-bezier(0.47, 0, 0.745, 0.715, 0.25) * 100%) 25%,
             mix(transparent, #000, ig-cubic-bezier(0.47, 0, 0.745, 0.715, 0.5)  * 100%) 50%,
             mix(transparent, #000, ig-cubic-bezier(0.47, 0, 0.745, 0.715, 0.75) * 100%) 75%,
-            mix(transparent, #000, ig-cubic-bezier(0.47, 0, 0.745, 0.715, 1)    * 100%) 100%
+            transparent 100%
         );
 
         @include assert-equal($gradient10, $expected10, 'Simple linear gradient with custom cubic-bezier easing');
@@ -252,7 +252,7 @@
             mix(transparent, #000, 0.25 * 100%) 25%,
             mix(transparent, #000, 0.5  * 100%) 50%,
             mix(transparent, #000, 0.75 * 100%) 75%,
-            mix(transparent, #000, 1    * 100%) 100%
+            transparent 100%
         );
 
         @include assert-equal($gradient11, $expected11, 'Simple linear gradient with custom steps easing');
