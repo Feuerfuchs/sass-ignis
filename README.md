@@ -18,14 +18,36 @@ For less clutter, there are shorter versions available.
 
 ## Getting started
 
-Ignis hasn't been published on a package manager like npm yet, so to get started you need to download this repository.
+Install the package `sass-ignis` from the npm repository using he package manager of your choice.
 
-Run `npm install` or `yarn` to install all development dependencies.
+- npm: `npm install sass-ignis`
+- yarn: `yarn add sass-ignis`
+
+Then include Ignis in your SASS stylesheet:
+
+```scss
+// overrides
+@import 'node_modules/sass-ignis/src/main';
+// rest of your files
+```
+
+If you want to use a function Ignis provides to override variables, include `ignis/src/prep` before the overrides.
+
+Ignis uses function, mixin and variable names that are prefixed with 'ig-' to avoid clashes with other libraries.
+However, Ignis optionally provides shorter versions of many mixins and functions (referred to as "shortcodes"):
+
+- `ignis/src/bem-shortcodes`: BEM-related features
+- `ignis/src/fluid-shortcodes`: Fluid properties
+- `ignis/src/harmony-shortcodes`: Modular scales
+
+## Development
+
+Clone this repository, then run `npm install` or `yarn` to install all dependencies.
 
 The following npm scripts are available:
 
 - `lint`: Lint the source code with sass-lint.
-- `livelint`: Lint automatically whenever the code changes. Useful in combination with the VSCode task `livelint`.
+- `livelint`: Lint automatically whenever the code changes.
 - `doc`: Generate the SassDoc documentation.
 - `test`: Run unit tests.
 

@@ -262,7 +262,7 @@
 /// excessively long selectors and bad compilation performance. This fix removes
 /// all duplicate selectors and should be called right after selector-nest.
 ///
-/// Issue was reported: https://github.com/sass/libsass/issues/2634
+/// Issue was reported: https://github.com/sass/libsass/issues/2640
 ///
 /// @param {selector} $selector - Selector modified with selector-nest
 ///

@@ -7,13 +7,6 @@
 ////
 
 /// 
-/// 
-///
-@function ig-math-sign($n) {
-    @return if($n < 0, -1, 1);
-}
-
-/// 
 /// Perform exponentiation. Only integer exponents are supported.
 ///
 /// @param {number} $base
