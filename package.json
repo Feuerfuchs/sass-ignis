@@ -5,9 +5,6 @@
 	"license": "MIT",
 	"description": "A mixin-based framework that makes it easier to work with BEM, organize variables and offers other useful features.",
 	"main": "src/main.scss",
-	"files": [
-		"src"
-	],
 	"keywords": [
 		"sass",
 		"scss",
