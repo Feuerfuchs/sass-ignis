@@ -9,7 +9,7 @@ Its main feature is a **[BEM system](#bem-system)**, though it also includes som
 - [Fluid properties](#fluid-properties): A generalization of fluid typography
 - [Modular scales](#modular-scales)
 
-All features are explained in greater detail the [Wiki](https://github.com/Feuerfuchs/sass-ignis/wiki).  
+All features are explained in greater detail in the [Wiki](https://github.com/Feuerfuchs/sass-ignis/wiki).  
 For thorough explanations about single mixins, functions and variables, check the [SassDoc documentation](https://ignis-doc.feuerfuchs.eu/).  
 The rest of this document is a quick overview over what Ignis has to offer.
 
