@@ -35,7 +35,7 @@
 	"scripts": {
 		"lint": "sass-lint '{src,test}/**/*.scss' -q -v || true",
 		"livelint": "nodemon --watch src --watch test -e scss -x 'echo \"BEGIN LINT\" && npm run lint && echo \"END LINT\"'",
-		"doc": "sassdoc src -d docs",
+		"doc": "sassdoc src",
 		"test": "mocha test/test.js",
 		"publishdoc": "rsync --progress --stats -avz --delete sassdoc/ vulpes@acrux.uberspace.de:/var/www/virtual/vulpes/ignis-doc.feuerfuchs.eu/"
 	}
