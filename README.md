@@ -13,12 +13,9 @@ All features are explained in the [Wiki](https://github.com/Feuerfuchs/sass-igni
 For thorough explanations about all mixins, functions and variables, check the [SassDoc documentation](https://ignis-doc.feuerfuchs.eu/).  
 The rest of this document is a quick overview over what Ignis has to offer.
 
-Note that for all mixins and functions, their long forms are shown since they are unlikely to clash with other SASS libraries.
-For less clutter, there are shorter versions available.
-
 ## Getting started
 
-Install the package `sass-ignis` from the npm repository using he package manager of your choice.
+Install the package `sass-ignis` from the npm repository using the package manager of your choice.
 
 - npm: `npm install sass-ignis`
 - yarn: `yarn add sass-ignis`
@@ -31,14 +28,14 @@ Then include Ignis in your SASS stylesheet:
 // rest of your files
 ```
 
-If you want to use a function Ignis provides to override variables, include `ignis/src/prep` before the overrides.
+If you want to use a function Ignis provides to override variables, import `ignis/src/prep` before the overrides.
 
 Ignis uses function, mixin and variable names that are prefixed with 'ig-' to avoid clashes with other libraries.
-However, Ignis optionally provides shorter versions of many mixins and functions (referred to as "shortcodes"):
+There are, however, shorter versions of many mixins and functions available (referred to as "shortcodes"):
 
-- `ignis/src/bem-shortcodes`: BEM
-- `ignis/src/fluid-shortcodes`: Fluid properties
-- `ignis/src/harmony-shortcodes`: Modular scales
+- `sass-ignis/src/bem-shortcodes`: BEM
+- `sass-ignis/src/fluid-shortcodes`: Fluid properties
+- `sass-ignis/src/harmony-shortcodes`: Modular scales
 
 ## Development
 
@@ -46,10 +43,10 @@ Clone this repository, then run `npm install` or `yarn` to install all dependenc
 
 The following npm scripts are available:
 
-- `lint`: Lint the source code with sass-lint.
+- `lint`: Lint the source code with [sass-lint](https://www.npmjs.com/package/sass-lint).
 - `livelint`: Lint automatically whenever the code changes.
-- `doc`: Generate the SassDoc documentation.
-- `test`: Run unit tests.
+- `doc`: Generate the SassDoc documentation with [sassdoc](http://sassdoc.com/).
+- `test`: Run unit tests with [sass-true](https://www.npmjs.com/package/sass-true) and [Mocha](https://mochajs.org/).
 
 ## BEM system
 
@@ -60,7 +57,7 @@ Ignis' main feature is its BEM system which was developed over the course of two
 - Quality: All mixins generate optimal selectors with a minimal degree of specificity.
 - Safety: All mixins perform checks if they are used correctly.
 - Flexibility: Mix BEM selectors and other selectors however you like — the BEM system will adapt.
-- Rules: The BEM system allows you to set rules that control how the BEM mixins may or may not be used.
+- Strictness: The BEM system allows you to define rules that control how the BEM mixins may or may not be used.
 
 Below is a basic example showing how the BEM system can be used:
 
