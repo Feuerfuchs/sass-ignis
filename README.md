@@ -36,7 +36,7 @@ If you want to use a function Ignis provides to override variables, include `ign
 Ignis uses function, mixin and variable names that are prefixed with 'ig-' to avoid clashes with other libraries.
 However, Ignis optionally provides shorter versions of many mixins and functions (referred to as "shortcodes"):
 
-- `ignis/src/bem-shortcodes`: BEM-related features
+- `ignis/src/bem-shortcodes`: BEM
 - `ignis/src/fluid-shortcodes`: Fluid properties
 - `ignis/src/harmony-shortcodes`: Modular scales
 
