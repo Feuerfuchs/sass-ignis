@@ -9,8 +9,8 @@ Its main feature is a **[BEM system](#bem-system)**, though it also includes som
 - [Fluid properties](#fluid-properties): A generalization of fluid typography
 - [Modular scales](#modular-scales)
 
-All features are explained in the [Wiki](https://github.com/Feuerfuchs/sass-ignis/wiki).  
-For thorough explanations about all mixins, functions and variables, check the [SassDoc documentation](https://ignis-doc.feuerfuchs.eu/).  
+All features are explained in greater detail the [Wiki](https://github.com/Feuerfuchs/sass-ignis/wiki).  
+For thorough explanations about single mixins, functions and variables, check the [SassDoc documentation](https://ignis-doc.feuerfuchs.eu/).  
 The rest of this document is a quick overview over what Ignis has to offer.
 
 ## Getting started
@@ -51,6 +51,10 @@ The following npm scripts are available:
 - `livelint`: Lint automatically whenever the code changes.
 - `doc`: Generate the SassDoc documentation with [sassdoc](http://sassdoc.com/).
 - `test`: Run unit tests with [sass-true](https://www.npmjs.com/package/sass-true) and [Mocha](https://mochajs.org/).
+
+## Known issues
+
+Check out the [issue tracker](https://github.com/Feuerfuchs/sass-ignis/issues).
 
 ## BEM system
 
