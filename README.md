@@ -1,6 +1,6 @@
 # Ignis
 
-Ignis is a [SASS](http://sass-lang.com/) library that I developed to create websites.
+Ignis is a [Sass](http://sass-lang.com/) library that I developed to create websites.
 Its main feature is a **[BEM system](#bem-system)**, though it also includes some other useful features:
 
 - [Easing background gradients](#easing-background-gradients)
@@ -20,7 +20,7 @@ Install the package [sass-ignis](https://www.npmjs.com/package/sass-ignis) from 
 - npm: `npm install sass-ignis`
 - yarn: `yarn add sass-ignis`
 
-Then include Ignis in your SASS stylesheet:
+Then include Ignis in your Sass stylesheet:
 
 ```scss
 // overrides
@@ -38,7 +38,7 @@ Just import one of these files to use a certain set of shortcodes:
 - `sass-ignis/src/fluid-shortcodes`: Fluid properties
 - `sass-ignis/src/harmony-shortcodes`: Modular scales
 
-**Note:** If the 'node_modules' folder isn't a search path for SASS imports, you have to prefix your imports with the path to 'node_modules'.
+**Note:** If the 'node_modules' folder isn't a search path for Sass imports, you have to prefix your imports with the path to 'node_modules'.
 An import might then look like this: `@import 'node_modules/sass-ignis/src/main';`
 
 ## Development
@@ -62,12 +62,12 @@ Check out the [issue tracker](https://github.com/Feuerfuchs/sass-ignis/issues).
 
 Ignis' main feature is its BEM system which was developed over the course of two years. Features include:
 
-- Full [BEM](https://en.bem.info/) and [BEMIT](https://csswizardry.com/2015/08/bemit-taking-the-bem-naming-convention-a-step-further/) support, i.e. namespaced blocks, suffixes, states, and so on.
-- Robustness: Most selector-related operations use SASS' native selector functions instead of manual parsing and assembling.
-- Quality: All mixins generate optimal selectors with a minimal degree of specificity.
-- Safety: All mixins perform checks if they are used correctly.
-- Flexibility: Mix BEM selectors and other selectors however you like — the BEM system will adapt.
-- Strictness: The BEM system allows you to define rules that control how the BEM mixins may or may not be used.
+- **Full [BEM](https://en.bem.info/) and [BEMIT](https://csswizardry.com/2015/08/bemit-taking-the-bem-naming-convention-a-step-further/) support:** Namespaced blocks, suffixes, states, and so on.
+- **Robustness:** Most selector-related operations use Sass' native selector functions instead of manual parsing and assembling.
+- **Quality:** All mixins generate optimal selectors with a minimal degree of specificity.
+- **Safety:** All mixins perform checks if they are used correctly.
+- **Flexibility:** Mix BEM selectors and other selectors however you like — the BEM system will adapt.
+- **Strictness:** The BEM system allows you to define rules that control how the BEM mixins may or may not be used.
 
 Below is a basic example showing how the BEM system can be used:
 

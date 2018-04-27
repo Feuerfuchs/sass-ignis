@@ -496,7 +496,7 @@
     //
     // To determine the twin for each element, iterate the sub-selectors from the current selector
     // and check if it contains the currently inspected element. This has to be done with string
-    // comparison since none of SASS selector functions is of use here.
+    // comparison since none of Sass selector functions is of use here.
     // Finally, the current twin will be appended to the extracted sub-selector as a successor
     // element.
     //

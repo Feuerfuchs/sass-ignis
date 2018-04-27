@@ -187,7 +187,7 @@
                 //
                 // Latest context is element. Since element contexts can consist of multiple single
                 // elements, inspect all elements and append its selector with the suffix "--$name".
-                // This has to be done with string comparison since none of SASS selector functions
+                // This has to be done with string comparison since none of Sass selector functions
                 // is of use here. 
                 // Possible outcomes:
                 //   - {m,s}.{e}--modifier

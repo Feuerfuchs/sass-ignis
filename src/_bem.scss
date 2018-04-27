@@ -5,7 +5,7 @@
 /// BEMIT is in extension of this methodology and allows you to give blocks a more fine-grained  purpose
 /// than BEM alone would let you do.
 ///
-/// SASS does support BEM quite well thanks to the ampersand (&) and the @at-root directive. However,
+/// Sass does support BEM quite well thanks to the ampersand (&) and the @at-root directive. However,
 /// there is no way to make sure users adhere to the BEM or BEMIT methodology.
 /// That's where the mixins in this file come into play: They automatically generate the right selectors
 /// and perform checks regarding the nesting order, nesting depth, and so on.

@@ -258,7 +258,7 @@
 /// 
 /// A bugfix for the built-in selector-nest function.
 ///
-/// For some reason, SASS will duplicate parts of the selector which will result in
+/// For some reason, Sass will duplicate parts of the selector which will result in
 /// excessively long selectors and bad compilation performance. This fix removes
 /// all duplicate selectors and should be called right after selector-nest.
 ///
