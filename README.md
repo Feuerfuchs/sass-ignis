@@ -28,7 +28,7 @@ Then include Ignis in your SASS stylesheet:
 // rest of your files
 ```
 
-If you want to use a function Ignis provides to override variables, import `sass-ignis/src/prep` before the overrides.
+If you want to override Ignis' variables and use a function provided by Ignis to do so, import `sass-ignis/src/prep` before the overrides.
 
 Ignis uses function, mixin and variable names that are prefixed with 'ig-' to avoid clashes with other libraries.
 There are, however, shorter versions of many mixins and functions available (referred to as "shortcodes").
