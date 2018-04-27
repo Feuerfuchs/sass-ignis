@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"author": "Feuerfuchs <npm@feuerfuchs.eu> (feuerfuchs.eu)",
 	"license": "MIT",
-	"description": "A mixin-based framework that makes it easier to work with BEM, organize variables and offers other useful features.",
+	"description": "A mixin-based SASS framework that makes it easier to work with BEM, organize variables and offers other useful features.",
 	"main": "src/main.scss",
 	"keywords": [
 		"sass",

@@ -15,7 +15,7 @@ The rest of this document is a quick overview over what Ignis has to offer.
 
 ## Getting started
 
-Install the package `sass-ignis` from the npm repository using the package manager of your choice.
+Install the package [sass-ignis](https://www.npmjs.com/package/sass-ignis) from the npm repository using the package manager of your choice.
 
 - npm: `npm install sass-ignis`
 - yarn: `yarn add sass-ignis`
