@@ -1,13 +1,13 @@
 # Ignis
 
 Ignis is a [SASS](http://sass-lang.com/) library that I developed to create websites.
-Its main feature is a **BEM system**, though it also includes some other useful features:
+Its main feature is a **[BEM system](#bem-system)**, though it also includes some other useful features:
 
-- Easing background gradients
-- Context stacks: A temporary data storage
-- Property trees: A persistent data storage
-- Fluid properties: A generalization of fluid typography
-- Modular scales
+- [Easing background gradients](#easing-background-gradients)
+- [Context stacks](#context-stacks): A temporary data storage
+- [Property trees](#property-trees): A persistent data storage
+- [Fluid properties](#fluid-properties): A generalization of fluid typography
+- [Modular scales](#modular-scales)
 
 All features are explained in the [Wiki](https://github.com/Feuerfuchs/sass-ignis/wiki).  
 For thorough explanations about all mixins, functions and variables, check the [SassDoc documentation](https://ignis-doc.feuerfuchs.eu/).  
@@ -24,22 +24,26 @@ Then include Ignis in your SASS stylesheet:
 
 ```scss
 // overrides
-@import 'node_modules/sass-ignis/src/main';
+@import 'sass-ignis/src/main';
 // rest of your files
 ```
 
-If you want to use a function Ignis provides to override variables, import `ignis/src/prep` before the overrides.
+If you want to use a function Ignis provides to override variables, import `sass-ignis/src/prep` before the overrides.
 
 Ignis uses function, mixin and variable names that are prefixed with 'ig-' to avoid clashes with other libraries.
-There are, however, shorter versions of many mixins and functions available (referred to as "shortcodes"):
+There are, however, shorter versions of many mixins and functions available (referred to as "shortcodes").
+Just import one of these files to use a certain set of shortcodes:
 
 - `sass-ignis/src/bem-shortcodes`: BEM
 - `sass-ignis/src/fluid-shortcodes`: Fluid properties
 - `sass-ignis/src/harmony-shortcodes`: Modular scales
 
+**Note:** If the 'node_modules' folder isn't a search path for SASS imports, you have to prefix your imports with the path to 'node_modules'.
+An import might then look like this: `@import 'node_modules/sass-ignis/src/main';`
+
 ## Development
 
-Clone this repository, then run `npm install` or `yarn` to install all dependencies.
+Clone the repository, then run `npm install` or `yarn` to install all dependencies.
 
 The following npm scripts are available:
 
