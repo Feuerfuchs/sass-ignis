@@ -23,12 +23,10 @@ Install the package [sass-ignis](https://www.npmjs.com/package/sass-ignis) from 
 Then include Ignis in your Sass stylesheet:
 
 ```scss
-// overrides
 @import 'sass-ignis/src/main';
-// rest of your files
+// (overrides)
+// files that depend on Ignis
 ```
-
-If you want to override Ignis' variables and use a function provided by Ignis to do so, import `sass-ignis/src/prep` before the overrides.
 
 Ignis uses function, mixin and variable names that are prefixed with 'ig-' to avoid clashes with other libraries.
 There are, however, shorter versions of many mixins and functions available (referred to as "shortcodes").

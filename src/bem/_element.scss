@@ -126,9 +126,9 @@
             @error 'Element nesting is forbidden.';
         }
 
-        $element-selector: map-get(nth($parent-context, 2), 'selector');
-
         @if $ig-bem-element-nesting-policy == 'append' {
+            $element-selector: map-get(nth($parent-context, 2), 'selector');
+
             @if not is-superselector(&, $element-selector) {
                 @error 'A nested element must be an immediate children of the parent element.';
             }
