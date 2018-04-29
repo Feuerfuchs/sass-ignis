@@ -226,15 +226,9 @@ $ig-easing-gradient-steps: 10 !default;
                         $easing:      nth($easing, 1);
                     }
 
-                    @if function-exists('ig-' + $easing) {
-                        $easing-func: get-function('ig-' + $easing);
-                    } @else {
-                        $easing-func: get-function($easing);
-                    }
-
                     $generated-stops: join(
                         $generated-stops,
-                        ig-easing-gradient-ease-stops($prev-stop, $next-stop, $easing-func, $easing-args)
+                        ig-easing-gradient-ease-stops($prev-stop, $next-stop, $easing, $easing-args)
                     );
                 } @else {
                     $generated-stops: append($generated-stops, ig-str-implode($next-stop, ' '));
@@ -297,7 +291,38 @@ $ig-easing-gradient-steps: 10 !default;
 ///
 /// @access private
 ///
-@function ig-easing-gradient-ease-stops($prev-stop, $next-stop, $easing-func, $easing-args: ()) {
+@function ig-easing-gradient-ease-stops($prev-stop, $next-stop, $easing, $easing-args: ()) {
+    @if $easing == 'steps' {
+        $steps: null;
+        $jump:  null;
+
+        @if length($easing-args) > 1 {
+            $steps: nth($easing-args, 1);
+            $jump:  nth($easing-args, 2);
+        } @else {
+            $steps: nth($easing-args, 1);
+            $jump:  jump-end;
+        }
+
+        @return ig-easing-gradient-steps-stops($prev-stop, $next-stop, $steps, $jump);
+    } @else {
+        $easing-func: null;
+        @if function-exists('ig-' + $easing) {
+            $easing-func: get-function('ig-' + $easing);
+        } @else {
+            $easing-func: get-function($easing);
+        }
+
+        @return ig-easing-gradient-bezier-stops($prev-stop, $next-stop, $easing-func, $easing-args);
+    }
+}
+
+///
+/// Generate a smooth transition from one color stop to another using the provided cubic-bezier function.
+///
+/// @access private
+///
+@function ig-easing-gradient-bezier-stops($prev-stop, $next-stop, $easing-func, $easing-args: ()) {
     $prev-stop-color: nth($prev-stop, 1);
     $prev-stop-pos:   nth($prev-stop, 2);
     $next-stop-color: nth($next-stop, 1);
@@ -354,6 +379,110 @@ $ig-easing-gradient-steps: 10 !default;
             }
 
             $stops: append($stops, $color + ' ' + $pos);
+        }
+    }
+
+    @return $stops;
+}
+
+///
+/// Generate a step transition from one color stop to another.
+///
+/// @access private
+///
+@function ig-easing-gradient-steps-stops($prev-stop, $next-stop, $steps, $jump: jump-end) {
+    $prev-stop-color: nth($prev-stop, 1);
+    $prev-stop-pos:   nth($prev-stop, 2);
+    $next-stop-color: nth($next-stop, 1);
+    $next-stop-pos:   nth($next-stop, 2);
+
+    $stops: ();
+
+    @if ((type-of($prev-stop-pos) == number) and (type-of($next-stop-pos) == number) and (unit($prev-stop-pos) == unit($next-stop-pos))) or ($prev-stop-pos == 0) or ($next-stop-pos == 0) {
+        //
+        // The transition color stop positions can be statically calculated.
+        //
+
+        $distance: $next-stop-pos - $prev-stop-pos;
+
+        @for $i from 1 through $steps {
+            $x1: ($i - 1) / $steps;
+            $x2: $i / $steps;
+            $y:  null;
+
+            @if $jump == jump-start {
+                $y: $i / $steps;
+            } @else if $jump == jump-end {
+                $y: ($i - 1) / $steps;
+            } @else if $jump == jump-both {
+                $y: $i / ($steps + 1);
+            } @else if $jump == jump-none {
+                $y: ($i - 1) / ($steps - 1);
+            } @else {
+                @error 'Invalid $jump: #{inspect($jump)}';
+            }
+
+            $color: null;
+            $pos1:  if($x1 == 0, $prev-stop-pos, $prev-stop-pos + $x1 * $distance);
+            $pos2:  if($x2 == 1, $next-stop-pos, $prev-stop-pos + $x2 * $distance);
+
+            @if $y == 0 {
+                $color: $prev-stop-color;
+            } @else if $y == 1 {
+                $color: $next-stop-color;
+            } @else {
+                $color: mix($next-stop-color, $prev-stop-color, $y * 100%);
+            }
+
+            $stops: append($stops, $color + ' ' + $pos1);
+            $stops: append($stops, $color + ' ' + $pos2);
+        }
+    } @else {
+        //
+        // The transition color stop positions have to be dynamically calculated with the calc() function.
+        //
+
+        @if type-of($prev-stop-pos) == string {
+            // assuming calc()
+            $prev-stop-pos: str-slice($prev-stop-pos, 6, str-length($prev-stop-pos) - 1);
+        }
+
+        @if type-of($next-stop-pos) == string {
+            // assuming calc()
+            $next-stop-pos: str-slice($next-stop-pos, 6, str-length($next-stop-pos) - 1);
+        }
+
+        @for $i from 1 through $steps {
+            $x1: ($i - 1) / $steps;
+            $x2: $i / $steps;
+            $y:  null;
+
+            @if $jump == jump-start {
+                $y: $i / $steps;
+            } @else if $jump == jump-end {
+                $y: ($i - 1) / $steps;
+            } @else if $jump == jump-both {
+                $y: $i / ($steps + 1);
+            } @else if $jump == jump-none {
+                $y: ($i - 1) / ($steps - 1);
+            } @else {
+                @error 'Invalid $jump: #{inspect($jump)}';
+            }
+
+            $color: null;
+            $pos1:  if($x1 == 0, $prev-stop-pos, calc(#{$prev-stop-pos} + (#{$next-stop-pos} - #{$prev-stop-pos}) * #{$x1}));
+            $pos2:  if($x2 == 1, $next-stop-pos, calc(#{$prev-stop-pos} + (#{$next-stop-pos} - #{$prev-stop-pos}) * #{$x2}));
+
+            @if $y == 0 {
+                $color: $prev-stop-color;
+            } @else if $y == 1 {
+                $color: $next-stop-color;
+            } @else {
+                $color: mix($next-stop-color, $prev-stop-color, $y * 100%);
+            }
+
+            $stops: append($stops, $color + ' ' + $pos1);
+            $stops: append($stops, $color + ' ' + $pos2);
         }
     }
 

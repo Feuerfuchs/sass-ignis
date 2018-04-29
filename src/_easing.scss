@@ -40,35 +40,6 @@ $ig-cubic-bezier-subdiv-precision: 0.0000001 !default;
 $ig-cubic-bezier-subdiv-max-iters: 10 !default;
 
 ///
-/// A steps function identical to the CSS steps function.
-///
-/// @param {number} $n        - Number of steps
-/// @param {string} $behavior - One of these: jump-none, jump-both, jump-start, jump-end
-/// @param {number} $x        - Progress between 0 and 1 inclusive
-///
-/// @return {number}
-///
-@function ig-steps($n, $behavior, $x) {
-    @if $behavior == jump-start {
-        $s: 1 / $n;
-        @return if($x == 0, $s, ceil($x / $s) * $s);
-    } @else if $behavior == jump-end {
-        $s: 1 / $n;
-        @return if($x == 1, 1 - $s, floor($x / $s) * $s);
-    } @else if $behavior == jump-both {
-        $sx: 1 / $n;
-        $sy: 1 / ($n + 1);
-        @return if($x == 0, $sy, ceil($x / $sx) * $sy);
-    } @else if $behavior == jump-none {
-        $sx: 1 / $n;
-        $sy: 1 / ($n - 1);
-        @return if($x == 1, 1, floor($x / $sx) * $sy);
-    } @else {
-        @error 'Invalid $behavior: #{inspect($behavior)}';
-    }
-}
-
-///
 /// A cubic bezier function identical to the CSS cubic-bezier function.
 ///
 /// @param {number} $x1 - X of first point

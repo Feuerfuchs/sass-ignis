@@ -249,9 +249,13 @@
         $expected11: linear-gradient(
             to right,
             #000 0,
+            mix(transparent, #000, 0.25 * 100%) 0,
             mix(transparent, #000, 0.25 * 100%) 25%,
+            mix(transparent, #000, 0.5  * 100%) 25%,
             mix(transparent, #000, 0.5  * 100%) 50%,
+            mix(transparent, #000, 0.75 * 100%) 50%,
             mix(transparent, #000, 0.75 * 100%) 75%,
+            transparent 75%,
             transparent 100%
         );
 
