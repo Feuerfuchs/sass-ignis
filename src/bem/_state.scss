@@ -5,7 +5,7 @@
 ////
 
 /// 
-/// Create a new is-state modifier.
+/// Create a new state rule.
 ///
 /// @param {string} $state  - First state name
 /// @param {list}   $states - List of more state names
@@ -16,7 +16,7 @@
 ///   @include ig-bem-object('menu') {
 ///     display: none;
 ///     
-///     @include ig-bem-is('open') {
+///     @include ig-bem-state('is', open') {
 ///       display: block;
 ///     }
 ///   }
@@ -35,7 +35,7 @@
 ///   @include ig-bem-object('menu') {
 ///     display: none;
 ///     
-///     @include ig-bem-is('open', 'visible') {
+///     @include ig-bem-state('is', open', 'visible') {
 ///       display: block;
 ///     }
 ///   }
@@ -51,17 +51,63 @@
 ///     display: block;
 ///   }
 ///
-@mixin ig-bem-is($state, $states...) {
-    $selector: nth(ig-bem-is($state, $states...), 1);
+@mixin ig-bem-state($prefix, $state, $states...) {
+    $result:   ig-bem-state($prefix, $state, $states...);
+    $selector: nth($result, 1);
+    $context:  nth($result, 2);
 
     @include ig-bem-validate(
-        'state-is',
-        (state: $state, states: $states),
+        'state',
+        (prefix: $prefix, state: $state, states: $states),
         $selector,
-        null
+        $context
     );
 
+    @include ig-context-push($ig-bem-context-id, $context...);
     @at-root #{$selector} {
+        @content;
+    }
+    @include ig-context-pop($ig-bem-context-id);
+}
+
+///
+/// Generate a new state.
+/// 
+/// @return {list} A list with two items: 1. selector, 2. context or `null`
+///
+/// @see {mixin} ig-bem-has
+///
+@function ig-bem-state($prefix, $state, $states...) {
+    $selector:   ();
+    $parts-data: ();
+
+    @each $state in join($state, $states) {
+        $sel:        selector-parse('.#{$prefix}-#{$state}');
+        @if & {
+            $sel:    selector-append(&, $sel);
+        }
+        $selector:   join($selector, $sel, comma);
+        $parts-data: append($parts-data, (
+                'name':     $state,
+                'selector': $sel
+        ));
+    }
+
+    $context: 'state', (
+        'parts':    $parts-data,
+        'selector': $selector
+    );
+
+    @return $selector $context;
+}
+
+/// 
+/// Create a new has-state modifier.
+///
+/// It's a shorthand for ig-bem-state('is', $state, $states...).
+///
+@mixin ig-bem-is($state, $states...) {
+    @include ig-bem-state('is', $state, $states...) {
         @content;
     }
 }
@@ -74,76 +120,16 @@
 /// @see {mixin} ig-bem-is
 ///
 @function ig-bem-is($state, $states...) {
-    $selector: ();
-
-    @each $state in join($state, $states) {
-        $sel:      '&.is-#{$state}';
-        $sel:      if(&, selector-nest(&, $sel), selector-parse($sel));
-        $sel:      ig-selector-nest-fix($sel);
-        $selector: join($selector, $sel, comma);
-    }
-
-    @return $selector null;
+    @return ig-bem-state('is', $state, $states...);
 }
 
 /// 
 /// Create a new has-state modifier.
 ///
-/// @param {string} $state  - First state name
-/// @param {list}   $states - List of more state names
-///
-/// @content
-///
-/// @example scss - Using single has-state
-///   @include ig-bem-object('buttonstrip') {
-///     display: none;
-///     
-///     @include ig-bem-has('buttons') {
-///       display: block;
-///     }
-///   }
-///   
-///   // Generates:
-///   
-///   .o-buttonstrip {
-///     display: none;
-///   }
-///   
-///   .o-buttonstrip.has-buttons {
-///     display: block;
-///   }
-///
-/// @example scss - Using multiple has-states
-///   @include ig-bem-object('buttonstrip') {
-///     display: none;
-///     
-///     @include ig-bem-has('buttons', 'textfields') {
-///       display: block;
-///     }
-///   }
-///   
-///   // Generates:
-///   
-///   .o-buttonstrip {
-///     display: none;
-///   }
-///   
-///   .o-buttonstrip.has-buttons,
-///   .o-buttonstrip.has-textfields {
-///     display: block;
-///   }
+/// It's a shorthand for ig-bem-state('has', $state, $states...).
 ///
 @mixin ig-bem-has($state, $states...) {
-    $selector: nth(ig-bem-has($state, $states...), 1);
-
-    @include ig-bem-validate(
-        'state-has',
-        (state: $state, states: $states),
-        $selector,
-        null
-    );
-
-    @at-root #{$selector} {
+    @include ig-bem-state('has', $state, $states...) {
         @content;
     }
 }
@@ -156,14 +142,5 @@
 /// @see {mixin} ig-bem-has
 ///
 @function ig-bem-has($state, $states...) {
-    $selector: ();
-
-    @each $state in join($state, $states) {
-        $sel:      '&.has-#{$state}';
-        $sel:      if(&, selector-nest(&, $sel), selector-parse($sel));
-        $sel:      ig-selector-nest-fix($sel);
-        $selector: join($selector, $sel, comma);
-    }
-
-    @return $selector null;
+    @return ig-bem-state('has', $state, $states...);
 }

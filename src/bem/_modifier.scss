@@ -178,7 +178,7 @@
             ));
         } @else {
             //
-            // Parent context is modifier or suffix and $extend is false. Get latest element or block.
+            // Parent context is modifier, suffix or state and $extend is false.
             //
 
             $be-context: ig-context-get($ig-bem-context-id, 'block' 'element');
