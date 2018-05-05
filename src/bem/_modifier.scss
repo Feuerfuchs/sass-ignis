@@ -135,7 +135,7 @@
     $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
-    $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix' 'at-theme');
+    $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'suffix');
     $parent-selector: map-get(nth($parent-context, 2), 'selector');
     $selector:        ();
     $parts-data:      ();
@@ -162,7 +162,7 @@
             $name:   nth($name, 1);
         }
 
-        @if index('block' 'element' 'at-theme', nth($parent-context, 1)) or $extend == true {
+        @if index('block' 'element', nth($parent-context, 1)) or $extend == true {
             //
             // Either the parent context is block or element, or a modifier or suffix
             // is to be extended. The modifier part can simply be appended.

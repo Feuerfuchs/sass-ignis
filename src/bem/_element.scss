@@ -116,7 +116,7 @@
     $noop: ig-context-assert-stack-count($ig-bem-context-id, $ig-bem-max-depth);
     $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
 
-    $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element' 'at-theme');
+    $parent-context: ig-context-get($ig-bem-context-id, 'block' 'element');
 
     $selector:   ();
     $parts-data: ();
@@ -149,7 +149,7 @@
             }
         }
 
-        $parent-context: ig-context-get($ig-bem-context-id, 'block' 'at-theme');
+        $parent-context: ig-context-get($ig-bem-context-id, 'block');
     }
 
     @if length($selector) == 0 {

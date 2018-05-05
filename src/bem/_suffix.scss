@@ -83,7 +83,7 @@
     $noop: ig-context-assert-stack-must-contain($ig-bem-context-id, 'block');
     $noop: ig-context-assert-stack-must-not-contain($ig-bem-context-id, 'suffix');
 
-    $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'at-theme');
+    $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier');
     $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
     @if not ig-selector-suffix-match(&, $parent-selector) {
