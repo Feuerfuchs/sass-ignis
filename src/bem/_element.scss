@@ -129,13 +129,14 @@
         @if $ig-bem-element-nesting-policy == 'append' {
             $element-selector: map-get(nth($parent-context, 2), 'selector');
 
-            @if not is-superselector(&, $element-selector) {
+            @if not ig-selector-suffix-match(&, $element-selector) {
                 @error 'A nested element must be an immediate children of the parent element.';
             }
 
             //
             // Possible outcomes:
             //   - {e}__element
+            //   - [manual selector] {e}__element
             //
 
             @each $name in join($name, $names) {
@@ -154,10 +155,11 @@
     @if length($selector) == 0 {
         $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
-        @if is-superselector(&, $parent-selector) {
+        @if ig-selector-suffix-match(&, $parent-selector) {
             //
             // Possible outcomes:
             //   - {b}__element
+            //   - [manual selector] {b}__element
             //
 
             @each $name in join($name, $names) {
@@ -505,19 +507,20 @@
         $part-name:     map-get($part-data, 'name');
 
         $sel: ();
-        @if is-superselector(&, $element-selector) {
+        @if ig-selector-suffix-match(&, $element-selector) {
             //
             // This mixin is included in the selector the last element mixin created.
             // Possible outcomes:
             //   - {e} + {e}
+            //   - [manual selector] {e} + {e}
             //
 
             @each $s in & {
                 @each $ps in $part-selector {
-                    @if $s == $ps {
+                    @if nth($s, -1) == nth($ps, -1) {
                         $sel-ent: selector-nest($s, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
                         $sel-ent: ig-selector-nest-fix($sel-ent);
-                        $sel:     append($sel, $sel-ent, comma);
+                        $sel:     join($sel, $sel-ent, comma);
                     }
                 }
             }
@@ -532,7 +535,7 @@
 
             @each $s in & {
                 @each $ps in $part-selector {
-                    @if str-index(inspect($s), inspect($ps)) == 1 {
+                    @if str-index(inspect($s), inspect($ps)) {
                         $char-index: str-length(inspect($ps)) + 1;
                         $match:      index(' ' ':' ',', str-slice(inspect($s), $char-index, $char-index)) != null;
 
@@ -547,7 +550,7 @@
                         @if $match {
                             $sel-ent: selector-nest($s, '+', selector-append($block-base-selector, $ig-bem-element-separator + $part-name));
                             $sel-ent: ig-selector-nest-fix($sel-ent);
-                            $sel:     append($sel, $sel-ent, comma);
+                            $sel:     join($sel, $sel-ent, comma);
                         }
                     }
                 }

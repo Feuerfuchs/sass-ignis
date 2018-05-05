@@ -86,7 +86,7 @@
     $parent-context:  ig-context-get($ig-bem-context-id, 'block' 'element' 'modifier' 'at-theme');
     $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
-    @if not is-superselector(&, $parent-selector) {
+    @if not ig-selector-suffix-match(&, $parent-selector) {
         //
         // The current selector doesn't match the parent selector.
         // The user manually added a selector between parent context and this suffix call.

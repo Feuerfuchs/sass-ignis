@@ -140,7 +140,7 @@
     $selector:        ();
     $parts-data:      ();
 
-    @if not is-superselector(&, $parent-selector) {
+    @if not ig-selector-suffix-match(&, $parent-selector) {
         //
         // The current selector doesn't match the parent selector.
         // The user manually added a selector between parent context and this modifier call.
@@ -201,8 +201,8 @@
                     $sel: ();
                     @each $s in & {
                         @each $ps in $elem-part-selector {
-                            @if (str-index(inspect($s), inspect($ps) + $ig-bem-modifier-separator) == 1) or (str-index(inspect($s), inspect($ps) + $ig-bem-suffix-separator) == 1) {
-                                $sel: append($sel, selector-unify($s, selector-append($ps, $ig-bem-modifier-separator + $name)), comma);
+                            @if str-index(inspect($s), inspect($ps) + $ig-bem-modifier-separator) or str-index(inspect($s), inspect($ps) + $ig-bem-suffix-separator) {
+                                $sel: join($sel, selector-unify($s, selector-append($ps, $ig-bem-modifier-separator + $name)), comma);
                             }
                         }
                     }

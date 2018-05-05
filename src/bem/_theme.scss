@@ -45,7 +45,7 @@
     $parent-context:  ig-context-get($ig-bem-context-id, 'block');
     $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
-    @if not is-superselector(&, $parent-selector) {
+    @if not ig-selector-suffix-match(&, $parent-selector) {
         @error 'An at-theme rule must be an immediate child of a block or another at-theme rule';
     }
 

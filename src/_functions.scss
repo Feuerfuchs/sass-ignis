@@ -271,15 +271,12 @@
 @function ig-selector-nest-fix($selector) {
     $new-selector: ();
 
-    @for $a from 1 through length($selector) {
+    @each $sel1 in $selector {
         $drop: false;
-        $sel1: nth($selector, $a);
 
         @if length($new-selector) != 0 {
-            @for $b from 1 through length($new-selector) {
+            @each $sel2 in $new-selector {
                 @if $drop == false {
-                    $sel2: nth($selector, $b);
-
                     @if length($sel1) == length($sel2) {
                         $same: true;
 
@@ -303,6 +300,40 @@
     }
 
     @return $new-selector;
+}
+
+@function ig-selector-suffix-match($selector, $suffixes) {
+    $match: true;
+
+    @each $sel in $selector {
+        @if $match {
+            $sel-match: false;
+
+            @each $suffix in $suffixes {
+                @if not $sel-match {
+                    $suf-match: true;
+
+                    $len-diff: length($sel) - length($suffix);
+
+                    @for $i from length($suffix) through 1 {
+                        @if $suf-match and (nth($sel, $i + $len-diff) != nth($suffix, $i)) {
+                            $suf-match: false;
+                        }
+                    }
+
+                    @if $suf-match {
+                        $sel-match: true;
+                    }
+                }
+            }
+
+            @if not $sel-match {
+                $match: false;
+            }
+        }
+    }
+
+    @return $match;
 }
 
 /// 

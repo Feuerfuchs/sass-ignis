@@ -190,10 +190,22 @@
     }
 
     @include assert('element modifier, single element, manual selector before') { /// 7 ///
-        @include output {
+        @include output(false) {
             @include ig-bem-block('something') {
                 &:hover {
-                    @include ig-bem-element('child') {
+                    @include ig-bem-element('child1') {
+                        @include ig-bem-modifier('mod') {
+                            font-size: 2.5em;
+
+                            @include ig-bem-modifier('submod') {
+                                font-size: 2.75em;
+                            }
+                        }
+                    }
+                }
+
+                .test & {
+                    @include ig-bem-element('child2') {
                         @include ig-bem-modifier('mod') {
                             font-size: 2.5em;
 
@@ -206,19 +218,27 @@
             }
         }
 
-        @include expect {
-            .something:hover .something__child--mod {
+        @include expect(false) {
+            .something:hover .something__child1--mod {
                 font-size: 2.5em;
             }
 
-            .something:hover .something__child--mod.something__child--submod {
+            .something:hover .something__child1--mod.something__child1--submod {
+                font-size: 2.75em;
+            }
+
+            .test .something__child2--mod {
+                font-size: 2.5em;
+            }
+
+            .test .something__child2--mod.something__child2--submod {
                 font-size: 2.75em;
             }
         }
     }
 
     @include assert('element modifier, multiple elements, manual selector before') { /// 8 ///
-        @include output {
+        @include output(false) {
             @include ig-bem-block('something') {
                 &:hover {
                     @include ig-bem-element('child1', 'child2') {
@@ -231,10 +251,22 @@
                         }
                     }
                 }
+
+                .test & {
+                    @include ig-bem-element('child3', 'child4') {
+                        @include ig-bem-modifier('mod') {
+                            font-size: 2.5em;
+
+                            @include ig-bem-modifier('submod') {
+                                font-size: 2.75em;
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        @include expect {
+        @include expect(false) {
             .something:hover .something__child1--mod,
             .something:hover .something__child2--mod {
                 font-size: 2.5em;
@@ -244,11 +276,21 @@
             .something:hover .something__child2--mod.something__child2--submod {
                 font-size: 2.75em;
             }
+
+            .test .something__child3--mod,
+            .test .something__child4--mod {
+                font-size: 2.5em;
+            }
+
+            .test .something__child3--mod.something__child3--submod,
+            .test .something__child4--mod.something__child4--submod {
+                font-size: 2.75em;
+            }
         }
     }
 
     @include assert('element modifier, single related element, manual selector before') { /// 9 ///
-        @include output {
+        @include output(false) {
             @include ig-bem-block('something') {
                 &:hover {
                     @include ig-bem-element('child1') {
@@ -264,9 +306,35 @@
                     }
                 }
 
-                @include ig-bem-element('child3') {
-                    &:hover {
+                .test & {
+                    @include ig-bem-element('child3') {
                         @include ig-bem-next-element('child4') {
+                            @include ig-bem-modifier('mod1') {
+                                font-size: 2.5em;
+
+                                @include ig-bem-modifier('submod1') {
+                                    font-size: 2.75em;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                @include ig-bem-element('child5') {
+                    &:hover {
+                        @include ig-bem-next-element('child6') {
+                            @include ig-bem-modifier('mod2') {
+                                font-size: 2.5em;
+
+                                @include ig-bem-modifier('submod2') {
+                                    font-size: 2.75em;
+                                }
+                            }
+                        }
+                    }
+
+                    .test & {
+                        @include ig-bem-next-element('child7') {
                             @include ig-bem-modifier('mod2') {
                                 font-size: 2.5em;
 
@@ -280,7 +348,7 @@
             }
         }
 
-        @include expect {
+        @include expect(false) {
             .something:hover .something__child1 + .something__child2--mod1 {
                 font-size: 2.5em;
             }
@@ -289,18 +357,34 @@
                 font-size: 2.75em;
             }
 
-            .something__child3:hover + .something__child4--mod2 {
+            .test .something__child3 + .something__child4--mod1 {
                 font-size: 2.5em;
             }
 
-            .something__child3:hover + .something__child4--mod2.something__child4--submod2 {
+            .test .something__child3 + .something__child4--mod1.something__child4--submod1 {
+                font-size: 2.75em;
+            }
+
+            .something__child5:hover + .something__child6--mod2 {
+                font-size: 2.5em;
+            }
+
+            .something__child5:hover + .something__child6--mod2.something__child6--submod2 {
+                font-size: 2.75em;
+            }
+
+            .test .something__child5:hover + .something__child7--mod2 {
+                font-size: 2.5em;
+            }
+
+            .test .something__child5:hover + .something__child7--mod2.something__child7--submod2 {
                 font-size: 2.75em;
             }
         }
     }
 
     @include assert('element modifier, multiple related elements, manual selector before') { /// 10 ///
-        @include output {
+        @include output(false) {
             @include ig-bem-block('something') {
                 &:hover {
                     @include ig-bem-element('child1') {
@@ -316,9 +400,35 @@
                     }
                 }
 
-                @include ig-bem-element('child4') {
-                    &:hover {
+                .test & {
+                    @include ig-bem-element('child4') {
                         @include ig-bem-next-element('child5', 'child6') {
+                            @include ig-bem-modifier('mod1') {
+                                font-size: 2.5em;
+
+                                @include ig-bem-modifier('submod1') {
+                                    font-size: 2.75em;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                @include ig-bem-element('child7') {
+                    &:hover {
+                        @include ig-bem-next-element('child8', 'child9') {
+                            @include ig-bem-modifier('mod2') {
+                                font-size: 2.5em;
+
+                                @include ig-bem-modifier('submod2') {
+                                    font-size: 2.75em;
+                                }
+                            }
+                        }
+                    }
+
+                    .test & {
+                        @include ig-bem-next-element('child10', 'child11') {
                             @include ig-bem-modifier('mod2') {
                                 font-size: 2.5em;
 
@@ -332,7 +442,7 @@
             }
         }
 
-        @include expect {
+        @include expect(false) {
             .something:hover .something__child1 + .something__child2--mod1,
             .something:hover .something__child1 + .something__child3--mod1 {
                 font-size: 2.5em;
@@ -343,13 +453,33 @@
                 font-size: 2.75em;
             }
 
-            .something__child4:hover + .something__child5--mod2,
-            .something__child4:hover + .something__child6--mod2 {
+            .test .something__child4 + .something__child5--mod1,
+            .test .something__child4 + .something__child6--mod1 {
                 font-size: 2.5em;
             }
 
-            .something__child4:hover + .something__child5--mod2.something__child5--submod2,
-            .something__child4:hover + .something__child6--mod2.something__child6--submod2 {
+            .test .something__child4 + .something__child5--mod1.something__child5--submod1,
+            .test .something__child4 + .something__child6--mod1.something__child6--submod1 {
+                font-size: 2.75em;
+            }
+
+            .something__child7:hover + .something__child8--mod2,
+            .something__child7:hover + .something__child9--mod2 {
+                font-size: 2.5em;
+            }
+
+            .something__child7:hover + .something__child8--mod2.something__child8--submod2,
+            .something__child7:hover + .something__child9--mod2.something__child9--submod2 {
+                font-size: 2.75em;
+            }
+
+            .test .something__child7:hover + .something__child10--mod2,
+            .test .something__child7:hover + .something__child11--mod2 {
+                font-size: 2.5em;
+            }
+
+            .test .something__child7:hover + .something__child10--mod2.something__child10--submod2,
+            .test .something__child7:hover + .something__child11--mod2.something__child11--submod2 {
                 font-size: 2.75em;
             }
         }

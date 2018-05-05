@@ -36,18 +36,28 @@
     }
 
     @include assert('single element, manual selector in-between') { /// 2 ///
-        @include output {
+        @include output(false) {
             @include ig-bem-block('something') {
                 &:hover {
-                    @include ig-bem-element('child') {
+                    @include ig-bem-element('child1') {
+                        font-size: 2em;
+                    }
+                }
+
+                .test & {
+                    @include ig-bem-element('child2') {
                         font-size: 2em;
                     }
                 }
             }
         }
 
-        @include expect {
-            .something:hover .something__child {
+        @include expect(false) {
+            .something:hover .something__child1 {
+                font-size: 2em;
+            }
+
+            .test .something__child2 {
                 font-size: 2em;
             }
         }
@@ -96,23 +106,39 @@
     }
 
     @include assert('single element, nested, manual selector in-between') { /// 5 ///
-        @include output {
+        @include output(false) {
             @include ig-bem-block('something') {
                 &:hover {
-                    @include ig-bem-element('child') {
+                    @include ig-bem-element('child1') {
                         font-size: 2em;
 
-                        @include ig-bem-element('subchild') {
+                        @include ig-bem-element('subchild1') {
                             font-size: 3em;
                         }
                     }
                 }
 
-                @include ig-bem-element('child') {
+                .test & {
+                    @include ig-bem-element('child2') {
+                        font-size: 2em;
+
+                        @include ig-bem-element('subchild2') {
+                            font-size: 3em;
+                        }
+                    }
+                }
+
+                @include ig-bem-element('child3') {
                     font-size: 2em;
 
                     &:hover {
-                        @include ig-bem-element('subchild') {
+                        @include ig-bem-element('subchild3') {
+                            font-size: 3em;
+                        }
+                    }
+
+                    .test & {
+                        @include ig-bem-element('subchild4') {
                             font-size: 3em;
                         }
                     }
@@ -120,20 +146,32 @@
             }
         }
 
-        @include expect {
-            .something:hover .something__child {
+        @include expect(false) {
+            .something:hover .something__child1 {
                 font-size: 2em;
             }
 
-            .something:hover .something__child .something__subchild {
+            .something:hover .something__child1 .something__subchild1 {
                 font-size: 3em;
             }
 
-            .something__child {
+            .test .something__child2 {
                 font-size: 2em;
             }
 
-            .something__child:hover .something__subchild {
+            .test .something__child2 .something__subchild2 {
+                font-size: 3em;
+            }
+
+            .something__child3 {
+                font-size: 2em;
+            }
+
+            .something__child3:hover .something__subchild3 {
+                font-size: 3em;
+            }
+
+            .test .something__child3 .something__subchild4 {
                 font-size: 3em;
             }
         }
@@ -221,19 +259,30 @@
     }
 
     @include assert('multiple elements, manual selector in-between') { /// 9 ///
-        @include output {
+        @include output(false) {
             @include ig-bem-block('something') {
                 &:hover {
                     @include ig-bem-element('child1', 'child2') {
                         font-size: 2em;
                     }
                 }
+
+                .test & {
+                    @include ig-bem-element('child3', 'child4') {
+                        font-size: 2em;
+                    }
+                }
             }
         }
 
-        @include expect {
+        @include expect(false) {
             .something:hover .something__child1,
             .something:hover .something__child2 {
+                font-size: 2em;
+            }
+
+            .test .something__child3,
+            .test .something__child4 {
                 font-size: 2em;
             }
         }
@@ -302,7 +351,7 @@
     }
 
     @include assert('multiple elements, nested, manual selector in-between') { /// 12 ///
-        @include output {
+        @include output(false) {
             @include ig-bem-block('something') {
                 @include ig-bem-element('child1', 'child2') {
                     font-size: 2em;
@@ -312,13 +361,25 @@
                             font-size: 3em;
                         }
                     }
+
+                    .test & {
+                        @include ig-bem-element('subchild2') {
+                            font-size: 3em;
+                        }
+                    }
                 }
 
                 @include ig-bem-element('child3') {
                     font-size: 2em;
 
                     &:hover {
-                        @include ig-bem-element('subchild2', 'subchild3') {
+                        @include ig-bem-element('subchild3', 'subchild4') {
+                            font-size: 3em;
+                        }
+                    }
+
+                    .test & {
+                        @include ig-bem-element('subchild5', 'subchild6') {
                             font-size: 3em;
                         }
                     }
@@ -326,7 +387,7 @@
             }
         }
 
-        @include expect {
+        @include expect(false) {
             .something__child1,
             .something__child2 {
                 font-size: 2em;
@@ -337,12 +398,22 @@
                 font-size: 3em;
             }
 
+            .test .something__child1 .something__subchild2,
+            .test .something__child2 .something__subchild2 {
+                font-size: 3em;
+            }
+
             .something__child3 {
                 font-size: 2em;
             }
 
-            .something__child3:hover .something__subchild2,
-            .something__child3:hover .something__subchild3 {
+            .something__child3:hover .something__subchild3,
+            .something__child3:hover .something__subchild4 {
+                font-size: 3em;
+            }
+
+            .test .something__child3 .something__subchild5,
+            .test .something__child3 .something__subchild6 {
                 font-size: 3em;
             }
         }
