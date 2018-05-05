@@ -1,5 +1,9 @@
 # Master
 
+**Improved:**
+
+- [BEM] Better handling of custom selectors with a trailing ampersand — [#5](https://github.com/Feuerfuchs/sass-ignis/issues/5)
+
 ---
 
 # 1.0.1
