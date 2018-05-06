@@ -46,7 +46,7 @@
     $parent-selector: map-get(nth($parent-context, 2), 'selector');
 
     @if not ig-selector-suffix-match(&, $parent-selector) {
-        @error 'An at-theme rule must be an immediate child of a block or another at-theme rule';
+        @error 'An at-theme rule must be an immediate child of a block';
     }
 
     $selector: ig-bem-theme-selector($name, $names...);

@@ -302,6 +302,14 @@
     @return $new-selector;
 }
 
+/// 
+/// Check if the given selector ends with one of the provided suffixes.
+///
+/// @param {selector} $selector
+/// @param {selector} $suffixes
+///
+/// @return {bool} `true` if the selector matches at least one suffix, otherwise `false`.
+///
 @function ig-selector-suffix-match($selector, $suffixes) {
     $match: true;
 
