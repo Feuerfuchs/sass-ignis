@@ -160,12 +160,19 @@ $ig-props-trees: ();
 /// 
 /// Generate assignments for native CSS custom properties with the values from the specified tree.
 ///
+/// @param {string} $root [null]                   - Sub-tree to use for assignment
 /// @param {string} $tree [$ig-props-default-tree] - ID of the property tree to use
 ///
-@mixin ig-props-assign-native($tree: $ig-props-default-tree) {
-    $prop-map: ig-props-get-all($tree);
+@mixin ig-props-assign-native($root: null, $tree: $ig-props-default-tree) {
+    $map: null;
 
-    @include ig-props-assign-native-internal($prop-map);
+    @if $root == null {
+        $map: ig-props-get-all($tree);
+    } @else {
+        $map: ig-props-get($root);
+    }
+
+    @include ig-props-assign-native-internal($map);
 }
 
 ///
