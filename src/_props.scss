@@ -11,6 +11,14 @@
 ////
 
 ///
+/// Indicate if property names must start with two dashes (--).
+/// This is required if property trees are also used for native CSS custom properties.
+///
+/// @type bool
+///
+$ig-props-enforce-double-dashes: true !default;
+
+///
 /// Default tree name to use if no name is specified.
 ///
 /// @type string
@@ -49,8 +57,10 @@ $ig-props-trees: ();
 @function ig-props-save($map, $tree: $ig-props-default-tree, $merge: false) {
     $prop-map: null;
 
-    @if not ig-props-validate($map) {
-        @error 'Property tree keys must start with two dashes (--).';
+    @if $ig-props-enforce-double-dashes {
+        @if not ig-props-validate($map) {
+            @error 'Property tree keys must start with two dashes (--). If you don\'t use property trees for native CSS custom properties, set $ig-props-enforce-double-dashes to false.';
+        }
     }
 
     @if map-has-key($ig-props-trees, $tree) {
