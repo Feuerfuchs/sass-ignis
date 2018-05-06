@@ -169,7 +169,7 @@ $ig-props-trees: ();
     @if $root == null {
         $map: ig-props-get-all($tree);
     } @else {
-        $map: ig-props-get($root);
+        $map: ig-props-get($root, $tree);
     }
 
     @include ig-props-assign-native-internal($map);
