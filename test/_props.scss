@@ -1,6 +1,33 @@
 // sass-lint:disable empty-args
 
 @include describe('Property trees') {
+    @include it('Validate names') {
+        $map-valid: (
+            --background: #fff,
+            --text:       #000,
+            --buttons: (
+                --primary: (
+                    --background: #f00,
+                    --text:       #fff
+                )
+            )
+        );
+
+        $map-invalid: (
+            --background: #fff,
+            --text:       #000,
+            --buttons: (
+                --primary: (
+                    background: #f00,
+                    text:       #fff
+                )
+            )
+        );
+
+        @include assert-equal(ig-props-validate($map-valid),   true,  'Check valid map');
+        @include assert-equal(ig-props-validate($map-invalid), false, 'Check invalid map');
+    }
+
     @include it('Save / Delete') {
         $map: (
             --background: #fff,
@@ -17,8 +44,8 @@
             )
         );
 
-        @include assert-equal(ig-props-save($map),    null, 'Save default tree');
-        @include assert-equal(ig-props-delete(), null, 'Delete default tree');
+        @include assert-equal(ig-props-save($map), null, 'Save default tree');
+        @include assert-equal(ig-props-delete(),   null, 'Delete default tree');
     }
 
     @include it('Read') {
@@ -99,7 +126,7 @@
         @include assert-equal(ig-props-get(--background),                                #fff,  'Before update, get --background');
         @include assert-equal(ig-props-get(--text),                                      #000,  'Before update, get --text');
         @include assert-equal(ig-props-get(--buttons --primary --background),            #f00,  'Before update, get --buttons --primary --background');
-        @include assert-equal(ig-props-get(--buttons --default --text, $default: false), false, 'Before update, get --buttons --default --text');
+        @include assert-equal(ig-props-get(--buttons --default --text, $default: false), false, 'Before update, get --buttons --default --text (returns default)');
 
         @include assert-equal(ig-props-save($map2, $merge: true), null, 'Overwrite default tree');
 
@@ -107,6 +134,67 @@
         @include assert-equal(ig-props-get(--text),                           #000, 'After update, get --text');
         @include assert-equal(ig-props-get(--buttons --primary --background), #00f, 'After update, get --buttons --primary --background');
         @include assert-equal(ig-props-get(--buttons --default --text),       #fff, 'After update, get --buttons --default --text');
+
+        @include assert-equal(ig-props-delete(), null, 'Delete default tree');
+    }
+
+    @include it('Native assignment') {
+        @include assert {
+            @include output {
+                $map: (
+                    --background: #fff,
+                    --text:       #000,
+                    --buttons: (
+                        --primary: (
+                            --background: #f00,
+                            --text:       #fff
+                        ),
+                        --default: (
+                            --background: #ddd,
+                            --text:       #000
+                        )
+                    )
+                );
+
+                @include ig-props-save($map);
+
+                @include ig-props-assign-native;
+
+                @include ig-props-delete;
+            }
+
+            @include expect {
+                --background:                   #fff;
+                --text:                         #000;
+                --buttons--primary--background: #f00;
+                --buttons--primary--text:       #fff;
+                --buttons--default--background: #ddd;
+                --buttons--default--text:       #000;
+            }
+        }
+    }
+
+    @include it('Native get') {
+        $map: (
+            --background: #fff,
+            --text:       #000,
+            --buttons: (
+                --primary: (
+                    --background: #f00,
+                    --text:       #fff
+                ),
+                --default: (
+                    --background: #ddd,
+                    --text:       #000
+                )
+            )
+        );
+
+        @include assert-equal(ig-props-save($map), null, 'Save default tree');
+
+        @include assert-equal(ig-props-get-native(--background),                        var(--background),                      'Get --background');
+        @include assert-equal(ig-props-get-native(--buttons --primary --text),          var(--buttons--primary--text),          'Get --buttons --primary --text');
+        @include assert-equal(ig-props-get-native(--buttons --secondary --text, false), var(--buttons--secondary--text, false), 'Get --buttons --secondary --text with default');
 
         @include assert-equal(ig-props-delete(), null, 'Delete default tree');
     }

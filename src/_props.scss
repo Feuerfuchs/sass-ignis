@@ -49,6 +49,10 @@ $ig-props-trees: ();
 @function ig-props-save($map, $tree: $ig-props-default-tree, $merge: false) {
     $prop-map: null;
 
+    @if not ig-props-validate($map) {
+        @error 'Property tree keys must start with two dashes (--).';
+    }
+
     @if map-has-key($ig-props-trees, $tree) {
         @if $merge {
             $map: ig-map-merge-recursive(map-get($ig-props-trees, $tree), $map);
@@ -125,4 +129,75 @@ $ig-props-trees: ();
     }
 
     @return $prop-value;
+}
+
+/// 
+/// Generate a var() function call to get native CSS custom property.
+///
+/// @param {string | list} $key            - Key of the property to read. If this is a list of keys, the map will be traversed in that order.
+/// @param {any}           $default [null] - Default value to return of no match was found.
+///
+/// @return {string} var()
+///
+@function ig-props-get-native($key, $default: null) {
+    $native-var: '';
+
+    @if type-of($key) == list {
+        @each $subkey in $key {
+            $native-var: $native-var + $subkey;
+        }
+    } @else {
+        $native-var: $key;
+    }
+
+    @if $default == null {
+        @return var(#{$native-var});
+    } @else {
+        @return var(#{$native-var}, #{$default});
+    }
+}
+
+/// 
+/// Generate assignments for native CSS custom properties with the values from the specified tree.
+///
+/// @param {string} $tree [$ig-props-default-tree] - ID of the property tree to use
+///
+@mixin ig-props-assign-native($tree: $ig-props-default-tree) {
+    $prop-map: ig-props-get-all($tree);
+
+    @include ig-props-assign-native-internal($prop-map);
+}
+
+///
+/// @access private
+///
+@mixin ig-props-assign-native-internal($map, $prefix: '') {
+    @each $key, $value in $map {
+        @if type-of($value) != map {
+            #{$prefix + $key}: #{$value};
+        } @else {
+            @include ig-props-assign-native-internal($value, $prefix + $key);
+        }
+    }
+}
+
+/// 
+/// Validate property names.
+///
+/// @access private
+///
+@function ig-props-validate($map) {
+    @each $key, $value in $map {
+        @if str-index($key, '--') != 1 {
+            @return false;
+        }
+
+        @if type-of($value) == map {
+            @if not ig-props-validate($value) {
+                @return false;
+            }
+        }
+    }
+
+    @return true;
 }
