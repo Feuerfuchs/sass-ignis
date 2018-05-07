@@ -1,0 +1,16 @@
+////
+/// @group BEM
+///
+/// @access public
+////
+
+@if $ig-bem-debug {
+    @each $type, $color in $ig-bem-debug-colors {
+        $namespace: map-get($ig-bem-namespaces, $type);
+
+        [class^='#{$namespace}-'],
+        [class*=' #{$namespace}-'] {
+            outline: 5px solid $color;
+        }
+    }
+}

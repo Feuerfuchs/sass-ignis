@@ -57,5 +57,6 @@
 @import 'bem/state';
 @import 'bem/theme';
 @import 'bem/multi';
+@import 'bem/debug';
 
 @include ig-context-stack-create($ig-bem-context-id);

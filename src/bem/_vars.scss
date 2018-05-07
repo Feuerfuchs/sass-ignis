@@ -86,3 +86,23 @@ $ig-bem-element-nesting-policy: 'allow' !default;
 /// @type string
 ///
 $ig-bem-context-id: 'bem' !default;
+
+///
+/// Debug mode.
+///
+/// @type bool
+///
+$ig-bem-debug: false !default;
+
+///
+/// Colors assigned to namespaces.
+///
+/// @type map
+///
+$ig-bem-debug-colors: (
+    object:    #ffa500,
+    component: #00f,
+    layout:    #ff0,
+    utility:   #008000,
+    hack:      #f00
+) !default;
