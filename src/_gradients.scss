@@ -5,7 +5,7 @@
 /// colors. This is especially apparent if you, for example, use a strong fade-out gradient to make
 /// text in front of a background more readable.
 ///
-/// The function in this file generates smoother gradients by using an easing function of the user's
+/// The function in this file generates smoother gradients by using easing functions of the user's
 /// choice.
 /// It's essentially a more flexible alternative to the PostCSS plugin "PostCSS Easing Gradients":
 /// https://github.com/larsenwork/postcss-easing-gradients
@@ -17,7 +17,7 @@
 
 ///
 /// Number of intermediate color stops generated to achieve easing.
-/// A higher value results in better quality, but also much more code.
+/// A higher value results in better quality, but also much more generated code.
 ///
 /// @type number
 ///
@@ -25,19 +25,19 @@ $ig-easing-gradient-steps: 10 !default;
 
 /// 
 /// Generate a new easing background gradient.
-/// This function is intended to be as similar as possible to CSS' built-in linear-gradient and radial-gradient,
-/// without losing on flexibility. The only major drawback of this function is that only two colors can be used.
+/// This function is intended to be as similar as possible to the newly proposed syntax for
+/// linear-gradient and radial-gradient which includes easing hints.
 ///
-/// @param {string}       $type                - Either 'linear' or 'radial', which means the gradient will be either a linear-gradient or a radial-gradient.
-/// @param {string}       $easing              - Easing function to use. For the integrated easing functions, you may leave out the "ig-ease-" prefix.
-/// @param {string}       $dir                 - The direction of the gradient. Depending on $type, this value must be a valid direction for linear-gradient or radial-gradient.
-/// @param {color | list} $start               - The start color. You may change the start position (default: 0) to another value by passing a list instead, with the first item being the color and the second item being the position.
-/// @param {color | list} $stop                - The stop color. You may change the stop position (default: 100%) to another value by passing a list instead, with the first item being the color and the second item being the position.
-/// @param {string}       $pos-template [null] - The template string for the position value of each step, where each instance of a certain substring (can't note it here because it breaks SassDoc, so see example below) is replaced with the percentage (between 0 and 1 inclusive) of the intermediate position. This is useful if you want to use complex positions with calc() that can't be automatically interpolated.
+/// @param {string}       $type  - Either 'linear' or 'radial', which means the gradient will be either a linear-gradient or a radial-gradient.
+/// @param {string}       $dir   - The direction of the gradient. Depending on $type, this value must be a valid direction for linear-gradient or radial-gradient.
+/// @param {color | list} $stop  - A color stop as used for linear-gradient or radial-gradient.
+/// @param {arglist}      $stops - More color stops as used for linear-gradient or radial-gradient. Between two color stops, you may also define an easing hint such as `ease-in-out`, `cubic-bezier 0.42 0 0.58 1`, `steps 3 jump-end`, and so on.
 ///
 /// @return {string} A linear-gradient or radial-gradient with an alternative transitioning behavior.
 ///
 /// @throw If $type is invalid
+///
+/// @link https://github.com/w3c/csswg-drafts/issues/1332 The new CSSWG proposal
 ///
 /// @example scss - A smoother linear gradient
 ///   .background {
