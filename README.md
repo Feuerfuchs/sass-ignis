@@ -10,7 +10,7 @@ Its main feature is a **[BEM system](#bem-system)**, though it also includes som
 - [Modular scales](#modular-scales)
 
 All features are explained in greater detail in the [Wiki](https://github.com/Feuerfuchs/sass-ignis/wiki).  
-For thorough explanations about single mixins, functions and variables, check the [SassDoc documentation](https://ignis-doc.feuerfuchs.eu/).  
+For thorough explanations about single mixins, functions and variables, check the [SassDoc documentation](https://feuerfuchs.github.io/sass-ignis/).  
 The rest of this document is a quick overview over what Ignis has to offer.
 
 ## Getting started

@@ -1,4 +1,5 @@
 node_modules
 sassdoc
+.sassdoc
 test/**/*.css
 yarn-error.log

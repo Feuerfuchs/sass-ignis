@@ -3190,6 +3190,10 @@ sassdoc@^2.5.0:
     vinyl-source-stream "^1.0.0"
     vinyl-string "^1.0.2"
 
+sassdocify@^0.3.4:
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/sassdocify/-/sassdocify-0.3.4.tgz#d965444d1ac90ad9ec98f55d85644bb6909c7f12"
+
 sax@^1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
