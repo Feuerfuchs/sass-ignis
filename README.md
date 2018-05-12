@@ -50,6 +50,10 @@ The following npm scripts are available:
 - `doc`: Generate the SassDoc documentation with [sassdoc](http://sassdoc.com/).
 - `test`: Run unit tests with [sass-true](https://www.npmjs.com/package/sass-true) and [Mocha](https://mochajs.org/).
 
+## Changelog
+
+[Changelog](https://github.com/Feuerfuchs/sass-ignis/blob/main/CHANGELOG.md)
+
 ## Known issues
 
 Check out the [issue tracker](https://github.com/Feuerfuchs/sass-ignis/issues).
