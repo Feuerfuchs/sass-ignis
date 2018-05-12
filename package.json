@@ -1,6 +1,6 @@
 {
 	"name": "sass-ignis",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"author": "Feuerfuchs <npm@feuerfuchs.eu> (feuerfuchs.eu)",
 	"license": "MIT",
 	"description": "A mixin-based Sass framework that makes it easier to work with BEM, organize variables and more.",
