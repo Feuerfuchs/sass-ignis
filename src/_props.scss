@@ -178,7 +178,7 @@ $ig-props-trees: ();
 /// @param {string} $tree [$ig-props-default-tree] - ID of the property tree to use
 /// @param {string} $root [null]                   - Sub-tree to use for assignment
 ///
-@mixin ig-props-assign-native($tree: $ig-props-default-tree, $root: null) {
+@mixin ig-props-assign-native($tree: $ig-props-default-tree, $root: null, $skip: ()) {
     $map: null;
 
     @if $root == null {
@@ -186,6 +186,8 @@ $ig-props-trees: ();
     } @else {
         $map: ig-props-get($root, $tree);
     }
+
+    $map: map-remove($map, $skip...);
 
     @include ig-props-assign-native-internal($map);
 }
