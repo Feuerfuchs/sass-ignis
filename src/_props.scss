@@ -145,11 +145,16 @@ $ig-props-trees: ();
 /// Generate a var() function call to get native CSS custom property.
 ///
 /// @param {string | list} $key            - Key of the property to read. If this is a list of keys, the map will be traversed in that order.
+/// @param {string | null} $tree    [null] - Optional tree to check if the property actually exists.
 /// @param {any}           $default [null] - Default value to return of no match was found.
 ///
 /// @return {string} var()
 ///
-@function ig-props-get-native($key, $default: null) {
+@function ig-props-get-native($key, $tree: null, $default: null) {
+    @if $tree != null {
+        $noop: ig-props-get($key, $tree, $default);
+    }
+
     $native-var: '';
 
     @if type-of($key) == list {
