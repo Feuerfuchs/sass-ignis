@@ -139,7 +139,7 @@
     }
 
     @include it('Native assignment') {
-        @include assert {
+        @include assert('Simple') {
             @include output {
                 $map: (
                     --background: #fff,
@@ -172,6 +172,36 @@
                 --buttons--default--text:       #000;
             }
         }
+
+        @include assert('Filtered') {
+            @include output {
+                $map: (
+                    --background: #fff,
+                    --text:       #000,
+                    --buttons: (
+                        --primary: (
+                            --background: #f00,
+                            --text:       #fff
+                        ),
+                        --default: (
+                            --background: #ddd,
+                            --text:       #000
+                        )
+                    )
+                );
+
+                @include ig-props-save($map);
+
+                @include ig-props-assign-native($skip: --buttons);
+
+                @include ig-props-delete;
+            }
+
+            @include expect {
+                --background: #fff;
+                --text:       #000;
+            }
+        }
     }
 
     @include it('Native get') {
@@ -192,9 +222,9 @@
 
         @include assert-equal(ig-props-save($map), null, 'Save default tree');
 
-        @include assert-equal(ig-props-get-native(--background),                        var(--background),                      'Get --background');
-        @include assert-equal(ig-props-get-native(--buttons --primary --text),          var(--buttons--primary--text),          'Get --buttons --primary --text');
-        @include assert-equal(ig-props-get-native(--buttons --secondary --text, false), var(--buttons--secondary--text, false), 'Get --buttons --secondary --text with default');
+        @include assert-equal(ig-props-get-native(--background),                                  var(--background),                      'Get --background');
+        @include assert-equal(ig-props-get-native(--buttons --primary --text),                    var(--buttons--primary--text),          'Get --buttons --primary --text');
+        @include assert-equal(ig-props-get-native(--buttons --secondary --text, $default: false), var(--buttons--secondary--text, false), 'Get --buttons --secondary --text with default');
 
         @include assert-equal(ig-props-delete(), null, 'Delete default tree');
     }
