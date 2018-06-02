@@ -25,6 +25,13 @@
 ///
 $ig-fluid-support-named-viewports: true !default;
 
+///
+/// Context ID used for fluid environment-related mixins.
+///
+/// @type string
+///
+$ig-fluid-context-id: 'fluid' !default;
+
 /// 
 /// Scale a property uniformly between a specific set of target viewports / values.
 ///
@@ -88,74 +95,154 @@ $ig-fluid-support-named-viewports: true !default;
 ///   }
 ///
 @mixin ig-fluid-property($props, $fluid-map) {
-    @if length($fluid-map) <= 1 {
-        @error '$fluid-map must contain at least two viewports.';
+    @include ig-fluid-env(map-keys($fluid-map)...) {
+        @if type-of($props) == list {
+            @each $prop in $props {
+                #{$prop}: ig-fluid-set(map-values($fluid-map)...);
+            }
+        } @else {
+            #{$props}: ig-fluid-set(map-values($fluid-map)...);
+        }
+    }
+}
+
+/// 
+/// Create a new fluid environment by specifying a set of viewports.
+/// Inside a fluid environment, use the ig-fluid-set function to make a property scale automatically.
+///
+/// @param {list} $viewports - Viewports sorted in ascending order
+///
+/// @content
+///
+/// @see {function} ig-fluid-set
+///
+/// @example scss - Responsive font-size between 2 viewports
+///   .something {
+///     @include ig-fluid-env(320px, 720px) {
+///       font-size: ig-fluid-set(20px, 30px);
+///     }
+///   }
+///   
+///   // Generates:
+///   
+///   @media (min-width: 320px) and (max-width: 720px) {
+///     .something {
+///       font-size: calc(20px + 10 * ((100vw - 20px) / 400));
+///     }
+///   }
+///   
+///   @media (max-width: 320px) {
+///     .something {
+///       font-size: 20px;
+///     }
+///   }
+///   
+///   @media (min-width: 720px) {
+///     .something {
+///       font-size: 30px;
+///     }
+///   }
+///
+@mixin ig-fluid-env($viewports...) {
+    @if length($viewports) <= 1 {
+        @error '$viewports must contain at least two viewports.';
     }
 
-    $new-fluid-map: ();
+    $new-viewports: ();
 
-    @each $key, $value in $fluid-map {
+    @each $viewport in $viewports {
         @if $ig-fluid-support-named-viewports and global-variable-exists(breakpoints) {
-            @if map-has-key($breakpoints, $key) {
-                $key: map-get($breakpoints, $key);
+            @if map-has-key($breakpoints, $viewport) {
+                $viewport: map-get($breakpoints, $viewport);
             }
         }
 
-        @if (type-of($key) != number) or unitless($key) {
-            @error '$fluid-map contains invalid viewports.';
+        @if (type-of($viewport) != number) or unitless($viewport) {
+            @error '$viewports contains invalid viewports.';
         }
 
-        $new-fluid-map: map-merge($new-fluid-map, ($key: $value));
+        $new-viewports: append($new-viewports, $viewport);
     }
 
-    $fluid-map: $new-fluid-map;
-    $keys:      ig-quicksort(map-keys($fluid-map));
+    $viewports: ig-quicksort($new-viewports);
 
-    @for $i from 1 to length($keys) {
-        $prev-key: nth($keys, $i);
-        $next-key: nth($keys, $i + 1);
-
-        $prev-value: map-get($fluid-map, $prev-key);
-        $next-value: map-get($fluid-map, $next-key);
-
-        $calc: ig-fluid-property-calc($prev-value, $next-value, $prev-key, $next-key);
-
-        @media (min-width: $prev-key) and (max-width: $next-key) {
-            @if type-of($props) == list {
-                @each $prop in $props {
-                    #{$prop}: $calc;
-                }
-            } @else {
-                #{$props}: $calc;
-            }
-        }
+    @if $new-viewports != $viewports {
+        @error '$viewports was not sorted in ascending order.';
     }
 
-    $first-key: nth($keys, 1);
-    $last-key:  nth($keys, length($keys));
+    @for $i from 1 to length($viewports) {
+        $prev-vp: nth($viewports, $i);
+        $next-vp: nth($viewports, $i + 1);
 
-    @media (max-width: $first-key) {
-        $val: map-get($fluid-map, $first-key);
+        @media (min-width: $prev-vp) and (max-width: $next-vp) {
+            @include ig-context-push($ig-fluid-context-id, 'env', (
+                    'viewports': $viewports,
+                    'mode':      transition,
+                    'index':     $i
+            ));
 
-        @if type-of($props) == list {
-            @each $prop in $props {
-                #{$prop}: $val;
-            }
-        } @else {
-            #{$props}: $val;
+            @content;
+
+            @include ig-context-pop($ig-fluid-context-id);
         }
     }
 
-    @media (min-width: $last-key) {
-        $val: map-get($fluid-map, $last-key);
+    $first-vp: nth($viewports, 1);
+    $last-vp:  nth($viewports, length($viewports));
 
-        @if type-of($props) == list {
-            @each $prop in $props {
-                #{$prop}: $val;
-            }
-        } @else {
-            #{$props}: $val;
-        }
+    @media (max-width: $first-vp) {
+        @include ig-context-push($ig-fluid-context-id, 'env', (
+                'viewports': $viewports,
+                'mode':      first
+        ));
+
+        @content;
+
+        @include ig-context-pop($ig-fluid-context-id);
+    }
+
+    @media (min-width: $last-vp) {
+        @include ig-context-push($ig-fluid-context-id, 'env', (
+                'viewports': $viewports,
+                'mode':      last
+        ));
+
+        @content;
+
+        @include ig-context-pop($ig-fluid-context-id);
+    }
+}
+
+///
+/// Make a property scale automatically inside a fluid environment.
+///
+/// @param {list} $values - Value for each viewport in the fluid environment. The first value will be used for the first viewport, the second value for the second viewport, and so on.
+/// 
+/// @return {number|string}
+///
+@function ig-fluid-set($values...) {
+    $noop: ig-context-assert-stack-must-contain($ig-fluid-context-id, 'env');
+
+    $data:      nth(ig-context-get($ig-fluid-context-id, 'env'), 2);
+    $viewports: map-get($data, 'viewports');
+    $mode:      map-get($data, 'mode');
+
+    @if length($values) != length($viewports) {
+        @error '$values must contain the same number of items as the fluid environment\'s $viewports.';
+    }
+
+    @if $mode == first {
+        @return nth($values, 1);
+    } @else if $mode == last {
+        @return nth($values, length($values));
+    } @else {
+        $index:      map-get($data, 'index');
+        $prev-vp:    nth($viewports, $index);
+        $next-vp:    nth($viewports, $index + 1);
+        $prev-value: nth($values, $index);
+        $next-value: nth($values, $index + 1);
+
+        @return ig-fluid-property-calc($prev-value, $next-value, $prev-vp, $next-vp);
     }
 }
 
@@ -212,3 +299,5 @@ $ig-fluid-support-named-viewports: true !default;
 
     @return calc(#{$min-value} + #{$value-diff} * ((100vw - #{$min-width}) / #{$width-diff}));
 }
+
+@include ig-context-stack-create($ig-fluid-context-id);
