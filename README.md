@@ -6,7 +6,7 @@ Its main feature is a **[BEM system](#bem-system)**, though it also includes som
 - [Easing background gradients](#easing-background-gradients)
 - [Context stacks](#context-stacks): A temporary data storage
 - [Property trees](#property-trees): A persistent data storage
-- [Fluid properties](#fluid-properties): A generalization of fluid typography
+- [Responsive properties](#responsive-properties): A generalization of responsive typography
 - [Modular scales](#modular-scales)
 
 All features are explained in greater detail in the [Wiki](https://github.com/Feuerfuchs/sass-ignis/wiki).  
@@ -33,7 +33,7 @@ There are, however, shorter versions of many mixins and functions available (ref
 Just import one of these files to use a certain set of shortcodes:
 
 - `sass-ignis/src/bem-shortcodes`: BEM
-- `sass-ignis/src/fluid-shortcodes`: Fluid properties
+- `sass-ignis/src/responsive-shortcodes`: Responsive properties
 - `sass-ignis/src/harmony-shortcodes`: Modular scales
 
 **Note:** If the 'node_modules' folder isn't a search path for Sass imports, you have to prefix your imports with the path to 'node_modules'.
@@ -260,14 +260,14 @@ a {
 }
 ```
 
-### Fluid properties
+### Responsive properties
 
-[Fluid typography](https://www.smashingmagazine.com/2016/05/fluid-typography/) is a technique where font sizes dynamically respond to the viewport size using viewport units like `vw`, `vh` and so on.
+[Fluid typography](https://css-tricks.com/snippets/css/fluid-typography/) is a technique where font sizes dynamically respond to the viewport size using viewport units like `vw`, `vh` and so on.
 Ignis provides mixins that can apply this concept to any property that accepts a numeric input.
 
 ```scss
 .title {
-    @include ig-fluid-property(padding, ( 20rem: 2.1rem, 40rem: 2.6rem, 60rem: 3.5rem ));
+    @include ig-responsive-property(padding, ( 20rem: 2.1rem, 40rem: 2.6rem, 60rem: 3.5rem ));
 }
 ```
 
@@ -280,7 +280,7 @@ So instead of the example above, you could also use something like this:
 
 ```scss
 .title {
-    @include ig-fluid-property(padding, ( phone: 2.1rem, tablet: 2.6rem, desktop: 3.5rem ));
+    @include ig-responsive-property(padding, ( phone: 2.1rem, tablet: 2.6rem, desktop: 3.5rem ));
 }
 ```
 
@@ -309,21 +309,21 @@ h3 {
 }
 ```
 
-Combined with Ignis' fluid properties:
+Combined with Ignis' responsive properties:
 
 ```scss
-$fluid-mod-scale: (
+$responsive-mod-scale: (
     320px: (1rem 2rem, 1.1),
     640px: (1rem 2rem, 1.2)
 );
 
 h1 {
-    @include ig-fluid-modular-scale(font-size, 3, $fluid-mod-scale);
+    @include ig-responsive-modular-scale(font-size, 3, $responsive-mod-scale);
 }
 h2 {
-    @include ig-fluid-modular-scale(font-size, 2, $fluid-mod-scale);
+    @include ig-responsive-modular-scale(font-size, 2, $responsive-mod-scale);
 }
 h3 {
-    @include ig-fluid-modular-scale(font-size, 1, $fluid-mod-scale);
+    @include ig-responsive-modular-scale(font-size, 1, $responsive-mod-scale);
 }
 ```

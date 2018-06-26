@@ -21,15 +21,15 @@
 }
 
 ///
-/// @alias ig-fluid-modular-scale
+/// @alias ig-responsive-modular-scale
 ///
-@mixin fluid-modular-scale($prop, $times, $fluid-map) {
-    @include ig-fluid-modular-scale($prop, $times, $fluid-map);
+@mixin responsive-modular-scale($prop, $times, $responsive-map) {
+    @include ig-responsive-modular-scale($prop, $times, $responsive-map);
 }
 
 ///
-/// @alias fluid-modular-scale
+/// @alias responsive-modular-scale
 ///
-@mixin fluid-ms($prop, $times, $fluid-map) {
-    @include fluid-modular-scale($prop, $times, $fluid-map);
+@mixin responsive-ms($prop, $times, $responsive-map) {
+    @include responsive-modular-scale($prop, $times, $responsive-map);
 }

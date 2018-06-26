@@ -54,11 +54,13 @@
 }
 
 ///
-/// Combine fluid properties with modular scales to achieve fluid modular scales.
+/// Combine responsive properties with modular scales to achieve responsive modular scales.
 ///
-/// @param {string | list} $props - Property or list of properties to set
-/// @param {number} $times        - Number of iterations. See ig-harmony-modular-scale for more information.
-/// @param {number} $fluid-map    - A map with keys = viewports and values = modular scales
+/// @param {string | list} $props          - Property or list of properties to set
+/// @param {number}        $times          - Number of iterations. See ig-harmony-modular-scale for more information.
+/// @param {number}        $responsive-map - A map with keys = viewports and values = modular scales
+/// @param {bool}          $fluid [true]   - If enabled, property values will smoothly transition from one viewport to the next
+
 ///
 /// @see {function} ig-harmony-modular-scale
 ///
@@ -69,25 +71,25 @@
 ///   );
 ///
 ///   h1 {
-///     @include ig-fluid-modular-scale(font-size, 3, $ms);
+///     @include ig-responsive-modular-scale(font-size, 3, $ms);
 ///   }
 ///
 ///   h2 {
-///     @include ig-fluid-modular-scale(font-size, 2, $ms);
+///     @include ig-responsive-modular-scale(font-size, 2, $ms);
 ///   }
 ///
 ///   h3 {
-///     @include ig-fluid-modular-scale(font-size, 1, $ms);
+///     @include ig-responsive-modular-scale(font-size, 1, $ms);
 ///   }
 ///
-@mixin ig-fluid-modular-scale($props, $times, $fluid-map) {
+@mixin ig-responsive-modular-scale($props, $times, $responsive-map, $fluid: true) {
     $new-map: ();
 
-    @each $key, $value in $fluid-map {
+    @each $key, $value in $responsive-map {
         $new-map: map-merge($new-map, (
                 $key: ig-harmony-modular-scale($times, $value...)
         ));
     }
 
-    @include ig-fluid-property($props, $new-map);
+    @include ig-responsive-property($props, $new-map, $fluid);
 }

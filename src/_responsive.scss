@@ -1,5 +1,5 @@
 ////
-/// Fluid properties.
+/// responsive properties.
 ///
 /// The mixins and functions in this file allow you to scale any px- or rem-based value depending on
 /// the available viewport width. One popular use case is the dynamic scaling of fonts.
@@ -23,24 +23,25 @@
 ///
 /// @type bool
 ///
-$ig-fluid-support-named-viewports: true !default;
+$ig-responsive-support-named-viewports: true !default;
 
 ///
-/// Context ID used for fluid environment-related mixins.
+/// Context ID used for responsive environment-related mixins.
 ///
 /// @type string
 ///
-$ig-fluid-context-id: 'fluid' !default;
+$ig-responsive-context-id: 'responsive' !default;
 
 /// 
 /// Scale a property uniformly between a specific set of target viewports / values.
 ///
-/// @param {string | list} $props     - Property or list of properties to set
-/// @param {number}        $fluid-map - A map with keys = viewports and values = target value
+/// @param {string | list} $props          - Property or list of properties to set
+/// @param {number}        $responsive-map - A map with keys = viewports and values = target value
+/// @param {bool}          $fluid [true]   - If enabled, property values will smoothly transition from one viewport to the next
 ///
 /// @example scss - Responsive font-size between 2 viewports
 ///   .something {
-///     @include ig-fluid-property(font-size, ( 320px: 20px, 720px: 30px ));
+///     @include ig-responsive-property(font-size, ( 320px: 20px, 720px: 30px ));
 ///   }
 ///   
 ///   // Generates:
@@ -65,7 +66,7 @@ $ig-fluid-context-id: 'fluid' !default;
 ///
 /// @example scss - Responsive font-size between 3 viewports
 ///   .something {
-///     @include ig-fluid-property(font-size, ( 320px: 20px, 720px: 30px, 1280px: 40px ));
+///     @include ig-responsive-property(font-size, ( 320px: 20px, 720px: 30px, 1280px: 40px ));
 ///   }
 ///   
 ///   // Generates:
@@ -94,32 +95,33 @@ $ig-fluid-context-id: 'fluid' !default;
 ///     }
 ///   }
 ///
-@mixin ig-fluid-property($props, $fluid-map) {
-    @include ig-fluid-env(map-keys($fluid-map)...) {
+@mixin ig-responsive-property($props, $responsive-map, $fluid: true) {
+    @include ig-responsive-env(map-keys($responsive-map), $fluid) {
         @if type-of($props) == list {
             @each $prop in $props {
-                #{$prop}: ig-fluid-set(map-values($fluid-map)...);
+                #{$prop}: ig-responsive-set(map-values($responsive-map)...);
             }
         } @else {
-            #{$props}: ig-fluid-set(map-values($fluid-map)...);
+            #{$props}: ig-responsive-set(map-values($responsive-map)...);
         }
     }
 }
 
 /// 
-/// Create a new fluid environment by specifying a set of viewports.
-/// Inside a fluid environment, use the ig-fluid-set function to make a property scale automatically.
+/// Create a new responsive environment by specifying a set of viewports.
+/// Inside a responsive environment, use the ig-responsive-set function to make a property scale automatically.
 ///
-/// @param {list} $viewports - Viewports sorted in ascending order
+/// @param {list} $viewports    - Viewports sorted in ascending order
+/// @param {bool} $fluid [true] - If enabled, property values will smoothly transition from one viewport to the next
 ///
 /// @content
 ///
-/// @see {function} ig-fluid-set
+/// @see {function} ig-responsive-set
 ///
 /// @example scss - Responsive font-size between 2 viewports
 ///   .something {
-///     @include ig-fluid-env(320px, 720px) {
-///       font-size: ig-fluid-set(20px, 30px);
+///     @include ig-responsive-env((320px, 720px)) {
+///       font-size: ig-responsive-set(20px, 30px);
 ///     }
 ///   }
 ///   
@@ -143,7 +145,7 @@ $ig-fluid-context-id: 'fluid' !default;
 ///     }
 ///   }
 ///
-@mixin ig-fluid-env($viewports...) {
+@mixin ig-responsive-env($viewports, $fluid: true) {
     @if length($viewports) <= 1 {
         @error '$viewports must contain at least two viewports.';
     }
@@ -151,7 +153,7 @@ $ig-fluid-context-id: 'fluid' !default;
     $new-viewports: ();
 
     @each $viewport in $viewports {
-        @if $ig-fluid-support-named-viewports and global-variable-exists(breakpoints) {
+        @if $ig-responsive-support-named-viewports and global-variable-exists(breakpoints) {
             @if map-has-key($breakpoints, $viewport) {
                 $viewport: map-get($breakpoints, $viewport);
             }
@@ -170,71 +172,98 @@ $ig-fluid-context-id: 'fluid' !default;
         @error '$viewports was not sorted in ascending order.';
     }
 
-    @for $i from 1 to length($viewports) {
-        $prev-vp: nth($viewports, $i);
-        $next-vp: nth($viewports, $i + 1);
+    @if $fluid {
+        $first-vp: nth($viewports, 1);
+        $last-vp:  nth($viewports, length($viewports));
 
-        @media (min-width: $prev-vp) and (max-width: $next-vp) {
-            @include ig-context-push($ig-fluid-context-id, 'env', (
+        @include ig-context-push($ig-responsive-context-id, 'env', (
+                'viewports': $viewports,
+                'mode':      set,
+                'index':     1
+        ));
+
+        @content;
+
+        @include ig-context-pop($ig-responsive-context-id);
+
+        @for $i from 1 to length($viewports) {
+            $prev-vp: nth($viewports, $i);
+            $next-vp: nth($viewports, $i + 1);
+
+            @media (min-width: $prev-vp) and (max-width: $next-vp) {
+                @include ig-context-push($ig-responsive-context-id, 'env', (
+                        'viewports': $viewports,
+                        'mode':      transition,
+                        'index':     $i
+                ));
+
+                @content;
+
+                @include ig-context-pop($ig-responsive-context-id);
+            }
+        }
+
+        @media (min-width: $last-vp) {
+            @include ig-context-push($ig-responsive-context-id, 'env', (
                     'viewports': $viewports,
-                    'mode':      transition,
-                    'index':     $i
+                    'mode':      set,
+                    'index':     length($viewports)
             ));
 
             @content;
 
-            @include ig-context-pop($ig-fluid-context-id);
+            @include ig-context-pop($ig-responsive-context-id);
         }
-    }
-
-    $first-vp: nth($viewports, 1);
-    $last-vp:  nth($viewports, length($viewports));
-
-    @media (max-width: $first-vp) {
-        @include ig-context-push($ig-fluid-context-id, 'env', (
+    } @else {
+        @include ig-context-push($ig-responsive-context-id, 'env', (
                 'viewports': $viewports,
-                'mode':      first
+                'mode':      set,
+                'index':     1
         ));
 
         @content;
 
-        @include ig-context-pop($ig-fluid-context-id);
-    }
+        @include ig-context-pop($ig-responsive-context-id);
 
-    @media (min-width: $last-vp) {
-        @include ig-context-push($ig-fluid-context-id, 'env', (
-                'viewports': $viewports,
-                'mode':      last
-        ));
+        @for $i from 2 through length($viewports) {
+            $vp: nth($viewports, $i);
 
-        @content;
+            @media (min-width: $vp) {
+                @include ig-context-push($ig-responsive-context-id, 'env', (
+                        'viewports': $viewports,
+                        'mode':      set,
+                        'index':     $i
+                ));
 
-        @include ig-context-pop($ig-fluid-context-id);
+                @content;
+
+                @include ig-context-pop($ig-responsive-context-id);
+            }
+        }
     }
 }
 
 ///
-/// Make a property scale automatically inside a fluid environment.
+/// Make a property scale automatically inside a responsive environment.
 ///
-/// @param {list} $values - Value for each viewport in the fluid environment. The first value will be used for the first viewport, the second value for the second viewport, and so on.
+/// @param {list} $values - Value for each viewport in the responsive environment. The first value will be used for the first viewport, the second value for the second viewport, and so on.
 /// 
 /// @return {number|string}
 ///
-@function ig-fluid-set($values...) {
-    $noop: ig-context-assert-stack-must-contain($ig-fluid-context-id, 'env');
+@function ig-responsive-set($values...) {
+    $noop: ig-context-assert-stack-must-contain($ig-responsive-context-id, 'env');
 
-    $data:      nth(ig-context-get($ig-fluid-context-id, 'env'), 2);
+    $data:      nth(ig-context-get($ig-responsive-context-id, 'env'), 2);
     $viewports: map-get($data, 'viewports');
     $mode:      map-get($data, 'mode');
+    $fluid:     map-get($data, 'fluid');
 
     @if length($values) != length($viewports) {
-        @error '$values must contain the same number of items as the fluid environment\'s $viewports.';
+        @error '$values must contain the same number of items as the responsive environment\'s $viewports.';
     }
 
-    @if $mode == first {
-        @return nth($values, 1);
-    } @else if $mode == last {
-        @return nth($values, length($values));
+    @if $mode == set {
+        @return nth($values, map-get($data, 'index'));
     } @else {
         $index:      map-get($data, 'index');
         $prev-vp:    nth($viewports, $index);
@@ -242,7 +271,7 @@ $ig-fluid-context-id: 'fluid' !default;
         $prev-value: nth($values, $index);
         $next-value: nth($values, $index + 1);
 
-        @return ig-fluid-property-calc($prev-value, $next-value, $prev-vp, $next-vp);
+        @return ig-responsive-fluid-calc($prev-value, $next-value, $prev-vp, $next-vp);
     }
 }
 
@@ -257,7 +286,7 @@ $ig-fluid-context-id: 'fluid' !default;
 ///
 /// @access private
 ///
-@function ig-fluid-property-calc($min-value, $max-value, $min-width, $max-width) {
+@function ig-responsive-fluid-calc($min-value, $max-value, $min-width, $max-width) {
     $value-unit:     unit($min-value);
     $max-value-unit: unit($max-value);
     $width-unit:     unit($min-width);
@@ -300,4 +329,4 @@ $ig-fluid-context-id: 'fluid' !default;
     @return calc(#{$min-value} + #{$value-diff} * ((100vw - #{$min-width}) / #{$width-diff}));
 }
 
-@include ig-context-stack-create($ig-fluid-context-id);
+@include ig-context-stack-create($ig-responsive-context-id);
