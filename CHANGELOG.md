@@ -1,12 +1,14 @@
 # Master
 
+---
+
+# 1.0.3
+
 **Improved:**
 
 - "Fluid properties" are now "Responsive properties"
 - [Responsive properties] Fluidity can be disabled with parameter
 - [Responsive properties] Optimized output
-
----
 
 # 1.0.2
 
