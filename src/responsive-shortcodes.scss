@@ -1,7 +1,7 @@
 ////
 /// Shorter version of the responsive-related mixins. Useful to reduce clutter.
 ///
-/// @group responsive shortcodes
+/// @group Responsive shortcodes
 ///
 /// @access public
 ////
@@ -9,6 +9,6 @@
 ///
 /// @alias ig-responsive-property
 ///
-@mixin responsive($props, $responsive-map) {
-    @include ig-responsive-property($props, $responsive-map);
+@mixin responsive($props, $responsive-map, $fluid: true) {
+    @include ig-responsive-property($props, $responsive-map, $fluid);
 }
