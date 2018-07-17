@@ -262,8 +262,9 @@ a {
 
 ### Responsive properties
 
-[Fluid typography](https://css-tricks.com/snippets/css/fluid-typography/) is a technique where font sizes dynamically respond to the viewport size using viewport units like `vw`, `vh` and so on.
-Ignis provides mixins that can apply this concept to any property that accepts a numeric input.
+Responsive properties allow you to assign values to properties depending on the current viewport width.
+Ignis provides a large number of mixins for this task to cover many use cases.
+The most simple one is the following:
 
 ```scss
 .title {
@@ -275,8 +276,11 @@ The padding will be 2.1rem if the viewport is 20rem wide, 2.6rem if it's 40rem w
 If the viewport is narrower than 20rem, the padding will stick with 2.1rem.
 If the viewport is wider than 60rem, the padding will stick with 3.5rem.
 
-If you use [include-media](https://include-media.com/), this mixin also supports named viewports.
-So instead of the example above, you could also use something like this:
+By default, Ignis will dynamically scale the property value between viewport widths, which is technique known from [fluid typography](https://css-tricks.com/snippets/css/fluid-typography/).
+This behavior can be switched off if it's undesired.
+
+If you use [include-media](https://include-media.com/), all responsive mixins also support named viewports.
+The example above could then be written like this:
 
 ```scss
 .title {
