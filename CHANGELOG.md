@@ -1,5 +1,9 @@
 # Master
 
+**Improved:**
+
+- [Responsive properties] Support vertical viewports
+
 ---
 
 # 1.0.3
