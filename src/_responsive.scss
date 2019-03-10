@@ -35,9 +35,10 @@ $ig-responsive-context-id: 'responsive' !default;
 /// 
 /// Scale a property uniformly between a specific set of target viewports / values.
 ///
-/// @param {string | list} $props          - Property or list of properties to set
-/// @param {number}        $responsive-map - A map with keys = viewports and values = target value
-/// @param {bool}          $fluid [true]   - If enabled, property values will smoothly transition from one viewport to the next
+/// @param {string | list} $props            - Property or list of properties to set
+/// @param {number}        $responsive-map   - A map with keys = viewports and values = target value
+/// @param {bool}          $fluid    [true]  - If enabled, property values will smoothly transition from one viewport to the next
+/// @param {bool}          $vertical [false] - If enabled, property viewport height will be used instead of viewport width
 ///
 /// @example scss - Responsive font-size between 2 viewports
 ///   .something {
@@ -95,14 +96,14 @@ $ig-responsive-context-id: 'responsive' !default;
 ///     }
 ///   }
 ///
-@mixin ig-responsive-property($props, $responsive-map, $fluid: true) {
-    @include ig-responsive-env(map-keys($responsive-map), $fluid) {
+@mixin ig-responsive-property($props, $responsive-map, $fluid: true, $vertical: false) {
+    @include ig-responsive-env(map-keys($responsive-map), $fluid, $vertical) {
         @if type-of($props) == list {
             @each $prop in $props {
-                #{$prop}: ig-responsive-set(map-values($responsive-map)...);
+                #{$prop}: ig-responsive-set(map-values($responsive-map));
             }
         } @else {
-            #{$props}: ig-responsive-set(map-values($responsive-map)...);
+            #{$props}: ig-responsive-set(map-values($responsive-map));
         }
     }
 }
@@ -111,8 +112,9 @@ $ig-responsive-context-id: 'responsive' !default;
 /// Create a new responsive environment by specifying a set of viewports.
 /// Inside a responsive environment, use the ig-responsive-set function to make a property scale automatically.
 ///
-/// @param {list} $viewports    - Viewports sorted in ascending order
-/// @param {bool} $fluid [true] - If enabled, property values will smoothly transition from one viewport to the next
+/// @param {list} $viewports        - Viewports sorted in ascending order
+/// @param {bool} $fluid [true]     - If enabled, property values will smoothly transition from one viewport to the next
+/// @param {bool} $vertical [false] - If enabled, property viewport height will be used instead of viewport width
 ///
 /// @content
 ///
@@ -145,7 +147,7 @@ $ig-responsive-context-id: 'responsive' !default;
 ///     }
 ///   }
 ///
-@mixin ig-responsive-env($viewports, $fluid: true) {
+@mixin ig-responsive-env($viewports, $fluid: true, $vertical: false) {
     @if length($viewports) <= 1 {
         @error '$viewports must contain at least two viewports.';
     }
@@ -179,7 +181,9 @@ $ig-responsive-context-id: 'responsive' !default;
         @include ig-context-push($ig-responsive-context-id, 'env', (
                 'viewports': $viewports,
                 'mode':      set,
-                'index':     1
+                'index':     1,
+                'fluid':     $fluid,
+                'vertical':  $vertical,
         ));
 
         @content;
@@ -190,11 +194,59 @@ $ig-responsive-context-id: 'responsive' !default;
             $prev-vp: nth($viewports, $i);
             $next-vp: nth($viewports, $i + 1);
 
-            @media (min-width: $prev-vp) and (max-width: $next-vp) {
+            @if not $vertical {
+                @media (min-width: $prev-vp) and (max-width: $next-vp) {
+                    @include ig-context-push($ig-responsive-context-id, 'env', (
+                            'viewports': $viewports,
+                            'mode':      transition,
+                            'index':     $i,
+                            'fluid':     $fluid,
+                            'vertical':  $vertical,
+                    ));
+
+                    @content;
+
+                    @include ig-context-pop($ig-responsive-context-id);
+                }
+            } @else {
+                @media (min-height: $prev-vp) and (max-height: $next-vp) {
+                    @include ig-context-push($ig-responsive-context-id, 'env', (
+                            'viewports': $viewports,
+                            'mode':      transition,
+                            'index':     $i,
+                            'fluid':     $fluid,
+                            'vertical':  $vertical,
+                    ));
+
+                    @content;
+
+                    @include ig-context-pop($ig-responsive-context-id);
+                }
+            }
+        }
+
+        @if not $vertical {
+            @media (min-width: $last-vp) {
                 @include ig-context-push($ig-responsive-context-id, 'env', (
                         'viewports': $viewports,
-                        'mode':      transition,
-                        'index':     $i
+                        'mode':      set,
+                        'index':     length($viewports),
+                        'fluid':     $fluid,
+                        'vertical':  $vertical,
+                ));
+
+                @content;
+
+                @include ig-context-pop($ig-responsive-context-id);
+            }
+        } @else {
+            @media (min-height: $last-vp) {
+                @include ig-context-push($ig-responsive-context-id, 'env', (
+                        'viewports': $viewports,
+                        'mode':      set,
+                        'index':     length($viewports),
+                        'fluid':     $fluid,
+                        'vertical':  $vertical,
                 ));
 
                 @content;
@@ -202,23 +254,13 @@ $ig-responsive-context-id: 'responsive' !default;
                 @include ig-context-pop($ig-responsive-context-id);
             }
         }
-
-        @media (min-width: $last-vp) {
-            @include ig-context-push($ig-responsive-context-id, 'env', (
-                    'viewports': $viewports,
-                    'mode':      set,
-                    'index':     length($viewports)
-            ));
-
-            @content;
-
-            @include ig-context-pop($ig-responsive-context-id);
-        }
     } @else {
         @include ig-context-push($ig-responsive-context-id, 'env', (
                 'viewports': $viewports,
                 'mode':      set,
-                'index':     1
+                'index':     1,
+                'fluid':     $fluid,
+                'vertical':  $vertical,
         ));
 
         @content;
@@ -228,16 +270,30 @@ $ig-responsive-context-id: 'responsive' !default;
         @for $i from 2 through length($viewports) {
             $vp: nth($viewports, $i);
 
-            @media (min-width: $vp) {
-                @include ig-context-push($ig-responsive-context-id, 'env', (
-                        'viewports': $viewports,
-                        'mode':      set,
-                        'index':     $i
-                ));
+            @if not $vertical {
+                @media (min-width: $vp) {
+                    @include ig-context-push($ig-responsive-context-id, 'env', (
+                            'viewports': $viewports,
+                            'mode':      set,
+                            'index':     $i
+                    ));
 
-                @content;
+                    @content;
 
-                @include ig-context-pop($ig-responsive-context-id);
+                    @include ig-context-pop($ig-responsive-context-id);
+                }
+            } @else {
+                @media (min-height: $vp) {
+                    @include ig-context-push($ig-responsive-context-id, 'env', (
+                            'viewports': $viewports,
+                            'mode':      set,
+                            'index':     $i
+                    ));
+
+                    @content;
+
+                    @include ig-context-pop($ig-responsive-context-id);
+                }
             }
         }
     }
@@ -250,13 +306,14 @@ $ig-responsive-context-id: 'responsive' !default;
 /// 
 /// @return {number|string}
 ///
-@function ig-responsive-set($values...) {
+@function ig-responsive-set($values, $without-calc: false) {
     $noop: ig-context-assert-stack-must-contain($ig-responsive-context-id, 'env');
 
     $data:      nth(ig-context-get($ig-responsive-context-id, 'env'), 2);
     $viewports: map-get($data, 'viewports');
     $mode:      map-get($data, 'mode');
     $fluid:     map-get($data, 'fluid');
+    $vertical:  map-get($data, 'vertical');
 
     @if length($values) != length($viewports) {
         @error '$values must contain the same number of items as the responsive environment\'s $viewports.';
@@ -271,7 +328,7 @@ $ig-responsive-context-id: 'responsive' !default;
         $prev-value: nth($values, $index);
         $next-value: nth($values, $index + 1);
 
-        @return ig-responsive-fluid-calc($prev-value, $next-value, $prev-vp, $next-vp);
+        @return ig-responsive-fluid-calc($prev-value, $next-value, $prev-vp, $next-vp, $vertical, $without-calc);
     }
 }
 
@@ -279,18 +336,19 @@ $ig-responsive-context-id: 'responsive' !default;
 /// Generate the calc() function that uniformly scales a value from $min-value to $max-value depending
 /// on the viewport width.
 ///
-/// @param {number} $min-value - Minimum value
-/// @param {number} $max-value - Maximum value
-/// @param {number} $min-width - Minimum viewport width
-/// @param {number} $max-width - Maximum viewport width
+/// @param {number} $min-value        - Minimum value
+/// @param {number} $max-value        - Maximum value
+/// @param {number} $min-viewport     - Minimum viewport size
+/// @param {number} $max-viewport     - Maximum viewport size
+/// @param {bool}   $vertical [false] - If enabled, property viewport height will be used instead of viewport width
 ///
 /// @access private
 ///
-@function ig-responsive-fluid-calc($min-value, $max-value, $min-width, $max-width) {
-    $value-unit:     unit($min-value);
-    $max-value-unit: unit($max-value);
-    $width-unit:     unit($min-width);
-    $max-width-unit: unit($max-width);
+@function ig-responsive-fluid-calc($min-value, $max-value, $min-viewport, $max-viewport, $vertical: false, $without-calc: false) {
+    $value-unit:        unit($min-value);
+    $max-value-unit:    unit($max-value);
+    $viewport-unit:     unit($min-viewport);
+    $max-viewport-unit: unit($max-viewport);
 
     @if $min-value == 0 {
         $value-unit: $max-value-unit;
@@ -298,35 +356,47 @@ $ig-responsive-context-id: 'responsive' !default;
     @if $max-value == 0 {
         $max-value-unit: $value-unit;
     }
-    @if $min-width == 0 {
-        $width-unit: $max-width-unit;
+    @if $min-viewport == 0 {
+        $viewport-unit: $max-viewport-unit;
     }
-    @if $max-width == 0 {
-        $max-width-unit: $width-unit;
-    }
-
-    @if ($value-unit != $max-value-unit) or ($width-unit != $max-width-unit) {
-        @error 'Units of $min-value and $max-value, $min-width and $max-width must match.';
+    @if $max-viewport == 0 {
+        $max-viewport-unit: $viewport-unit;
     }
 
-    @if ($value-unit == rem) and ($width-unit == px) {
-        $min-width:  ig-px-to-rem($min-width);
-        $max-width:  ig-px-to-rem($max-width);
-        $width-unit: rem;
-    } @else if ($value-unit == px) and ($width-unit == rem) {
+    @if ($value-unit != $max-value-unit) or ($viewport-unit != $max-viewport-unit) {
+        @error 'Units of $min-value and $max-value, $min-viewport and $max-viewport must match.';
+    }
+
+    @if ($value-unit == rem) and ($viewport-unit == px) {
+        $min-viewport:  ig-px-to-rem($min-viewport);
+        $max-viewport:  ig-px-to-rem($max-viewport);
+        $viewport-unit: rem;
+    } @else if ($value-unit == px) and ($viewport-unit == rem) {
         $min-value:  ig-px-to-rem($min-value);
         $max-value:  ig-px-to-rem($max-value);
         $value-unit: rem;
     }
 
-    @if $value-unit != $width-unit {
+    @if $value-unit != $viewport-unit {
         @error 'This combination of units is not supported.';
     }
 
-    $value-diff: ig-strip-unit($max-value - $min-value);
-    $width-diff: ig-strip-unit($max-width - $min-width);
+    $value-diff:    ig-strip-unit($max-value - $min-value);
+    $viewport-diff: ig-strip-unit($max-viewport - $min-viewport);
 
-    @return calc(#{$min-value} + #{$value-diff} * ((100vw - #{$min-width}) / #{$width-diff}));
+    $calc: '';
+
+    @if not $vertical {
+        $calc: unquote('#{$min-value} + #{$value-diff} * ((100vw - #{$min-viewport}) / #{$viewport-diff})');
+    } @else {
+        $calc: unquote('#{$min-value} + #{$value-diff} * ((100vh - #{$min-viewport}) / #{$viewport-diff})');
+    }
+
+    @if $without-calc {
+        @return $calc;
+    } @else {
+        @return calc(#{$calc});
+    }
 }
 
 @include ig-context-stack-create($ig-responsive-context-id);
